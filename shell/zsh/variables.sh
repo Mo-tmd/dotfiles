@@ -1,4 +1,5 @@
 ## Source common variables
+mkdir -p ~/dump
 File=~/dump/sh_variables_tmp_`uuidgen`
 sed 's/{env_var}/export/g' ~/dotfiles/shell/variables | \
 sed 's/{separator}/=/g'                               | \

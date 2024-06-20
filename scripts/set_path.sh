@@ -7,6 +7,8 @@ AddToPath() {
 }
 
 AddToPath ~/bin
+AddToPath /snap/bin
+AddToPath "${DotFiles}/scripts"
 #AddToPath "$HOME/Path with spaces"
 
 echo $PATH
