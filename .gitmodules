@@ -1,3 +1,6 @@
 [submodule ".tmux"]
 	path = .tmux
 	url = git@github.com:Mo-tmd/.tmux.git
+[submodule "shell/zsh/ohmyzsh"]
+	path = shell/zsh/ohmyzsh
+	url = git@github.com:Mo-tmd/ohmyzsh.git
