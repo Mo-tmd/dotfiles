@@ -388,6 +388,12 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call Tnoremap('<C-^>', '<C-^>')
 
+nnoremap <leader>td :call DotFiles()<CR>
+call Tnoremap('<leader>td', ':call DotFiles()<CR>')
+function! DotFiles()
+    call Terminal('Dotfiles_terminal', 'cd ~/dotfiles')
+endfunction
+
 command! -nargs=? Term call Terminal(<f-args>)
 function! Terminal(...)
     if len(a:000) > 0
