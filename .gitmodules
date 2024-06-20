@@ -4,3 +4,6 @@
 [submodule "shell/zsh/ohmyzsh"]
 	path = shell/zsh/ohmyzsh
 	url = git@github.com:Mo-tmd/ohmyzsh.git
+[submodule "shell/zsh/ohmyzsh_custom/plugins/zsh-syntax-highlighting"]
+	path = shell/zsh/ohmyzsh_custom/plugins/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
