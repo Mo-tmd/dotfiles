@@ -1,9 +1,11 @@
+################################################################################
+# Set DISPLAY
+################################################################################
 if [[ -n "${OldDisplay}" || $- != *i* ]]; then
     ## Either DISPLAY has already been set to Citrix, or
     ## running a non-interactive shell. Do nothing
     :
 else
-    echo 'mo zsh, setting DISPLAY'
     ## This is the first login shell. i.e. not a subshell
     ## Set OldDisplay to DISPLAY (probably X forwarding)
     if [[ -n "${DISPLAY}" ]]; then
@@ -31,13 +33,23 @@ else
     ## Finally, set DISPLAY to Citrix by reading the file.
     if [[ -e $CitrixDisplayFile ]]; then
         export DISPLAY=`cat ~/citrix_displays/$HOST`
-    else
-        echo "Error, $CitrixDisplayFile not found"
     fi
     unset CitrixDisplayFile
 fi
 
-ThisDir=$0:A:h
+################################################################################
+# Source rc_common.sh if running a non-interactive shell.
+################################################################################
+## Figure out ThisDir. Stolen from https://stackoverflow.com/a/26492107
+SOURCE=${(%):-%N}
+while [ -h "$SOURCE" ]; do
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+ThisDir="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+unset SOURCE
+
 if [[ $- == *i* ]]; then
     # Interactive shell, do nothing (continue)
     :
@@ -56,6 +68,10 @@ ZSH_COMPDUMP=~/.zcompdump
 # Disables some check that shows strange errors.
 export ZSH_DISABLE_COMPFIX="true"
 
+#function ExtraPrompt() {
+#    echo "hello"
+#}
+
 # Used by zsh-syntax-highlighting plugin.
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[default]='fg=105'
@@ -70,7 +86,7 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=105,underline'
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/user/dotfiles/shell/zsh/ohmyzsh"
+export ZSH="${ThisDir}/ohmyzsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -131,7 +147,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM=/home/user/dotfiles/shell/zsh/ohmyzsh_custom
+ZSH_CUSTOM="${ThisDir}/ohmyzsh_custom"
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -173,6 +189,7 @@ source $ZSH/oh-my-zsh.sh
 ################################################################################
 ################################################################################
 source $ThisDir/rc_common.sh
+unset ThisDir
 
 unset RPS1
 

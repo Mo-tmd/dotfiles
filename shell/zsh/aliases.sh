@@ -1,4 +1,5 @@
 ## Source common aliases
+mkdir -p ~/dump
 File=~/dump/sh_aliases_tmp_`uuidgen`
 sed 's/{separator}/=/g' "$DotFiles"/shell/aliases > $File
 source $File

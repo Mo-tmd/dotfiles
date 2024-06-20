@@ -21,7 +21,7 @@ function afmagic_dashes {
 # primary prompt: dashed separator, extra user prompt, and current dir
 PS1="${FG[237]}\${(l.\$(afmagic_dashes)..-.)}%{$reset_color%}
 "
-if [[ -n "$(ExtraPrompt)" ]]; then
+if type 'ExtraPrompt' 2>/dev/null | grep -q 'function'; then
   PS1+="${FG[240]}\$(ExtraPrompt)%{$reset_color%}
 "
 fi
