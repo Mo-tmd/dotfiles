@@ -1,0 +1,36 @@
+################################################################################
+# Git
+################################################################################
+alias gs{separator}'git status'
+alias gd{separator}'git diff'
+alias ga{separator}'git add'
+alias gc{separator}'git commit -m'
+alias push{separator}'git push'
+alias pull{separator}'git pull'
+alias checkout{separator}'git checkout'
+alias gr{separator}'git revert'
+alias rh{separator}'git reset --hard'
+alias rs{separator}'git reset --soft'
+alias hd{separator}'git reset --hard HEAD'
+alias svg{separator}'git add -u; git commit -m "Save game"'
+
+################################################################################
+# Tmux
+################################################################################
+#alias tmn: implemented in "user"
+alias tma{separator}'tmux attach -t'
+alias tml{separator}'tmux list-sessions'
+alias tmkk{separator}'tmux_kill_session.py'
+
+################################################################################
+# Misc
+################################################################################
+alias search{separator}'find . -iname'
+alias searchin{separator}'grep -irn . -e'
+alias untar{separator}'tar -xvf'
+alias ll{separator}'ls -lhA'
+
+alias path{separator}'echo $PATH | sed "s/:/\n/g"'
+alias windowpid{separator}'xprop _NET_WM_PID | sed "'"s/_NET_WM_PID(CARDINAL) = //"'"'
+alias suicide{separator}'pkill -u $USER'
+
