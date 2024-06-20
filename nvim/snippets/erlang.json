@@ -1,0 +1,131 @@
+{
+    "dbg": {
+        "prefix": ["dbgg"],
+        "body": ["io:format(\"~n~n~n~n~n~nmo ~p:~p~n~n${1:~p}~n~n~n~n~n~n~n~n\", [?MODULE,?LINE,${2:hello}])${3:,}"],
+        "description": "A print out with a lot of line breaks to make it easy to find in large logs"
+    },
+    "todo": {
+        "prefix": ["todo"],
+        "body": ["%% TODO ${1:mo this review} - ${2:.}"],
+        "description": "TODO comment"
+    },
+    "case": {
+        "prefix": ["case"],
+        "body": [
+            "case ${1:SomeVariable} of",
+            "    ${2:true} ->",
+            "        ${3:sth};",
+            "    ${4:false} ->",
+            "        ${5:something_else}",
+            "end${6:,}"
+        ],
+        "description": "Case statement"
+    },
+    "List comprehension": {
+        "prefix": ["comp"],
+        "body": ["[${1:Something} || ${2:Element} <- ${3:List}]${4:,}"],
+        "description": "List comprehensions"
+    },
+    "Lists foreach": {
+        "prefix": ["listsforeach"],
+        "body": [
+            "lists:foreach(fun(${1:Element}) ->",
+            "                      ${2:MappedElement}",
+            "              end,",
+            "              ${3:List}",
+            "             )${4:.}"
+        ],
+        "description": "lists:foreach"
+    },
+    "Lists map": {
+        "prefix": ["listsmap"],
+        "body": [
+            "lists:map(fun(${1:Element}) ->",
+            "                  ${2:MappedElement}",
+            "          end,",
+            "          ${3:List}",
+            "         )${4:.}"
+        ],
+        "description": "lists:map"
+    },
+    "Lists filter": {
+        "prefix": ["listsfilter"],
+        "body": [
+            "lists:filter(fun(${1:Element}) ->",
+            "                     ${2:sth}",
+            "             end,",
+            "             ${3:List}",
+            "            )${4:.}"
+        ],
+        "description": "lists:filter"
+    },
+    "Lists filtermap": {
+        "prefix": ["listsfiltermap"],
+        "body": [
+            "lists:filtermap(fun(${1:Element}) ->",
+            "                        ${2:sth}",
+            "                end,",
+            "                ${3:List}",
+            "               )${4:.}"
+        ],
+        "description": "lists:filtermap"
+    },
+    "Lists foldl": {
+        "prefix": ["listsfoldl"],
+        "body": [
+            "lists:foldl(fun(${1:Element}, ${2:AccIn}) ->",
+            "                    ${3:AccOut}",
+            "            end,",
+            "            ${4:Acc0}",
+            "            ${5:List}",
+            "           )${6:.}"
+        ],
+        "description": "lists:foldl"
+    },
+    "Maps map": {
+        "prefix": ["mapsmap"],
+        "body": [
+            "maps:map(fun(${1:Key}, ${2:Value}) ->",
+            "                 ${3:MappedValue}",
+            "         end,",
+            "         ${4:Map}",
+            "        )${5:.}"
+        ],
+        "description": "maps:map"
+    },
+    "Maps filter": {
+        "prefix": ["mapsfilter"],
+        "body": [
+            "maps:filter(fun(${1:Key}, ${2:Value}) ->",
+            "                    ${3:sth}",
+            "            end,",
+            "            ${4:Map}",
+            "           )${5:.}"
+        ],
+        "description": "maps:filter"
+    },
+    "Maps filtermap": {
+        "prefix": ["mapsfiltermap"],
+        "body": [
+            "maps:filtermap(fun(${1:Key}, ${2:Value}) ->",
+            "                       ${3:sth}",
+            "               end,",
+            "               ${4:Map}",
+            "              )${5:.}"
+        ],
+        "description": "maps:filtermap"
+    },
+    "Maps fold": {
+        "prefix": ["mapsfold"],
+        "body": [
+            "maps:fold(fun(${1:Key}, ${2:Value}, #{3:AccIn}) ->",
+            "                  ${4:AccOut}",
+            "          end,",
+            "          ${5:Acc0}",
+            "          ${6:Map}",
+            "         )${7:.}"
+        ],
+        "description": "maps:fold"
+    }
+}
+

@@ -1,0 +1,3 @@
+{
+    "workspace.library": ["~/.local/share/nvim"]
+}

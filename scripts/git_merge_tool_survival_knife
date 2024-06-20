@@ -1,0 +1,23 @@
+#!/bin/bash
+
+BASE="$1"
+LOCAL="$2"
+REMOTE="$3"
+MERGED="$4"
+
+arg=" edit $MERGED                                                   \
+    | tabe $BASE   | vert diffsplit $LOCAL                           \
+    | tabe $BASE   | vert diffsplit $REMOTE                          \
+    | tabe $LOCAL  | vert diffsplit $REMOTE                          \
+    | tabe $LOCAL  | vert diffsplit $BASE   | vert diffsplit $REMOTE \
+    | tabe $LOCAL  | vert diffsplit $MERGED                          \
+    | tabe $REMOTE | vert diffsplit $MERGED                          \
+    | tabe $LOCAL  | vert diffsplit $MERGED | vert diffsplit $REMOTE \
+    | tabnext \
+    | nnoremap ,m :call ToggleMerged(\"$MERGED\")<cr> \
+    | let g:is_merging=1 \
+    "
+
+nvim -f -c "$arg"
+
+
