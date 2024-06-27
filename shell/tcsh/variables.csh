@@ -1,9 +1,9 @@
 ## Source common variables
 mkdir -p ~/dump
 set File=~/dump/csh_variables_tmp_`uuidgen`
-sed 's/{env_var}/setenv/g' ~/dotfiles/shell/variables | \
-sed 's/{separator}/ /g'                               | \
-sed 's/{shell_var}/set /g'                              \
+sed 's/{env_var}/setenv/g' "${DotFiles}/shell/variables" | \
+sed 's/{separator}/ /g'                                  | \
+sed 's/{shell_var}/set /g'                               \
 > $File
 source $File
 

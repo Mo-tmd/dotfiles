@@ -1,4 +1,20 @@
 ################################################################################
+## Stuff that needs to be in the beginning
+################################################################################
+if (! $?DotFiles) then
+    if (-e ~/.cshrc.user) then
+        set ThisFile = ~/.cshrc.user
+    else
+        set ThisFile = ~/.cshrc
+    endif
+    set ThisFile = `readlink -f $ThisFile`
+    set ThisDir = `dirname "${ThisFile}"`
+    unset ThisFile
+    setenv DotFiles `readlink -f "${ThisDir}/../.."`
+    unset ThisDir
+endif
+
+################################################################################
 ## Set DISPLAY
 ################################################################################
 if ($?OldDisplay || ! $?prompt) then
@@ -40,10 +56,17 @@ endif
 ################################################################################
 ## Set variables and aliases etc
 ################################################################################
-source ~/dotfiles/shell/tcsh/variables.csh
-source "$DotFiles"/shell/tcsh/aliases.csh
-source "$DotFiles"/.modules
-setup_symlinks.sh
+source "${DotFiles}/shell/tcsh/variables.csh"
+source "${DotFiles}/shell/tcsh/aliases.csh"
+if ($?SkipSymlinksSetup) then
+    if ($SkipSymlinksSetup == true) then
+        :
+    else
+        setup_symlinks.sh "${DotFiles}"
+    endif
+else
+    setup_symlinks.sh "${DotFiles}"
+endif
 
 ################################################################################
 ## Key bindings

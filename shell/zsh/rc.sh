@@ -1,5 +1,18 @@
 ################################################################################
-# Set DISPLAY
+## Stuff that needs to be in the beginning
+################################################################################
+if [[ ! -v DotFiles ]]; then
+    [[ -e ~/.zshrc.user ]] && ThisFile=~/.zshrc.user || ThisFile=~/.zshrc
+    ThisFile=$(readlink -f $ThisFile)
+    ThisDir=$(dirname "${ThisFile}")
+    unset ThisFile
+    export DotFiles=$(readlink -f "${ThisDir}/../..")
+else
+    ThisDir="${DotFiles}/shell/zsh"
+fi
+
+################################################################################
+## Set DISPLAY
 ################################################################################
 if [[ -n "${OldDisplay}" || $- != *i* ]]; then
     ## Either DISPLAY has already been set to Citrix, or
@@ -38,29 +51,20 @@ else
 fi
 
 ################################################################################
-# Source rc_common.sh if running a non-interactive shell.
+## Source rc_common.sh if running a non-interactive shell.
 ################################################################################
-## Figure out ThisDir. Stolen from https://stackoverflow.com/a/26492107
-SOURCE=${(%):-%N}
-while [ -h "$SOURCE" ]; do
-  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-  SOURCE="$(readlink "$SOURCE")"
-  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
-done
-ThisDir="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-unset SOURCE
-
 if [[ $- == *i* ]]; then
     # Interactive shell, do nothing (continue)
     :
 else
     # Non interactive shell, source common rc and exit script.
-    source $ThisDir/rc_common.sh
+    source "${ThisDir}/rc_common.sh"
+    unset ThisDir
     return
 fi
 
 ################################################################################
-# Pre Oh My Zsh
+## Pre Oh My Zsh
 ################################################################################
 # For some reason many dump files are created. This hopefully avoids that.
 ZSH_COMPDUMP=~/.zcompdump
@@ -188,7 +192,7 @@ source $ZSH/oh-my-zsh.sh
 ############################## END Oh My Zsh ###################################
 ################################################################################
 ################################################################################
-source $ThisDir/rc_common.sh
+source "${ThisDir}/rc_common.sh"
 unset ThisDir
 
 unset RPS1
