@@ -6,7 +6,7 @@ CreateSymlink() {
     if [[ -L $From && `readlink $From` == $To ]]; then
         : # Symlink already exists and is valid. Do nothing
     else
-        if [[ -e $From ]]; then
+        if [[ -e $From || -L $From ]]; then
             Timestamp=`date +%F_%T`
             echo "Found ${From}, but it's not a valid symlink. Moving to ${From}${Timestamp}"
             mv $From $From$Timestamp
