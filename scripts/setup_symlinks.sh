@@ -21,10 +21,10 @@ CreateSymlink() {
 DotFilesDir=$1
 [[ -e "${DotFilesDir}" ]] || { echo "Error, \"${DotFilesDir}\" doesn't exist"; exit 0; }
 
-[[ -e ~/.cshrc.user ]] && CshRcFile=~/.cshrc.user || CshRcFile=~/.cshrc
+[[ -e ~/.cshrc.user || -L ~/.cshrc.user ]] && CshRcFile=~/.cshrc.user || CshRcFile=~/.cshrc
 CreateSymlink $CshRcFile "${DotFilesDir}/shell/tcsh/rc.csh"
 
-[[ -e ~/.zshrc.user ]] && ZshRcFile=~/.zshrc.user || ZshRcFile=~/.zshrc
+[[ -e ~/.zshrc.user || -L ~/.zshrc.user ]] && ZshRcFile=~/.zshrc.user || ZshRcFile=~/.zshrc
 CreateSymlink $ZshRcFile "${DotFilesDir}/shell/zsh/rc.sh"
 
 CreateSymlink ~/.zshenv "${DotFilesDir}/shell/zsh/.zshenv"
