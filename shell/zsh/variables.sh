@@ -1,5 +1,5 @@
 ################################################################################
-## Source variables that are common between csh and sh
+# Source variables that are common between csh and sh
 ################################################################################
 ## First, put personal and work variables in the same tmp file.
 mkdir -p ~/dump
@@ -26,7 +26,7 @@ rm $TmpShVariablesFile
 unset TmpShVariablesFile
 
 ################################################################################
-## sh specific
+# sh specific
 ################################################################################
 WorkShVariables="${WorkDotFiles}/shell/zsh/variables.sh"
 if [[ -e "${WorkShVariables}" ]]; then
