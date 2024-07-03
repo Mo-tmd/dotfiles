@@ -1,7 +1,7 @@
 ################################################################################
 # Stuff that needs to be in the beginning
 ################################################################################
-if (! $?DotFiles) then
+if (! $?Dotfiles) then
     if (-e ~/.cshrc.user) then
         set ThisFile = ~/.cshrc.user
     else
@@ -10,7 +10,7 @@ if (! $?DotFiles) then
     set ThisFile = `readlink -f $ThisFile`
     set ThisDir = `dirname "${ThisFile}"`
     unset ThisFile
-    setenv DotFiles `readlink -f "${ThisDir}/../.."`
+    setenv Dotfiles `readlink -f "${ThisDir}/../.."`
     unset ThisDir
 endif
 
@@ -56,16 +56,16 @@ endif
 ################################################################################
 # Set variables and aliases etc
 ################################################################################
-source "${DotFiles}/shell/tcsh/variables.csh"
-source "${DotFiles}/shell/tcsh/aliases.csh"
+source "${Dotfiles}/shell/tcsh/variables.csh"
+source "${Dotfiles}/shell/tcsh/aliases.csh"
 if ($?SkipSymlinksSetup) then
     if ($SkipSymlinksSetup == true) then
         :
     else
-        setup_symlinks.sh "${DotFiles}"
+        setup_symlinks.sh "${Dotfiles}"
     endif
 else
-    setup_symlinks.sh "${DotFiles}"
+    setup_symlinks.sh "${Dotfiles}"
 endif
 
 ################################################################################

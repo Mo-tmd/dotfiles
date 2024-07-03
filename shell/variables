@@ -1,8 +1,8 @@
-{env_var} PATH{separator}`"${DotFiles}/scripts/path/set_path.sh" "${DotFiles}/shell/path"`
+{env_var} PATH{separator}`"${Dotfiles}/scripts/path/set_path.sh" "${Dotfiles}/shell/path"`
 
 {env_var} EDITOR{separator}nvim
 {env_var} LESS{separator}"-iR"
-{env_var} RIPGREP_CONFIG_PATH{separator}"${DotFiles}/.ripgreprc"
+{env_var} RIPGREP_CONFIG_PATH{separator}"${Dotfiles}/.ripgreprc"
 {env_var} FZF_DEFAULT_COMMAND{separator}'rg --files'
 {env_var} TMUX_TMPDIR{separator}~/tmux_sessions/$HOST
 

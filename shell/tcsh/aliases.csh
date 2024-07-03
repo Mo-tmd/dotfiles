@@ -4,9 +4,9 @@
 ## First, put personal and work aliases in the same tmp file.
 mkdir -p ~/dump
 set TmpCommonAliasesFile = ~/dump/common_aliases_`uuidgen`
-cp "${DotFiles}/shell/aliases" $TmpCommonAliasesFile
-if ($?WorkDotFiles) then
-    set WorkAliases = "${WorkDotFiles}/shell/aliases"
+cp "${Dotfiles}/shell/aliases" $TmpCommonAliasesFile
+if ($?WorkDotfiles) then
+    set WorkAliases = "${WorkDotfiles}/shell/aliases"
     if (-e "${WorkAliases}") then
         cat "${WorkAliases}" >> $TmpCommonAliasesFile
     endif
@@ -27,15 +27,15 @@ unset TmpCshAliasesFile
 ################################################################################
 # csh specific
 ################################################################################
-if ($?WorkDotFiles) then
-    set WorkCshAliases = "${WorkDotFiles}/shell/tcsh/aliases.csh"
+if ($?WorkDotfiles) then
+    set WorkCshAliases = "${WorkDotfiles}/shell/tcsh/aliases.csh"
     if (-e "${WorkCshAliases}") then
         source "${WorkCshAliases}"
     endif
     unset WorkCshAliases
 endif
 
-alias aliases 'nvim "$DotFiles"/shell/tcsh/aliases.csh; source "$DotFiles"/shell/tcsh/aliases.csh'
-alias saf 'source "$DotFiles"/shell/tcsh/rc.csh; source_tmux_conf.sh'
+alias aliases 'nvim "$Dotfiles"/shell/tcsh/aliases.csh; source "$Dotfiles"/shell/tcsh/aliases.csh'
+alias saf 'source "$Dotfiles"/shell/tcsh/rc.csh; source_tmux_conf.sh'
 alias xd 'setenv DISPLAY `tmux show-env | sed -n 's/^OldDisplay=//p'`' ## Use X forwarding display.
 alias ctd 'setenv DISPLAY `cat ~/citrix_displays/$HOST`'               ## Use Citrix display.

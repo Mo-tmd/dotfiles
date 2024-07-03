@@ -388,9 +388,9 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call Tnoremap('<C-^>', '<C-^>')
 
-nnoremap <leader>td :call DotFiles()<CR>
-call Tnoremap('<leader>td', ':call DotFiles()<CR>')
-function! DotFiles()
+nnoremap <leader>td :call Dotfiles()<CR>
+call Tnoremap('<leader>td', ':call Dotfiles()<CR>')
+function! Dotfiles()
     call Terminal('Dotfiles_terminal', 'cd ~/dotfiles')
 endfunction
 

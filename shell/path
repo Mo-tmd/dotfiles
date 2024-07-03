@@ -1,5 +1,5 @@
 ~/bin
 /snap/bin
-"${DotFiles}/scripts"
-"${DotFiles}/scripts/tmux"
-"${DotFiles}/scripts/path"
+"${Dotfiles}/scripts"
+"${Dotfiles}/scripts/tmux"
+"${Dotfiles}/scripts/path"

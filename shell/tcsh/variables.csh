@@ -4,9 +4,9 @@
 ## First, put personal and work variables in the same tmp file.
 mkdir -p ~/dump
 set TmpCommonVariablesFile = ~/dump/common_variables_`uuidgen`
-cp "${DotFiles}/shell/variables" $TmpCommonVariablesFile
-if ($?WorkDotFiles) then
-    set WorkVariables = "${WorkDotFiles}/shell/variables"
+cp "${Dotfiles}/shell/variables" $TmpCommonVariablesFile
+if ($?WorkDotfiles) then
+    set WorkVariables = "${WorkDotfiles}/shell/variables"
     if (-e "${WorkVariables}") then
         cat "${WorkVariables}" >> $TmpCommonVariablesFile
     endif
@@ -30,8 +30,8 @@ unset TmpCshVariablesFile
 ################################################################################
 # csh specific
 ################################################################################
-if ($?WorkDotFiles) then
-    set WorkCshVariables = "${WorkDotFiles}/shell/tcsh/variables.csh"
+if ($?WorkDotfiles) then
+    set WorkCshVariables = "${WorkDotfiles}/shell/tcsh/variables.csh"
     if (-e "${WorkCshVariables}") then
         source "${WorkCshVariables}"
     endif

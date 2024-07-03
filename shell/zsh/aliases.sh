@@ -4,8 +4,8 @@
 ## First, put personal and work aliases in the same tmp file.
 mkdir -p ~/dump
 TmpCommonAliasesFile=~/dump/common_aliases_`uuidgen`
-cp "${DotFiles}/shell/aliases" $TmpCommonAliasesFile
-WorkAliases="${WorkDotFiles}/shell/aliases"
+cp "${Dotfiles}/shell/aliases" $TmpCommonAliasesFile
+WorkAliases="${WorkDotfiles}/shell/aliases"
 if [[ -e "${WorkAliases}" ]]; then
     cat "${WorkAliases}" >> $TmpCommonAliasesFile
 fi
@@ -25,13 +25,13 @@ unset TmpShAliasesFile
 ################################################################################
 # sh specific
 ################################################################################
-WorkShAliases="${WorkDotFiles}/shell/zsh/aliases.sh"
+WorkShAliases="${WorkDotfiles}/shell/zsh/aliases.sh"
 if [[ -e "${WorkShAliases}" ]]; then
     source "${WorkShAliases}"
 fi
 unset WorkShAliases
 
-alias aliases='nvim "$DotFiles"/shell/zsh/aliases.sh; source "$DotFiles"/shell/zsh/aliases.sh'
+alias aliases='nvim "$Dotfiles"/shell/zsh/aliases.sh; source "$Dotfiles"/shell/zsh/aliases.sh'
 alias saf='exec $0; source_tmux_conf.sh'
 alias xd='export DISPLAY=`tmux show-env | sed -n 's/^OldDisplay=//p'`' ## Use X forwarding display.
 alias ctd='export DISPLAY=`cat ~/citrix_displays/$HOST`'               ## Use Citrix display.
