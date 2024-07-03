@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import session_db
 import tmux_new_session
 from session import Window, Session
