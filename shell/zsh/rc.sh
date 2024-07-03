@@ -1,14 +1,14 @@
 ################################################################################
 # Stuff that needs to be in the beginning
 ################################################################################
-if [[ ! -v DotFiles ]]; then
+if [[ ! -v Dotfiles ]]; then
     [[ -e ~/.zshrc.user ]] && ThisFile=~/.zshrc.user || ThisFile=~/.zshrc
     ThisFile=$(readlink -f $ThisFile)
     ThisDir=$(dirname "${ThisFile}")
     unset ThisFile
-    export DotFiles=$(readlink -f "${ThisDir}/../..")
+    export Dotfiles=$(readlink -f "${ThisDir}/../..")
 else
-    ThisDir="${DotFiles}/shell/zsh"
+    ThisDir="${Dotfiles}/shell/zsh"
 fi
 
 ################################################################################

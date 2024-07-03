@@ -18,18 +18,18 @@ CreateSymlink() {
     fi
 }
 
-DotFilesDir=$1
-[[ -e "${DotFilesDir}" ]] || { echo "Error, \"${DotFilesDir}\" doesn't exist"; exit 0; }
+DotfilesDir=$1
+[[ -e "${DotfilesDir}" ]] || { echo "Error, \"${DotfilesDir}\" doesn't exist"; exit 0; }
 
 [[ -e ~/.cshrc.user || -L ~/.cshrc.user ]] && CshRcFile=~/.cshrc.user || CshRcFile=~/.cshrc
-CreateSymlink $CshRcFile "${DotFilesDir}/shell/tcsh/rc.csh"
+CreateSymlink $CshRcFile "${DotfilesDir}/shell/tcsh/rc.csh"
 
 [[ -e ~/.zshrc.user || -L ~/.zshrc.user ]] && ZshRcFile=~/.zshrc.user || ZshRcFile=~/.zshrc
-CreateSymlink $ZshRcFile "${DotFilesDir}/shell/zsh/rc.sh"
+CreateSymlink $ZshRcFile "${DotfilesDir}/shell/zsh/rc.sh"
 
-CreateSymlink ~/.zshenv "${DotFilesDir}/shell/zsh/.zshenv"
-CreateSymlink ~/.config/nvim "${DotFilesDir}/nvim"
-CreateSymlink ~/.tmux.conf "${DotFilesDir}/.tmux/.tmux.conf"
-CreateSymlink ~/.tmux.conf.local "${DotFilesDir}/.tmux/.tmux.conf.local"
-CreateSymlink ~/.screenrc "${DotFilesDir}/.screenrc"
-CreateSymlink ~/.gitconfig "${DotFilesDir}/.gitconfig"
+CreateSymlink ~/.zshenv "${DotfilesDir}/shell/zsh/.zshenv"
+CreateSymlink ~/.config/nvim "${DotfilesDir}/nvim"
+CreateSymlink ~/.tmux.conf "${DotfilesDir}/.tmux/.tmux.conf"
+CreateSymlink ~/.tmux.conf.local "${DotfilesDir}/.tmux/.tmux.conf.local"
+CreateSymlink ~/.screenrc "${DotfilesDir}/.screenrc"
+CreateSymlink ~/.gitconfig "${DotfilesDir}/.gitconfig"
