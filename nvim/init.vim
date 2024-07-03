@@ -96,7 +96,12 @@ nnoremap <leader>dt :lua toggle_diagnostics()<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Lua Scripts
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let s:OldRuntimePath = &runtimepath
+set runtimepath+=$Dotfiles/nvim
 lua require('init')
+if (s:OldRuntimePath != &runtimepath)
+    set runtimepath-=$Dotfiles/nvim
+endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General

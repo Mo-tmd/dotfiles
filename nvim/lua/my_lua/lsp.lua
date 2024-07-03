@@ -30,11 +30,16 @@ lspconfig.lua_ls.setup(lsp.nvim_lua_ls())
 -- erlang_ls
 -------------------------------------------------------------------------------
 local function root_dir(_)
-    return '/some/path'
+    return vim.g.ErlangLsRootDir
 end
-lspconfig.erlangls.setup({
-    root_dir = root_dir
-})
+
+if (vim.g.ErlangLsRootDir) == nil then
+    Options = {}
+else
+    Options = {root_dir = root_dir}
+end
+
+lspconfig.erlangls.setup(Options)
 
 -------------------------------------------------------------------------------
 -- vim-language-server
@@ -54,7 +59,12 @@ lspconfig.bashls.setup({})
 -------------------------------------------------------------------------------
 -- jdtls (Java)
 -------------------------------------------------------------------------------
-lspconfig.jdtls.setup({})
+if (vim.g.JdtlsCmd) == nil then
+    Options = {}
+else
+    Options = {cmd = {vim.g.JdtlsCmd}}
+end
+lspconfig.jdtls.setup(Options)
 
 -------------------------------------------------------------------------------
 --
@@ -67,7 +77,11 @@ lsp.setup()
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
 
-require('luasnip.loaders.from_vscode').lazy_load({paths={"~/dotfiles/nvim/snippets"}})
+paths = {os.getenv("Dotfiles") .. "/nvim/snippets"}
+if (os.getenv("WorkDotfiles") ~= nil) then
+    table.insert(paths, os.getenv("WorkDotfiles") .. "/nvim/snippets")
+end
+require('luasnip.loaders.from_vscode').lazy_load({paths=paths})
 
 local luasnip = require('luasnip')
 Tab = cmp.mapping(function(fallback)
