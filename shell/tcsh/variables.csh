@@ -1,5 +1,5 @@
 ################################################################################
-## Source variables that are common between csh and sh
+# Source variables that are common between csh and sh
 ################################################################################
 ## First, put personal and work variables in the same tmp file.
 mkdir -p ~/dump
@@ -28,7 +28,7 @@ rm $TmpCshVariablesFile
 unset TmpCshVariablesFile
 
 ################################################################################
-## csh specific
+# csh specific
 ################################################################################
 if ($?WorkDotFiles) then
     set WorkCshVariables = "${WorkDotFiles}/shell/tcsh/variables.csh"

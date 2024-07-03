@@ -1,5 +1,5 @@
 ################################################################################
-## Stuff that needs to be in the beginning
+# Stuff that needs to be in the beginning
 ################################################################################
 if [[ ! -v DotFiles ]]; then
     [[ -e ~/.zshrc.user ]] && ThisFile=~/.zshrc.user || ThisFile=~/.zshrc
@@ -12,7 +12,7 @@ else
 fi
 
 ################################################################################
-## Set DISPLAY
+# Set DISPLAY
 ################################################################################
 if [[ -n "${OldDisplay}" || $- != *i* ]]; then
     ## Either DISPLAY has already been set to Citrix, or
@@ -51,7 +51,7 @@ else
 fi
 
 ################################################################################
-## Source rc_common.sh if running a non-interactive shell.
+# Source rc_common.sh if running a non-interactive shell.
 ################################################################################
 if [[ $- == *i* ]]; then
     # Interactive shell, do nothing (continue)
@@ -64,7 +64,7 @@ else
 fi
 
 ################################################################################
-## Pre Oh My Zsh
+# Pre Oh My Zsh
 ################################################################################
 # For some reason many dump files are created. This hopefully avoids that.
 ZSH_COMPDUMP=~/.zcompdump

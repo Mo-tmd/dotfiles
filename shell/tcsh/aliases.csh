@@ -1,5 +1,5 @@
 ################################################################################
-## Source aliases that are common between csh and sh
+# Source aliases that are common between csh and sh
 ################################################################################
 ## First, put personal and work aliases in the same tmp file.
 mkdir -p ~/dump
@@ -25,7 +25,7 @@ rm $TmpCshAliasesFile
 unset TmpCshAliasesFile
 
 ################################################################################
-## csh specific
+# csh specific
 ################################################################################
 if ($?WorkDotFiles) then
     set WorkCshAliases = "${WorkDotFiles}/shell/tcsh/aliases.csh"

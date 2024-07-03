@@ -1,5 +1,5 @@
 ################################################################################
-## Stuff that needs to be in the beginning
+# Stuff that needs to be in the beginning
 ################################################################################
 if (! $?DotFiles) then
     if (-e ~/.cshrc.user) then
@@ -15,7 +15,7 @@ if (! $?DotFiles) then
 endif
 
 ################################################################################
-## Set DISPLAY
+# Set DISPLAY
 ################################################################################
 if ($?OldDisplay || ! $?prompt) then
     ## Either DISPLAY has already been set to Citrix, or
@@ -54,7 +54,7 @@ else
 endif
 
 ################################################################################
-## Set variables and aliases etc
+# Set variables and aliases etc
 ################################################################################
 source "${DotFiles}/shell/tcsh/variables.csh"
 source "${DotFiles}/shell/tcsh/aliases.csh"
@@ -69,7 +69,7 @@ else
 endif
 
 ################################################################################
-## Key bindings
+# Key bindings
 ################################################################################
 bindkey -e
 bindkey "^F" forward-word

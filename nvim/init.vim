@@ -522,6 +522,6 @@ highlight ConflictMarkerEnd                 guifg=#7A7979
 highlight ConflictMarkerSeparator           guifg=#7A7979
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Stuff that needs to be at the end.
+" Stuff that needs to be at the end
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
