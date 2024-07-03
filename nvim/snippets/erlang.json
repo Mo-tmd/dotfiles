@@ -1,14 +1,4 @@
 {
-    "dbg": {
-        "prefix": ["dbgg"],
-        "body": ["io:format(\"~n~n~n~n~n~nmo ~p:~p~n~n${1:~p}~n~n~n~n~n~n~n~n\", [?MODULE,?LINE,${2:hello}])${3:,}"],
-        "description": "A print out with a lot of line breaks to make it easy to find in large logs"
-    },
-    "todo": {
-        "prefix": ["todo"],
-        "body": ["%% TODO ${1:mo this review} - ${2:.}"],
-        "description": "TODO comment"
-    },
     "case": {
         "prefix": ["case"],
         "body": [
