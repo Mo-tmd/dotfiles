@@ -58,12 +58,8 @@ endif
 ################################################################################
 source "${Dotfiles}/shell/tcsh/variables.csh"
 source "${Dotfiles}/shell/tcsh/aliases.csh"
-if ($?SkipSymlinksSetup) then
-    if ($SkipSymlinksSetup == true) then
-        :
-    else
-        setup_symlinks.sh "${Dotfiles}"
-    endif
+if ($?WorkDotfiles) then
+    setup_symlinks.sh "${WorkDotfiles}"
 else
     setup_symlinks.sh "${Dotfiles}"
 endif
