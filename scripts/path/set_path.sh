@@ -5,8 +5,9 @@ source "${ThisDir}/add_to_path.sh"
 
 PathFile=$1
 while IFS= read -r Line; do
+    [[ "${Line}" =~ ^\s*# ]] && continue
     Line=$(eval echo $Line)
     add_to_path "${Line}"
-done <<<$(grep -v '^\s*#' "${PathFile}")
+done < "${PathFile}"
 
 echo $PATH
