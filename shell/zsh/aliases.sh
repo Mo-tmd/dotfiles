@@ -25,13 +25,12 @@ unset TmpShAliasesFile
 ################################################################################
 # sh specific
 ################################################################################
+alias saf='exec $0; source_tmux_conf.sh'
+alias xd='export DISPLAY=`tmux show-env | sed -n 's/^OldDisplay=//p'`' ## Use X forwarding display.
+alias ctd='export DISPLAY=`cat ~/citrix_displays/$HOST`'               ## Use Citrix display.
+
 WorkShAliases="${WorkDotfiles}/shell/zsh/aliases.sh"
 if [[ -e "${WorkShAliases}" ]]; then
     source "${WorkShAliases}"
 fi
 unset WorkShAliases
-
-alias aliases='nvim "$Dotfiles"/shell/zsh/aliases.sh; source "$Dotfiles"/shell/zsh/aliases.sh'
-alias saf='exec $0; source_tmux_conf.sh'
-alias xd='export DISPLAY=`tmux show-env | sed -n 's/^OldDisplay=//p'`' ## Use X forwarding display.
-alias ctd='export DISPLAY=`cat ~/citrix_displays/$HOST`'               ## Use Citrix display.

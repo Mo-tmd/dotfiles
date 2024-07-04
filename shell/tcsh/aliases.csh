@@ -27,6 +27,10 @@ unset TmpCshAliasesFile
 ################################################################################
 # csh specific
 ################################################################################
+alias saf 'source "$Dotfiles"/shell/tcsh/rc.csh; source_tmux_conf.sh'
+alias xd 'setenv DISPLAY `tmux show-env | sed -n 's/^OldDisplay=//p'`' ## Use X forwarding display.
+alias ctd 'setenv DISPLAY `cat ~/citrix_displays/$HOST`'               ## Use Citrix display.
+
 if ($?WorkDotfiles) then
     set WorkCshAliases = "${WorkDotfiles}/shell/tcsh/aliases.csh"
     if (-e "${WorkCshAliases}") then
@@ -35,7 +39,3 @@ if ($?WorkDotfiles) then
     unset WorkCshAliases
 endif
 
-alias aliases 'nvim "$Dotfiles"/shell/tcsh/aliases.csh; source "$Dotfiles"/shell/tcsh/aliases.csh'
-alias saf 'source "$Dotfiles"/shell/tcsh/rc.csh; source_tmux_conf.sh'
-alias xd 'setenv DISPLAY `tmux show-env | sed -n 's/^OldDisplay=//p'`' ## Use X forwarding display.
-alias ctd 'setenv DISPLAY `cat ~/citrix_displays/$HOST`'               ## Use Citrix display.

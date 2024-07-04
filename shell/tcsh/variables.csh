@@ -30,6 +30,10 @@ unset TmpCshVariablesFile
 ################################################################################
 # csh specific
 ################################################################################
+set HIST = "~/.history"
+set histdup = erase # Remove duplicate entries in history
+set savehist = (500 merge lock)
+
 if ($?WorkDotfiles) then
     set WorkCshVariables = "${WorkDotfiles}/shell/tcsh/variables.csh"
     if (-e "${WorkCshVariables}") then
@@ -37,8 +41,4 @@ if ($?WorkDotfiles) then
     endif
     unset WorkCshVariables
 endif
-
-set HIST = "~/.history"
-set histdup = erase # Remove duplicate entries in history
-set savehist = (500 merge lock)
 
