@@ -27,6 +27,7 @@ unset TmpCshAliasesFile
 ################################################################################
 # csh specific
 ################################################################################
+alias e 'bash -c "[[ -n "\${NVIM}" ]] && nvr \!* || nvim \!*"'
 alias saf 'source "$Dotfiles"/shell/tcsh/rc.csh; source_tmux_conf.sh'
 alias xd 'setenv DISPLAY `tmux show-env | sed -n 's/^OldDisplay=//p'`' ## Use X forwarding display.
 alias ctd 'setenv DISPLAY `cat ~/citrix_displays/$HOST`'               ## Use Citrix display.

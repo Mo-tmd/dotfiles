@@ -1,12 +1,12 @@
+[user]
+    email =
+    name = Mo-TMD
 [merge]
-	conflictStyle = diff3
+    conflictStyle = diff3
 [mergetool "vscode"]
-	cmd = code --wait $MERGED
+    cmd = code --wait $MERGED
 [mergetool "sk"]
     cmd = git_merge_tool_survival_knife "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
 [oh-my-zsh]
-	hide-status = 1
-	hide-dirty = 1
-[user]
-	email =
-	name = Mo-TMD
+    hide-status = 1
+    hide-dirty = 1

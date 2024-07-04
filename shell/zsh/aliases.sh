@@ -25,6 +25,7 @@ unset TmpShAliasesFile
 ################################################################################
 # sh specific
 ################################################################################
+e() { [[ -n "${NVIM}" ]] && nvr "${@}" || nvim "${@}" }
 alias saf='exec $0; source_tmux_conf.sh'
 alias xd='export DISPLAY=`tmux show-env | sed -n 's/^OldDisplay=//p'`' ## Use X forwarding display.
 alias ctd='export DISPLAY=`cat ~/citrix_displays/$HOST`'               ## Use Citrix display.
