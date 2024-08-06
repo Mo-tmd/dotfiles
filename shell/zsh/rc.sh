@@ -12,45 +12,6 @@ else
 fi
 
 ################################################################################
-# Set DISPLAY
-################################################################################
-if [[ -n "${OldDisplay}" || $- != *i* ]]; then
-    ## Either DISPLAY has already been set to Citrix, or
-    ## running a non-interactive shell. Do nothing
-    :
-else
-    ## This is the first login shell. i.e. not a subshell
-    ## Set OldDisplay to DISPLAY (probably X forwarding)
-    if [[ -n "${DISPLAY}" ]]; then
-        export OldDisplay=$DISPLAY
-    else
-        export OldDisplay="None"
-    fi
-    ## If running in Citrix, save/update its DISPLAY in a file.
-    CitrixDisplaysDir="$HOME/citrix_displays"
-    CitrixDisplayFile="$CitrixDisplaysDir/$HOST"
-    if [[ -v CITRIX_DISPLAY ]]; then
-        if [[ ! -e $CitrixDisplaysDir ]]; then
-            mkdir $CitrixDisplaysDir
-        fi
-        unset CitrixDisplaysDir
-        if [[ ! -e $CitrixDisplayFile ]]; then
-            touch $CitrixDisplayFile
-        fi
-        if [[ $CITRIX_DISPLAY != `cat ~/citrix_displays/$HOST` ]]; then
-            ## The file is empty or out of date, update/set it.
-            echo $CITRIX_DISPLAY > $CitrixDisplayFile
-        fi
-    fi
-
-    ## Finally, set DISPLAY to Citrix by reading the file.
-    if [[ -e $CitrixDisplayFile ]]; then
-        export DISPLAY=`cat ~/citrix_displays/$HOST`
-    fi
-    unset CitrixDisplayFile
-fi
-
-################################################################################
 # Source rc_common.sh if running a non-interactive shell.
 ################################################################################
 if [[ $- == *i* ]]; then
