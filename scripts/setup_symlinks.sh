@@ -3,18 +3,19 @@
 CreateSymlink() {
     From=$1
     To=$2
-    if [[ -L $From && `readlink $From` == $To ]]; then
+    if [[ -L "${From}" && `readlink "${From}"` == "${To}" ]]; then
         : # Symlink already exists and is valid. Do nothing
     else
-        if [[ -e $From || -L $From ]]; then
+        if [[ -e "${From}" || -L "${From}" ]]; then
             Timestamp=`date +%F_%T`
             echo "Found ${From}, but it's not a valid symlink. Moving to ${From}${Timestamp}"
-            mv $From $From$Timestamp
+            mv "${From}" "${From}${Timestamp}"
         else
             echo "${From} is not found"
+            mkdir -p `dirname "${From}"`
         fi
         echo "Creating symlink from ${From} to ${To}"
-        ln -s "$To" "$From"
+        ln -s "${To}" "${From}"
     fi
 }
 
