@@ -383,7 +383,7 @@ function! CloseDiff()
 
     for l:Buffer in l:Buffers
         let l:BufferName = bufname(l:Buffer)
-        if l:BufferName =~ '^fugitive:///.*\.git//\S\+'
+        if l:BufferName =~ '^fugitive:///.*\.git.*//\d'
             execute 'bwipeout ' . l:Buffer
             break
         endif
