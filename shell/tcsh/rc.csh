@@ -38,3 +38,7 @@ bindkey "^P" history-search-backward
 bindkey "^N" history-search-forward
 bindkey "^X" dabbrev-expand
 
+################################################################################
+# Misc
+################################################################################
+unset rprompt
