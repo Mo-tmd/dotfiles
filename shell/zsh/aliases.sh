@@ -26,7 +26,7 @@ unset TmpShAliasesFile
 # sh specific
 ################################################################################
 e() { [[ -n "${NVIM}" ]] && nvr "${@}" || nvim "${@}" }
-alias saf='exec $0; source_tmux_conf.sh'
+alias saf='exec `echo $0 | sed "s/^-//"`; source_tmux_conf.sh'
 
 WorkShAliases="${WorkDotfiles}/shell/zsh/aliases.sh"
 if [[ -e "${WorkShAliases}" ]]; then
