@@ -66,6 +66,9 @@ call Tnoremap('<C-j>', '<C-W>j')
 call Tnoremap('<C-k>', '<C-W>k')
 call Tnoremap('<C-h>', '<C-W>h')
 call Tnoremap('<C-l>', '<C-W>l')
+" netrw overrides my mappings. So override them again here :D
+autocmd filetype netrw nnoremap <buffer> <C-h> <C-W>h
+autocmd filetype netrw nnoremap <buffer> <C-l> <C-W>l
 
 nnoremap <leader>iv :e ~/dotfiles/nvim/init.vim<CR>
 nnoremap <leader>il :e ~/dotfiles/nvim/lua/init.lua<CR>
