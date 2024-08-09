@@ -129,6 +129,9 @@ function! KillBuffer()
     let l:BufferNumber = bufnr('%')
     call PreviousBuffer()
     execute 'bwipeout! ' . l:BufferNumber
+    " Call PreviousBuffer() twice to get C-^ to work.
+    call PreviousBuffer()
+    call PreviousBuffer()
 endfunction
 
 function! PreviousBuffer()
