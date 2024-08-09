@@ -132,11 +132,10 @@ function! KillBuffer()
 endfunction
 
 function! PreviousBuffer()
-    let l:CurrentBuffer = bufnr('%')
-    execute 'buffer#'
-    if l:CurrentBuffer == bufnr('%')
+    if bufexists(bufnr('#'))
+        execute 'buffer#'
+    else
         " No alternate buffer. Use last buffer from fzf instead.
-        " I'm not sure that this can actually happen.
         let l:Buffers = fzf#vim#_buflisted_sorted()
         if len(l:Buffers) > 1
             execute 'buffer ' . l:Buffers[1]
