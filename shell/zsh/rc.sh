@@ -174,5 +174,19 @@ bindkey ';i' beginning-of-line
 bindkey ';b' backward-word
 bindkey ';w' forward-word
 
-bindkey '^U' kill-buffer
+# Kill buffer
+function KillBuffer() {
+    zle end-of-history
+    zle kill-buffer
+}
+zle -N KillBuffer
+bindkey '^U' KillBuffer
+
+# Kill buffer in vicmd mode
+function KillBufferVicmdMode() {
+    KillBuffer
+    zle vi-insert
+}
+zle -N KillBufferVicmdMode
+bindkey -M vicmd '^U' KillBufferVicmdMode
 
