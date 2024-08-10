@@ -427,9 +427,7 @@ function! Terminal(...)
         let l:StartActions = []
     endif
 
-    if GoToBuffer(l:TerminalName) == 'ok'
-        startinsert
-    else
+    if GoToBuffer(l:TerminalName) != 'ok'
         let l:PreviousBuffer = bufnr('%')
         execute 'terminal'
         execute 'file ' . l:TerminalName
@@ -504,17 +502,46 @@ endfunction
 
 augroup TermEnterOrLeave
     autocmd!
-    autocmd WinEnter,BufEnter * call ToggleTermEnterOrLeave()
+    " The function ToggleTermEnterOrLeave relies on cursor position (line
+    " specifically). When triggered by BufEnter, line('.') always
+    " returns 1. This is probably becuase cursor hasn't been drawn yet or
+    " similar. So add a delay to solve.
+    autocmd WinEnter,BufEnter * call timer_start(1, 'ToggleTermEnterOrLeave')
     autocmd TermOpen * startinsert
 augroup END
 
-function! ToggleTermEnterOrLeave()
+function! ToggleTermEnterOrLeave(...)
     if &buftype == "terminal"
-        " TODO perhaps only if terminal was exited when it was in terminal mode
-        startinsert
+        let l:FirstTime = !exists("b:NotFirstTime")
+        if (l:FirstTime)
+            startinsert
+            let b:NotFirstTime = "true"
+        else
+            let l:CurrentLine = line('.')
+            let l:LastNonEmptyLine = GetLastNonEmptyLine()
+            if (l:CurrentLine == l:LastNonEmptyLine)
+                startinsert
+            endif
+        endif
     else
         stopinsert
     endif
+endfunction
+
+function! GetLastNonEmptyLine()
+    " Start from the last line in the buffer
+    let l:LastLine = line('$')
+
+    " Loop backwards until a non-empty line is found
+    while l:LastLine > 0
+        if getline(l:LastLine) != ''
+            return l:LastLine
+        endif
+        let l:LastLine -= 1
+    endwhile
+
+    " If no non-empty line is found, return 0
+    return 0
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
