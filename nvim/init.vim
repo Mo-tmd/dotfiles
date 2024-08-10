@@ -27,8 +27,11 @@ call plug#begin()
     " nerdtree
     Plug 'preservim/nerdtree'
 
-    "Lightline
+    " Lightline
     Plug 'itchyny/lightline.vim'
+
+    " YankRing.vim
+    Plug 'vim-scripts/YankRing.vim'
 call plug#end()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -396,6 +399,12 @@ function! CloseDiff()
 endfunction
 
 command! -nargs=1 Gs execute "G difftool -y " . <f-args> . "~1 " . <f-args>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" YankRing
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:yankring_history_dir = "~/dump"
+nnoremap <silent> <leader>p :YRShow<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Terminals
