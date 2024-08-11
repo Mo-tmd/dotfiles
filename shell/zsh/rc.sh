@@ -27,8 +27,7 @@ fi
 ################################################################################
 # Pre Oh My Zsh
 ################################################################################
-# For some reason many dump files are created. This hopefully avoids that.
-ZSH_COMPDUMP=~/.zcompdump
+export ZSH_COMPDUMP="${HOME}/dump/zsh/zcompdump-${HOST}-${ZSH_VERSION}"
 
 # Disables some check that shows strange errors.
 export ZSH_DISABLE_COMPFIX="true"
@@ -155,6 +154,8 @@ source $ZSH/oh-my-zsh.sh
 ################################################################################
 source "${ThisDir}/rc_common.sh"
 unset ThisDir
+
+HISTFILE=~/dump/.zsh_history
 
 unset RPS1
 
