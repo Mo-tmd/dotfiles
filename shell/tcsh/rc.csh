@@ -13,12 +13,21 @@ if (! $?Dotfiles) then
     setenv Dotfiles `readlink -f "${ThisDir}/../.."`
     unset ThisDir
 endif
+setenv PATH `"${Dotfiles}/scripts/path/set_path.sh" "${Dotfiles}/shell/path"`
 
 ################################################################################
-# Set variables and aliases etc
+# Main
 ################################################################################
-source "${Dotfiles}/shell/tcsh/variables.csh"
-source "${Dotfiles}/shell/tcsh/aliases.csh"
+set GeneratedAliases = `generate_aliases_or_variables_file.sh aliases tcsh "${Dotfiles}"/shell/aliases`
+source "${GeneratedAliases}"
+rm "${GeneratedAliases}"
+unset GeneratedAliases
+
+set GeneratedVariables = `generate_aliases_or_variables_file.sh variables tcsh "${Dotfiles}"/shell/variables`
+source "${GeneratedVariables}"
+rm "${GeneratedVariables}"
+unset GeneratedVariables
+
 if ($?WorkDotfiles) then
     setup_symlinks.sh "${WorkDotfiles}"
 else
@@ -41,5 +50,4 @@ bindkey "^X" dabbrev-expand
 ################################################################################
 # Misc
 ################################################################################
-set histfile = ~/dump/.history
 unset rprompt

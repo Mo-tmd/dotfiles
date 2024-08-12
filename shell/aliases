@@ -1,6 +1,9 @@
 ################################################################################
-# Git
+# Aliases common for all shells
 ################################################################################
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## Git
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 alias gs{separator}'git status'
 alias gd{separator}'git diff'
 alias ga{separator}'git add'
@@ -14,17 +17,16 @@ alias rs{separator}'git reset --soft'
 alias hd{separator}'git reset --hard HEAD'
 alias svg{separator}'git add -u; git commit -m "Save game"'
 
-################################################################################
-# Tmux
-################################################################################
-#alias tmn: implemented in "user"
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## Tmux
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 alias tma{separator}'tmux attach -t'
 alias tml{separator}'tmux list-sessions'
 alias tmkk{separator}'tmux_kill_session.py'
 
-################################################################################
-# Misc
-################################################################################
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## Misc
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 alias search{separator}'find . -iname'
 alias searchin{separator}'grep -irn . -e'
 alias untar{separator}'tar -xvf'
@@ -33,4 +35,16 @@ alias ll{separator}'ls -lhA'
 alias path{separator}'echo $PATH | sed "s/:/\n/g"'
 alias windowpid{separator}'xprop _NET_WM_PID | sed "'"s/_NET_WM_PID(CARDINAL) = //"'"'
 alias suicide{separator}'pkill -u $USER'
+
+################################################################################
+# Aliases specific to ZSH
+################################################################################
+e() { [[ -n "${NVIM}" ]] && nvr "${@}" || nvim "${@}" }
+alias saf='exec `echo $0 | sed "s/^-//"`; source_tmux_conf.sh'
+
+################################################################################
+# Aliases specific to TCSH
+################################################################################
+alias e 'bash -c "[[ -n "\${NVIM}" ]] && nvr \!* || nvim \!*"'
+alias saf 'source "$Dotfiles"/shell/tcsh/rc.csh; source_tmux_conf.sh'
 

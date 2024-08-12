@@ -11,6 +11,8 @@ else
     ThisDir="${Dotfiles}/shell/zsh"
 fi
 
+PATH=`"${Dotfiles}/scripts/path/set_path.sh" "${Dotfiles}/shell/path"`
+
 ################################################################################
 # Source rc_common.sh if running a non-interactive shell.
 ################################################################################

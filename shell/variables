@@ -1,5 +1,6 @@
-{env_var} PATH{separator}`"${Dotfiles}/scripts/path/set_path.sh" "${Dotfiles}/shell/path"`
-
+################################################################################
+# Variables common for all shells
+################################################################################
 {env_var} EDITOR{separator}nvim
 {env_var} LESS{separator}"-iR"
 {env_var} RIPGREP_CONFIG_PATH{separator}"${Dotfiles}/.ripgreprc"
@@ -7,4 +8,16 @@
 {env_var} TMUX_TMPDIR{separator}~/tmux_sessions/$HOST
 {env_var} LESSHISTFILE{separator}~/dump/.lesshst
 {env_var} PYTHON_HISTORY{separator}~/dump/.python_history
+
+################################################################################
+# Variables specific to ZSH
+################################################################################
+
+################################################################################
+# Variables specific to TCSH
+################################################################################
+set HIST = "~/dump/.history"
+set histfile = ~/dump/.history
+set histdup = erase # Remove duplicate entries in history
+set savehist = (500 merge lock)
 
