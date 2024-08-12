@@ -5,7 +5,7 @@
 {env_var} LESS{separator}"-iR"
 {env_var} RIPGREP_CONFIG_PATH{separator}"${Dotfiles}/.ripgreprc"
 {env_var} FZF_DEFAULT_COMMAND{separator}'rg --files'
-{env_var} TMUX_TMPDIR{separator}~/tmux_sessions/$HOST
+{env_var} TMUX_TMPDIR{separator}"${HOME}/tmux_sessions/${HOST}"
 {env_var} LESSHISTFILE{separator}~/dump/.lesshst
 {env_var} PYTHON_HISTORY{separator}~/dump/.python_history
 
