@@ -44,7 +44,7 @@ function! Tnoremap(Lhs, Rhs)
         let s:MyTermBindings = []
     endif
 
-    let l:Binding = 'tnoremap <buffer> ' . a:Lhs . ' <C-\><C-n>' . a:Rhs
+    let l:Binding = 'tnoremap <silent> <buffer> ' . a:Lhs . ' <C-\><C-n>' . a:Rhs
     let s:MyTermBindings += [l:Binding]
 endfunction
 
@@ -65,13 +65,25 @@ nnoremap <C-j> <C-W>j
 nnoremap <C-k> <C-W>k
 nnoremap <C-h> <C-W>h
 nnoremap <C-l> <C-W>l
-call Tnoremap('<C-j>', '<C-W>j')
-call Tnoremap('<C-k>', '<C-W>k')
-call Tnoremap('<C-h>', '<C-W>h')
-call Tnoremap('<C-l>', '<C-W>l')
+call Tnoremap('<C-j>', ':call TerminalMoveWindow("j")<CR>')
+call Tnoremap('<C-k>', ':call TerminalMoveWindow("k")<CR>')
+call Tnoremap('<C-h>', ':call TerminalMoveWindow("h")<CR>')
+call Tnoremap('<C-l>', ':call TerminalMoveWindow("l")<CR>')
 " netrw overrides my mappings. So override them again here :D
 autocmd filetype netrw nnoremap <buffer> <C-h> <C-W>h
 autocmd filetype netrw nnoremap <buffer> <C-l> <C-W>l
+function! TerminalMoveWindow(Direction)
+    let l:CurrentWindow = winnr()
+    let l:TargetWindow = winnr(a:Direction)
+    if (l:CurrentWindow == l:TargetWindow)
+        " There's no window in that direction. Do nothing
+        " and go back to terminal mode.
+        startinsert
+    else
+        let b:LeftInTerminalMode="true"
+        exec 'wincmd ' . a:Direction
+    endif
+endfunction
 
 nnoremap <leader>iv :e ~/dotfiles/nvim/init.vim<CR>
 nnoremap <leader>il :e ~/dotfiles/nvim/lua/init.lua<CR>
@@ -411,7 +423,18 @@ nnoremap <silent> <leader>p :YRShow<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Terminals
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call Tnoremap('<C-^>', '<C-^>')
+call Tnoremap('<C-^>', ':call TerminalGoToAlternateBuffer()<CR>')
+function! TerminalGoToAlternateBuffer()
+    if bufexists(bufnr('#'))
+        let b:LeftInTerminalMode="true"
+        execute 'buffer#'
+    else
+        echohl ErrorMsg
+        echo "E23: No alternate file"
+        echohl NONE
+        startinsert
+    endif
+endfunction
 
 nnoremap <leader>td :call Dotfiles()<CR>
 call Tnoremap('<leader>td', ':call Dotfiles()<CR>')
@@ -518,12 +541,11 @@ function! ToggleTermEnterOrLeave(...)
         if (l:FirstTime)
             startinsert
             let b:NotFirstTime = "true"
-        else
-            let l:CurrentLine = line('.')
-            let l:LastNonEmptyLine = GetLastNonEmptyLine()
-            if (l:CurrentLine == l:LastNonEmptyLine)
-                startinsert
-            endif
+        elseif exists('b:LeftInTerminalMode')
+            unlet b:LeftInTerminalMode
+            startinsert
+        elseif (line('.') == GetLastNonEmptyLine())
+            startinsert
         endif
     else
         stopinsert
