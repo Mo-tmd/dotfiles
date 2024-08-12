@@ -46,5 +46,5 @@ alias saf='exec `echo $0 | sed "s/^-//"`; source_tmux_conf.sh'
 # Aliases specific to TCSH
 ################################################################################
 alias e 'bash -c "[[ -n "\${NVIM}" ]] && nvr \!* || nvim \!*"'
-alias saf 'source "$Dotfiles"/shell/tcsh/rc.csh; source_tmux_conf.sh'
+alias saf 'source "$Dotfiles"/shell/tcsh/rc.tcsh; source_tmux_conf.sh'
 

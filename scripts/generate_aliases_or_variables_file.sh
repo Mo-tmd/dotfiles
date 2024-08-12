@@ -4,7 +4,7 @@ mkdir -p ~/dump
 AliasesOrVariables=$1
 Shell="${2,,}" # Tranform to lower case.
 InputFile=$3
-OutputFile="${HOME}/dump/${Shell}_${AliasesOrVariables}_`uuidgen`"
+OutputFile="${HOME}/dump/${AliasesOrVariables}_`uuidgen`.${Shell}"
 
 function extract_section() {
     Section=$1

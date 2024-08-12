@@ -14,14 +14,14 @@ fi
 PATH=`"${Dotfiles}/scripts/path/set_path.sh" "${Dotfiles}/shell/path"`
 
 ################################################################################
-# Source rc_common.sh if running a non-interactive shell.
+# Source rc_common.zsh if running a non-interactive shell.
 ################################################################################
 if [[ $- == *i* ]]; then
     # Interactive shell, do nothing (continue)
     :
 else
     # Non interactive shell, source common rc and exit script.
-    source "${ThisDir}/rc_common.sh"
+    source "${ThisDir}/rc_common.zsh"
     unset ThisDir
     return
 fi
@@ -155,7 +155,7 @@ source $ZSH/oh-my-zsh.sh
 ############################## END Oh My Zsh ###################################
 ################################################################################
 ################################################################################
-source "${ThisDir}/rc_common.sh"
+source "${ThisDir}/rc_common.zsh"
 unset ThisDir
 
 HISTFILE=~/dump/.zsh_history

@@ -285,8 +285,10 @@ set tabstop=4
 " Use system clipboard for yanking, deleting etc. Let's see how this works out.
 set clipboard=unnamedplus
 
-:set nowrap
-:set smartindent
+set nowrap
+set smartindent
+
+autocmd BufNewFile,BufRead *shell/variables,*shell/aliases set filetype=bash
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Colors

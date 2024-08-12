@@ -23,10 +23,10 @@ DotfilesDir=$1
 [[ -e "${DotfilesDir}" ]] || { echo "Error, \"${DotfilesDir}\" doesn't exist"; exit 0; }
 
 [[ -e ~/.cshrc.user || -L ~/.cshrc.user ]] && CshRcFile=~/.cshrc.user || CshRcFile=~/.cshrc
-create_symlink $CshRcFile "${DotfilesDir}/shell/tcsh/rc.csh"
+create_symlink $CshRcFile "${DotfilesDir}/shell/tcsh/rc.tcsh"
 
 [[ -e ~/.zshrc.user || -L ~/.zshrc.user ]] && ZshRcFile=~/.zshrc.user || ZshRcFile=~/.zshrc
-create_symlink $ZshRcFile "${DotfilesDir}/shell/zsh/rc.sh"
+create_symlink $ZshRcFile "${DotfilesDir}/shell/zsh/rc.zsh"
 
 create_symlink ~/.zshenv "${DotfilesDir}/shell/zsh/.zshenv"
 create_symlink ~/.config/nvim "${DotfilesDir}/nvim"
