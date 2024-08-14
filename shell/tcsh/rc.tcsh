@@ -16,18 +16,25 @@ endif
 setenv PATH `"${Dotfiles}/scripts/path/set_path.sh" "${Dotfiles}/shell/path"`
 
 ################################################################################
-# Main
+# Variables and aliases
 ################################################################################
-set GeneratedAliases = `generate_aliases_or_variables_file.sh aliases tcsh "${Dotfiles}"/shell/aliases`
+set GeneratedFilesDir=~/dump/tcsh/aliases_and_variables
+mkdir -p "${GeneratedFilesDir}"
+
+set GeneratedAliases="${GeneratedFilesDir}/aliases"
+generate_aliases_or_variables_file.sh aliases tcsh "${Dotfiles}"/shell/aliases "${GeneratedAliases}"
 source "${GeneratedAliases}"
-rm "${GeneratedAliases}"
 unset GeneratedAliases
 
-set GeneratedVariables = `generate_aliases_or_variables_file.sh variables tcsh "${Dotfiles}"/shell/variables`
+set GeneratedVariables="${GeneratedFilesDir}/variables"
+generate_aliases_or_variables_file.sh variables tcsh "${Dotfiles}"/shell/variables "${GeneratedVariables}"
 source "${GeneratedVariables}"
-rm "${GeneratedVariables}"
 unset GeneratedVariables
+unset GeneratedFilesDir
 
+################################################################################
+# Setup symlinks
+################################################################################
 if ($?WorkDotfiles) then
     setup_symlinks.sh "${WorkDotfiles}"
 else

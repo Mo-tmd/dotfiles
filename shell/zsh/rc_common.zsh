@@ -1,12 +1,23 @@
 # rc file common for both interactive and non interactive shells
-GeneratedAliases=$(generate_aliases_or_variables_file.sh aliases ZSH "${Dotfiles}"/shell/aliases)
+
+################################################################################
+# Variables and aliases
+################################################################################
+GeneratedFilesDir=~/dump/zsh/aliases_and_variables
+mkdir -p "${GeneratedFilesDir}"
+
+GeneratedAliases="${GeneratedFilesDir}/aliases"
+generate_aliases_or_variables_file.sh aliases ZSH "${Dotfiles}"/shell/aliases "${GeneratedAliases}"
 source "${GeneratedAliases}"
-rm "${GeneratedAliases}"
 unset GeneratedAliases
 
-GeneratedVariables=$(generate_aliases_or_variables_file.sh variables ZSH "${Dotfiles}"/shell/variables)
+GeneratedVariables="${GeneratedFilesDir}/variables"
+generate_aliases_or_variables_file.sh variables ZSH "${Dotfiles}"/shell/variables "${GeneratedVariables}"
 source "${GeneratedVariables}"
-rm "${GeneratedVariables}"
 unset GeneratedVariables
+unset GeneratedFilesDir
 
+################################################################################
+# Setup symlinks
+################################################################################
 [[ -n "${WorkDotfiles}" ]] && setup_symlinks.sh "${WorkDotfiles}" || setup_symlinks.sh "${Dotfiles}"
