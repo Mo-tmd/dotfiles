@@ -12,12 +12,12 @@
 ################################################################################
 # Variables specific to ZSH
 ################################################################################
+HISTFILE=~/dump/.zsh_history
 
 ################################################################################
 # Variables specific to TCSH
 ################################################################################
-set HIST = "~/dump/.history"
-set histfile = ~/dump/.history
+set histfile = ~/dump/.tcsh_history
 set histdup = erase # Remove duplicate entries in history
 set savehist = (500 merge lock)
 

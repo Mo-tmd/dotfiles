@@ -80,7 +80,7 @@ function! TerminalMoveWindow(Direction)
         " and go back to terminal mode.
         startinsert
     else
-        let b:LeftInTerminalMode="true"
+        let b:LeftInTerminalMode=1
         exec 'wincmd ' . a:Direction
     endif
 endfunction
@@ -426,7 +426,7 @@ nnoremap <silent> <leader>p :YRShow<CR>
 call Tnoremap('<C-^>', ':call TerminalGoToAlternateBuffer()<CR>')
 function! TerminalGoToAlternateBuffer()
     if bufexists(bufnr('#'))
-        let b:LeftInTerminalMode="true"
+        let b:LeftInTerminalMode=1
         execute 'buffer#'
     else
         echohl ErrorMsg
@@ -565,6 +565,54 @@ function! GetLastNonEmptyLine()
     endwhile
 
     " If no non-empty line is found, return 0
+    return 0
+endfunction
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Man pages
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+command! -nargs=* -complete=customlist,v:lua.require'man'.man_complete Mn call MyMan(<q-args>)
+function! MyMan(Args)
+    let l:StartBuffer = bufnr('%')
+    let l:StartAlternateBuffer = bufnr('#')
+    try
+        call TryMyMan(a:Args)
+    catch
+        if bufexists(l:StartAlternateBuffer)
+            exec 'buffer ' . l:StartAlternateBuffer
+        endif
+        exec 'buffer ' . l:StartBuffer
+        echohl ErrorMsg
+        echom v:exception
+        echohl None
+    endtry
+endfunction
+
+function! TryMyMan(Args)
+    let l:StartBuffer = bufnr('%')
+    let l:FirstManWindow = GetFirstManWindow()
+    if (l:FirstManWindow == 0)
+        exec 'Man ' . a:Args
+        let l:MyManBufNr = bufnr('%')
+        q
+        exec 'buffer ' . l:MyManBufNr
+    else
+        if (&filetype != 'man')
+            exec 'buffer ' . winbufnr(l:FirstManWindow)
+        endif
+        exec 'Man ' . a:Args
+        exec 'buffer ' . l:StartBuffer
+        exec 'buffer#'
+    endif
+endfunction
+
+function! GetFirstManWindow()
+    for l:i in range(1, winnr('$'))
+        let l:Buffer = winbufnr(l:i)
+        if (getbufvar(l:Buffer,'&filetype') == 'man')
+            return l:i
+        endif
+    endfor
     return 0
 endfunction
 

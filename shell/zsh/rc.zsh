@@ -158,8 +158,6 @@ source $ZSH/oh-my-zsh.sh
 source "${ThisDir}/rc_common.zsh"
 unset ThisDir
 
-HISTFILE=~/dump/.zsh_history
-
 unset RPS1
 
 #Key bindings
