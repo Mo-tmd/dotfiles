@@ -412,7 +412,21 @@ function! CloseDiff()
     endfor
 endfunction
 
-command! -nargs=1 Gs execute "G difftool -y " . <f-args> . "~1 " . <f-args>
+command! -nargs=* Gs call GitShow(<f-args>)
+function! GitShow(...)
+    let l:Commit = len(a:000) > 0 ? a:000[0] : "HEAD"
+    let l:File = len(a:000) > 1 ? a:000[1] : ""
+    exec printf("G difftool -y %s~1 %s %s", l:Commit, l:Commit, l:File)
+endfunction
+
+" TODO this doesn't handle renames.
+command! Grb call GitRecursiveBlame()
+function! GitRecursiveBlame()
+    let l:ReblameMapping = execute('nmap -')
+    let l:FugitiveScript = matchstr(l:ReblameMapping, '<SNR>\d\+_')
+    let [l:Commit, l:Path, l:Lnum] = call(l:FugitiveScript . 'BlameCommitFileLnum', [])
+    call GitShow(expand('<cword>'), l:Path)
+endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " YankRing
