@@ -130,7 +130,7 @@ set path+=/home/user/dotfiles/scripts
 
 set scrollback=100000
 
-let $GIT_EDITOR = 'nvr --remote-wait'
+let $GIT_EDITOR = 'nvr --remote-send "<C-\><C-n>:let b:LeftInTerminalMode=1<CR>"; nvr --remote-wait'
 
 " Reload File
 nnoremap <leader>rf :call ReloadFile()<CR>
