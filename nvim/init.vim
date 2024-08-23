@@ -529,6 +529,7 @@ function! TermSendKeys(TargetBuffer, Keys)
 
     execute 'vsplit'
     execute 'buffer ' . a:TargetBuffer
+    startinsert
     call feedkeys(a:Keys, 'n')
     if getbufvar(a:TargetBuffer, "&buftype") == "terminal"
         let l:GoToNormalMode = "\<C-\>\<C-n>"
