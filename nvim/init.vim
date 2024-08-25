@@ -58,8 +58,6 @@ nnoremap 3C <C-i>
 
 nnoremap <leader>sp :vsplit<CR>
 
-inoremap <Tab> <Space><Space><Space><Space>
-
 " Smart way to move between windows
 nnoremap <C-j> <C-W>j
 nnoremap <C-k> <C-W>k
@@ -98,12 +96,6 @@ tnoremap ;i ;i
 nnoremap <leader>q :q<CR>
 tnoremap <leader>q <C-\><C-n>:q<CR>
 
-" Avoid removing indentation when exiting insert mode after adding a line break.
-" Copied from https://stackoverflow.com/a/7413117
-inoremap <CR> <CR>x<BS>
-nnoremap o ox<BS>
-nnoremap O Ox<BS>
-
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
 
@@ -130,8 +122,6 @@ set path+=/home/user/dotfiles/scripts
 
 set scrollback=100000
 
-let $GIT_EDITOR = 'nvr --remote-send "<C-\><C-n>:let b:LeftInTerminalMode=1<CR>"; nvr --remote-wait'
-
 " Reload File
 nnoremap <leader>rf :call ReloadFile()<CR>
 function! ReloadFile()
@@ -145,22 +135,35 @@ nnoremap <leader>kb :call KillBuffer()<CR>
 call Tnoremap('<leader>kb', ':call KillBuffer()<CR>')
 function! KillBuffer()
     let l:BufferNumber = bufnr('%')
-    call PreviousBuffer()
-    execute 'bwipeout! ' . l:BufferNumber
-    " Call PreviousBuffer() twice to get C-^ to work.
-    call PreviousBuffer()
-    call PreviousBuffer()
+    call GoToPreviousBuffer()
+    if bufexists(l:BufferNumber)
+        execute 'bwipeout! ' . l:BufferNumber
+    else
+        : " Probably buhidden=wipe
+    endif
+    " Call GoToPreviousBuffer() twice to get C-^ to work.
+    call GoToPreviousBuffer()
+    call GoToPreviousBuffer()
 endfunction
 
-function! PreviousBuffer()
-    if bufexists(bufnr('#'))
-        execute 'buffer#'
-    else
+" TODO: use window specific buffer history and not fzf history. Either do that
+" manually, or look for some plugin.
+function! GoToPreviousBuffer()
+    let l:PreviousBuffer = GetPreviousBuffer()
+    if bufexists(l:PreviousBuffer)
+        execute 'buffer ' . l:PreviousBuffer
+    endif
+endfunction
+function! GetPreviousBuffer()
+    let l:AlternateBuffer = bufnr('#')
+    let l:Buffers = fzf#vim#_buflisted_sorted()
+    if bufexists(l:AlternateBuffer)
+        return l:AlternateBuffer
+    elseif len(l:Buffers) > 1
         " No alternate buffer. Use last buffer from fzf instead.
-        let l:Buffers = fzf#vim#_buflisted_sorted()
-        if len(l:Buffers) > 1
-            execute 'buffer ' . l:Buffers[1]
-        endif
+        return l:Buffers[1]
+    else
+        return -1
     endif
 endfunction
 
@@ -176,6 +179,19 @@ function! ScratchBuffer()
         setlocal noswapfile
         setlocal nolist
         setlocal nowrap
+    endif
+endfunction
+
+command! -nargs=1 RenameBuffer call RenameBuffer(<q-args>)
+function! RenameBuffer(NewName)
+    let l:AlternateBuffer = bufnr('#')
+    exec 'file ' . a:NewName
+    if bufexists(l:AlternateBuffer)
+        " Renaming the buffer messes up <C-6> history.
+        " Switch to PreviousBuffer and then switch back
+        " to fix it.
+        exec 'buffer ' . l:AlternateBuffer
+        exec 'buffer#'
     endif
 endfunction
 
@@ -293,6 +309,13 @@ set expandtab
 " 1 tab == 4 spaces
 set shiftwidth=4
 set tabstop=4
+inoremap <Tab> <Space><Space><Space><Space>
+
+" Avoid removing indentation when exiting insert mode after adding a line break.
+" Copied from https://stackoverflow.com/a/7413117
+inoremap <CR> <CR>x<BS>
+nnoremap o ox<BS>
+nnoremap O Ox<BS>
 
 " Use system clipboard for yanking, deleting etc. Let's see how this works out.
 set clipboard=unnamedplus
@@ -320,7 +343,6 @@ autocmd BufNewFile,BufRead *shell/variables,*shell/aliases set filetype=bash
         set termguicolors
     endif
 "endif
-
 "let g:gruvbox_italic=1 TODO: doesn't work in TMUX
 
 colorscheme gruvbox
@@ -467,19 +489,9 @@ function! Terminal(...)
     endif
 
     if GoToBuffer(l:TerminalName) != 'ok'
-        let l:PreviousBuffer = bufnr('%')
         execute 'terminal'
-        execute 'file ' . l:TerminalName
-
+        call RenameBuffer(l:TerminalName)
         call SetMyTermBindings()
-
-        " Renaming the buffer messes up <C-6> history.
-        " Switch to PreviousBuffer and then switch back
-        " to fix it.
-        let l:TerminalBuffer = bufnr('%')
-        execute 'buffer ' . l:PreviousBuffer
-        execute 'buffer ' . l:TerminalBuffer
-
         for l:StartAction in l:StartActions
             call feedkeys(l:StartAction . "\<CR>", 'n')
         endfor
@@ -586,6 +598,8 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Man pages
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+autocmd filetype man setlocal number relativenumber | setlocal nowrap
+
 command! -nargs=* -complete=customlist,v:lua.require'man'.man_complete Mn call MyMan(<q-args>)
 function! MyMan(Args)
     let l:StartBuffer = bufnr('%')
@@ -600,6 +614,17 @@ function! MyMan(Args)
         echohl ErrorMsg
         echom v:exception
         echohl None
+    finally
+        if (&filetype == 'man')
+            exec 'nnoremap <silent> <buffer> q :call GoToPreviousBuffer()<CR>'
+            if bufname() !~ '^\d\+ man'
+                " There's a bug in Man when invoked as a MANPAGER. It would crash if there's
+                " already an existing buffer with the same name as the new man page.
+                " See https://github.com/neovim/neovim/issues/30132
+                " Workaround: prefix buffer name with buffer number to make it unique.
+                call RenameBuffer(bufnr() . ' ' . bufname())
+            endif
+        endif
     endtry
 endfunction
 
@@ -616,6 +641,15 @@ function! TryMyMan(Args)
             exec 'buffer ' . winbufnr(l:FirstManWindow)
         endif
         exec 'Man ' . a:Args
+        for l:Buffer in range(1, bufnr('$'))
+            if l:Buffer != bufnr() && bufexists(l:Buffer) && bufname(l:Buffer) =~ '^\d\+ ' . bufname()
+                let l:DuplicateManBuffer = bufnr()
+                exec 'buffer ' . l:StartBuffer
+                exec 'buffer ' . l:Buffer
+                exec 'bwipeout! ' . l:DuplicateManBuffer
+                return
+            endif
+        endfor
         exec 'buffer ' . l:StartBuffer
         exec 'buffer#'
     endif
@@ -657,6 +691,13 @@ highlight ConflictMarkerTheirs              guifg=#2991C1
 highlight ConflictMarkerEnd                 guifg=#7A7979
 
 highlight ConflictMarkerSeparator           guifg=#7A7979
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" General TODOs
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" TODO buffers that get auto wiped (e.g. using bufhidden=wipe) can mess with
+" <C-^> history. Perhaps add some autocmd if possible and manually fix alternate
+" file history. Or perhaps better to make <C-^> use PreviousBuffer() instead.
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Stuff that needs to be at the end

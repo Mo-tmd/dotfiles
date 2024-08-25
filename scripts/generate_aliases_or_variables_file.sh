@@ -90,6 +90,7 @@ if [[ $AliasesOrVariables == variables ]]; then
                "${OutputFile}"
         extract_section "Variables specific to TCSH"
     fi
+    extract_section "Unset variables"
 fi
 
 rm "${OutputFile}.lock"
