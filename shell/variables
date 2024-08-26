@@ -9,11 +9,9 @@
 {env_var} MANWIDTH{separator}80
 
 {shell_var}InsideNvimPager="nvr -cc 'let b:LeftInTerminalMode=1' +'Man! | setlocal bufhidden=wipe |  nnoremap <silent> <buffer> q :call GoToPreviousBuffer()<CR>' -"
-{shell_var}InsideNvimGitPager="nvr -cc 'let b:LeftInTerminalMode=1' +'Man! | setlocal bufhidden=wipe |  nnoremap <silent> <buffer> q :call GoToPreviousBuffer()<CR> | setfiletype git' -"
 {shell_var}InsideNvimGitEditor="nvr -cc 'let b:LeftInTerminalMode=1' --remote-wait"
 
 {shell_var}OutsideNvimPager="nvim +'Man! | setlocal bufhidden=wipe' -"
-{shell_var}OutsideNvimGitPager="nvim +'Man! | setlocal bufhidden=wipe | setfiletype git' - "
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Misc
@@ -29,12 +27,10 @@
 ################################################################################
 HISTFILE=~/dump/.zsh_history
 if [[ -n "${NVIM}" ]]; then
-    export PAGER=$InsideNvimPager
-    export GIT_PAGER=$InsideNvimGitPager
+    export MANPAGER=$InsideNvimPager
     export GIT_EDITOR=$InsideNvimGitEditor
 else
-    export PAGER=$OutsideNvimPager
-    export GIT_PAGER=$OutsideNvimGitPager
+    export MANPAGER=$OutsideNvimPager
 fi
 
 ################################################################################
@@ -44,20 +40,16 @@ set histfile = ~/dump/.tcsh_history
 set histdup = erase # Remove duplicate entries in history
 set savehist = (500 merge lock)
 if ($?NVIM) then
-    setenv PAGER "${InsideNvimPager}"
-    setenv GIT_PAGER "${InsideNvimGitPager}"
+    setenv MANPAGER "${InsideNvimPager}"
     setenv GIT_EDITOR "${InsideNvimGitEditor}"
 else
-    setenv PAGER "${OutsideNvimPager}"
-    setenv GIT_PAGER "${OutsideNvimGitPager}"
+    setenv MANPAGER "${OutsideNvimPager}"
 endif
 
 ################################################################################
 # Unset variables
 ################################################################################
 unset InsideNvimPager
-unset InsideNvimGitPager
 unset InsideNvimGitEditor
 unset OutsideNvimPager
-unset OutsideNvimGitPager
 
