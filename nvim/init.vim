@@ -571,7 +571,7 @@ function! ToggleTermEnterOrLeave(...)
         elseif exists('b:LeftInTerminalMode')
             unlet b:LeftInTerminalMode
             startinsert
-        elseif (line('.') == GetLastNonEmptyLine())
+        elseif (line('.') >= GetLastNonEmptyLine())
             startinsert
         endif
     else
