@@ -30,8 +30,8 @@ call plug#begin()
     " Lightline
     Plug 'itchyny/lightline.vim'
 
-    " YankRing.vim
-    Plug 'vim-scripts/YankRing.vim'
+    " yanky
+    Plug 'gbprod/yanky.nvim'
 call plug#end()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
