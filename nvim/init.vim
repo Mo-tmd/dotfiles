@@ -622,6 +622,7 @@ function! MyMan(Args)
                 " already an existing buffer with the same name as the new man page.
                 " See https://github.com/neovim/neovim/issues/30132
                 " Workaround: prefix buffer name with buffer number to make it unique.
+                setlocal bufhidden=
                 call RenameBuffer(bufnr() . ' ' . bufname())
             endif
         endif
