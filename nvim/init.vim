@@ -94,7 +94,7 @@ nnoremap <silent> <CR> :noh<CR><CR>
 tnoremap ;i ;i
 
 nnoremap <leader>q :q<CR>
-tnoremap <leader>q <C-\><C-n>:q<CR>
+tnoremap <leader>q <C-\><C-n>:let b:LeftInTerminalMode=1<CR>:q<CR>
 
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
