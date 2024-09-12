@@ -103,7 +103,7 @@ STab = cmp.mapping(function(fallback)
       end
     end, { "i", "s" })
 local mappings = {
-    ['<CR>']    = cmp.mapping.confirm({select=true}),
+    ['<CR>']    = cmp.mapping.confirm({select=false}),
     ['<Tab>']   = Tab,
     ['<S-Tab>'] = STab,
 }
