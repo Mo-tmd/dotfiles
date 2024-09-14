@@ -35,20 +35,47 @@ call plug#begin()
 call plug#end()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Key bindings
+" Stuff that needs to be in the beginning
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! Tnoremap(Lhs, Rhs)
-" Adds a terminal mode mapping to a list. These mappings will then later be
-" applied only to "my" terminals. i.e., terminal created through Terminal()
-    if !exists('s:MyTermBindings')
-        let s:MyTermBindings = []
+function! GetFullTerminalName(...)
+    if len(a:000) > 0 && len(a:000[0]) > 0
+        let l:TerminalName = a:000[0]
+    else
+        if exists('s:TerminalNumber')
+            let s:TerminalNumber += 1
+        else
+            let s:TerminalNumber = 1
+        endif
+        let l:TerminalName = s:TerminalNumber
     endif
-
-    let l:Binding = 'tnoremap <silent> <buffer> ' . a:Lhs . ' <C-\><C-n>' . a:Rhs
-    let s:MyTermBindings += [l:Binding]
+    return 'Term: ' . l:TerminalName
 endfunction
 
 let mapleader = ","
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Key bindings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Adds a terminal mode mapping to a list. These mappings will then later be
+" applied only to "my" terminals. i.e., terminals created through Terminal()
+function! Tnoremap(Lhs, Rhs)
+    if !exists('s:MyTerminalBindings')
+        let s:MyTerminalBindings = []
+    endif
+    let l:Binding = 'tnoremap <silent> <buffer> ' . a:Lhs . ' <C-\><C-n>' . a:Rhs
+    let s:MyTerminalBindings += [l:Binding]
+endfunction
+
+" Creates a mapping in both normal and terminal modes to
+" start/go_to a terminal.
+function! CreateMapForStartingTerminal(Lhs, TerminalName, ...)
+    let l:Args = [a:TerminalName] + a:000
+    let l:QuotedArgs = map(l:Args, 'printf("\"%s\"", v:val)')
+    let l:ArgsString = join(l:QuotedArgs, ',')
+    exec printf('nnoremap <silent> %s :call call("Terminal", [%s])<CR>', a:Lhs, l:ArgsString)
+    call Tnoremap(a:Lhs, printf(':execute (bufname("%") == "%s" ? "startinsert" : ''let b:LeftInTerminalMode=1 \| call call("Terminal", [%s])'')<CR>', GetFullTerminalName(a:TerminalName), l:ArgsString))
+endfunction
+
 set timeoutlen=500
 
 nnoremap <A-Left> <C-o>
@@ -67,9 +94,6 @@ call Tnoremap('<C-j>', ':call TerminalMoveWindow("j")<CR>')
 call Tnoremap('<C-k>', ':call TerminalMoveWindow("k")<CR>')
 call Tnoremap('<C-h>', ':call TerminalMoveWindow("h")<CR>')
 call Tnoremap('<C-l>', ':call TerminalMoveWindow("l")<CR>')
-" netrw overrides my mappings. So override them again here :D
-autocmd filetype netrw nnoremap <buffer> <C-h> <C-W>h
-autocmd filetype netrw nnoremap <buffer> <C-l> <C-W>l
 function! TerminalMoveWindow(Direction)
     let l:CurrentWindow = winnr()
     let l:TargetWindow = winnr(a:Direction)
@@ -82,6 +106,9 @@ function! TerminalMoveWindow(Direction)
         exec 'wincmd ' . a:Direction
     endif
 endfunction
+" netrw overrides my mappings. So override them again here :D
+autocmd filetype netrw nnoremap <buffer> <C-h> <C-W>h
+autocmd filetype netrw nnoremap <buffer> <C-l> <C-W>l
 
 nnoremap <leader>iv :e ~/dotfiles/nvim/init.vim<CR>
 nnoremap <leader>il :e ~/dotfiles/nvim/lua/init.lua<CR>
@@ -89,9 +116,6 @@ nnoremap <leader>il :e ~/dotfiles/nvim/lua/init.lua<CR>
 inoremap ii <Esc>
 call Tnoremap('ii', '<C-\><C-n>')
 nnoremap <silent> <CR> :noh<CR><CR>
-
-" Used by ZSH to go to begging of line. Map it to avoid neovim causing delay after pressing `i`
-tnoremap ;i ;i
 
 nnoremap <leader>q :q<CR>
 tnoremap <leader>q <C-\><C-n>:let b:LeftInTerminalMode=1<CR>:q<CR>
@@ -184,9 +208,10 @@ endfunction
 
 command! -nargs=1 RenameBuffer call RenameBuffer(<q-args>)
 function! RenameBuffer(NewName)
+    let l:StartBuffer = bufnr('%')
     let l:AlternateBuffer = bufnr('#')
     exec 'file ' . a:NewName
-    if bufexists(l:AlternateBuffer)
+    if bufexists(l:AlternateBuffer) && l:StartBuffer != l:AlternateBuffer
         " Renaming the buffer messes up <C-6> history.
         " Switch to PreviousBuffer and then switch back
         " to fix it.
@@ -251,7 +276,7 @@ let g:lightline = {
       \ 'component': {
       \   'cwd': 'CWD: %{getcwd()}',
       \   'readonly': '%{&filetype=="help"?"":&readonly?"🔒":""}',
-      \   'modified': '%{&filetype=="help"?"":&modified?"+":&modifiable?"":"-"}',
+      \   'modified': '%{&filetype=="help"||&buftype=="terminal"?"":&modified?"+":&modifiable?"":"-"}',
       \   'fugitive': '%{exists("*FugitiveHead")?FugitiveHead():""}'
       \ },
       \ 'component_visible_condition': {
@@ -385,7 +410,7 @@ endfunction
 nnoremap <leader>af :Files<CR>
 nnoremap <leader>df :Files ~/dotfiles<CR>
 nnoremap <leader>b :Buffers<CR>
-tnoremap <leader>b <C-\><C-n>:Buffers<CR>
+tnoremap <leader>b <C-\><C-n>:let b:LeftInTerminalMode=1<CR>:Buffers<CR>
 
 " Below is copied from Oskar, I have no idea what it does for now
 command! -nargs=* -bang FileContents call FileContentsFunc(<q-args>, <bang>0)
@@ -472,19 +497,15 @@ function! TerminalGoToAlternateBuffer()
     endif
 endfunction
 
-nnoremap <leader>td :call Dotfiles()<CR>
-call Tnoremap('<leader>td', ':call Dotfiles()<CR>')
-function! Dotfiles()
-    call Terminal('Dotfiles_terminal', 'cd ~/dotfiles')
-endfunction
+call CreateMapForStartingTerminal('<leader>td', 'Dotfiles', 'cd ~/dotfiles')
 
-command! -nargs=? Term call Terminal(<f-args>)
+command! -nargs=? Term call Terminal(<q-args>)
 function! Terminal(...)
-    if len(a:000) > 0
-        let l:TerminalName = a:000[0]
+    if len(a:000) > 0 && len(a:000[0]) > 0
+        let l:TerminalName = GetFullTerminalName(a:000[0])
         let l:StartActions = a:000[1:]
     else
-        let l:TerminalName = GetTerminalName()
+        let l:TerminalName = GetFullTerminalName()
         let l:StartActions = []
     endif
 
@@ -496,15 +517,6 @@ function! Terminal(...)
             call feedkeys(l:StartAction . "\<CR>", 'n')
         endfor
     endif
-endfunction
-
-function! GetTerminalName()
-    if exists('s:TerminalNumber')
-        let s:TerminalNumber += 1
-    else
-        let s:TerminalNumber = 1
-    endif
-    return 'Terminal ' . s:TerminalNumber
 endfunction
 
 " * Go to a buffer and return 'ok' if it exists.
@@ -529,7 +541,7 @@ function! GoToBuffer(BufferName)
 endfunction
 
 function! SetMyTermBindings()
-    for l:KeyBinding in s:MyTermBindings
+    for l:KeyBinding in s:MyTerminalBindings
         execute l:KeyBinding
     endfor
 endfunction
@@ -558,7 +570,9 @@ augroup TermEnterOrLeave
     " specifically). When triggered by BufEnter, line('.') always
     " returns 1. This is probably becuase cursor hasn't been drawn yet or
     " similar. So add a delay to solve.
-    autocmd WinEnter,BufEnter * call timer_start(1, 'ToggleTermEnterOrLeave')
+    " Update: this seems to also solve the issue where entering a terminal
+    " buffer through :Buffers doesn't enter terminal mode for some reason.
+    autocmd WinEnter,BufEnter * call timer_start(10, 'ToggleTermEnterOrLeave')
     autocmd TermOpen * startinsert
 augroup END
 
