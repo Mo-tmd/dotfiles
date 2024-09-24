@@ -454,16 +454,18 @@ endfunction
 
 nnoremap <leader>cd :call CloseDiff()<CR>
 function! CloseDiff()
-    let l:Buffers = tabpagebuflist()
-    call sort(l:Buffers)
-    call reverse(l:Buffers)
-
-    for l:Buffer in l:Buffers
-        let l:BufferName = bufname(l:Buffer)
-        if l:BufferName =~ '^fugitive:///.*\.git.*//\S\+'
-            " TODO: just close instead of wipeout in case the buffer exists in
-            " other windows
-            execute 'bwipeout ' . l:Buffer
+    let l:Windows = range(1, winnr('$')) " Iterate through all windows in the current tab.
+    for l:Window in l:Windows
+        let l:Buffer = winbufnr(l:Window)
+        if bufname(l:Buffer) =~ '^fugitive:///.*\.git.*//\S\+'
+            let l:AllBufferWindows = win_findbuf(l:Buffer)
+            if len(l:AllBufferWindows) == 1
+                " The buffer doesn't exist in other windows, just wipeout.
+                execute 'bwipeout ' . l:Buffer
+            elseif len(l:AllBufferWindows) > 1
+                " The buffer exists in other windows. Just close the window.
+                call win_execute(win_getid(l:Window), 'close')
+            endif
             break
         endif
     endfor
