@@ -53,6 +53,14 @@ endfunction
 
 let mapleader = ","
 
+" Wrapper around system() function. It removes the new line character at the
+" end of the output (displayed as ^@)
+" See https://superuser.com/a/935646
+function! SystemCmd(...)
+    let l:Output = call('system', a:000)
+    return substitute(l:Output, '\n$', '', '')
+endfunction
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Key bindings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -453,6 +461,8 @@ function! CloseDiff()
     for l:Buffer in l:Buffers
         let l:BufferName = bufname(l:Buffer)
         if l:BufferName =~ '^fugitive:///.*\.git.*//\S\+'
+            " TODO: just close instead of wipeout in case the buffer exists in
+            " other windows
             execute 'bwipeout ' . l:Buffer
             break
         endif
