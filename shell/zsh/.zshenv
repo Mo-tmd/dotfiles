@@ -1,3 +1,6 @@
-# If interactive shell, do nothing.
-# If not interactive shell, source rc file.
-[[ $- == *i* ]] && : || source ~/.zshrc
+if [[ $- == *i* ]]; then
+    : # Interactive shell, do nothing.
+else
+    # Non-interactive shell, source rc file
+    [[ -e ~/.zshrc.user ]] && source ~/.zshrc.user || source ~/.zshrc
+fi
