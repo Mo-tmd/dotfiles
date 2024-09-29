@@ -7,7 +7,7 @@
 alias gs{separator}'git status'
 alias gd{separator}'git diff'
 alias ga{separator}'git add'
-alias gc{separator}'git commit -m'
+alias gc{separator}'git commit'
 alias push{separator}'git push'
 alias pull{separator}'git pull'
 alias co{separator}'git checkout'
