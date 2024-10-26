@@ -600,7 +600,7 @@ function! ToggleTermEnterOrLeave(...)
         elseif (line('.') >= GetLastNonEmptyLine())
             startinsert
         endif
-    else
+    elseif &filetype != "TelescopePrompt" && &filetype != "alpha"
         stopinsert
     endif
 endfunction
