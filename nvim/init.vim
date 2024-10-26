@@ -37,53 +37,14 @@ call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Stuff that needs to be in the beginning
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! GetFullTerminalName(...)
-    if len(a:000) > 0 && len(a:000[0]) > 0
-        let l:TerminalName = a:000[0]
-    else
-        if exists('s:TerminalNumber')
-            let s:TerminalNumber += 1
-        else
-            let s:TerminalNumber = 1
-        endif
-        let l:TerminalName = s:TerminalNumber
-    endif
-    return 'Term: ' . l:TerminalName
-endfunction
-
 let mapleader = ","
 
-" Wrapper around system() function. It removes the new line character at the
-" end of the output (displayed as ^@)
-" See https://superuser.com/a/935646
-function! SystemCmd(...)
-    let l:Output = call('system', a:000)
-    return substitute(l:Output, '\n$', '', '')
-endfunction
+source $Dotfiles/nvim/vimscript/util.vim
+source $Dotfiles/nvim/vimscript/terminals.vim
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Key bindings
+" Key mappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Adds a terminal mode mapping to a list. These mappings will then later be
-" applied only to "my" terminals. i.e., terminals created through Terminal()
-function! Tnoremap(Lhs, Rhs)
-    if !exists('s:MyTerminalBindings')
-        let s:MyTerminalBindings = []
-    endif
-    let l:Binding = 'tnoremap <silent> <buffer> ' . a:Lhs . ' <C-\><C-n>' . a:Rhs
-    let s:MyTerminalBindings += [l:Binding]
-endfunction
-
-" Creates a mapping in both normal and terminal modes to
-" start/go_to a terminal.
-function! CreateMapForStartingTerminal(Lhs, TerminalName, ...)
-    let l:Args = [a:TerminalName] + a:000
-    let l:QuotedArgs = map(l:Args, 'printf("\"%s\"", v:val)')
-    let l:ArgsString = join(l:QuotedArgs, ',')
-    exec printf('nnoremap <silent> %s :call call("Terminal", [%s])<CR>', a:Lhs, l:ArgsString)
-    call Tnoremap(a:Lhs, printf(':execute (bufname("%") == "%s" ? "startinsert" : ''let b:LeftInTerminalMode=1 \| call call("Terminal", [%s])'')<CR>', GetFullTerminalName(a:TerminalName), l:ArgsString))
-endfunction
-
 set timeoutlen=500
 
 nnoremap <A-Left> <C-o>
@@ -492,134 +453,6 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:yankring_history_dir = "~/dump"
 nnoremap <silent> <leader>p :YRShow<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Terminals
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call Tnoremap('<C-^>', ':call TerminalGoToAlternateBuffer()<CR>')
-function! TerminalGoToAlternateBuffer()
-    if bufexists(bufnr('#'))
-        let b:LeftInTerminalMode=1
-        execute 'buffer#'
-    else
-        echohl ErrorMsg
-        echo "E23: No alternate file"
-        echohl NONE
-        startinsert
-    endif
-endfunction
-
-call CreateMapForStartingTerminal('<leader>td', 'Dotfiles', 'cd ~/dotfiles')
-
-command! -nargs=? Term call Terminal(<q-args>)
-function! Terminal(...)
-    if len(a:000) > 0 && len(a:000[0]) > 0
-        let l:TerminalName = GetFullTerminalName(a:000[0])
-        let l:StartActions = a:000[1:]
-    else
-        let l:TerminalName = GetFullTerminalName()
-        let l:StartActions = []
-    endif
-
-    if GoToBuffer(l:TerminalName) != 'ok'
-        execute 'terminal'
-        call RenameBuffer(l:TerminalName)
-        call SetMyTermBindings()
-        for l:StartAction in l:StartActions
-            call feedkeys(l:StartAction . "\<CR>", 'n')
-        endfor
-    endif
-endfunction
-
-" * Go to a buffer and return 'ok' if it exists.
-" * Return 'error' if it doesn't exist.
-" * If the buffer exists and is neither loaded nor listed, kill the
-"   buffer and return 'error'.
-"   Don't know why this happens sometimes. Noticed this for terminals
-"   where it would go to the buffer, but it's not a terminal.
-function! GoToBuffer(BufferName)
-    let l:BufferNumber = bufnr('^' . a:BufferName . '$')
-    if l:BufferNumber > 0
-        if bufloaded(l:BufferNumber) || buflisted(l:BufferNumber)
-            execute 'buffer ' . l:BufferNumber
-            return 'ok'
-        else
-            execute 'bwipeout ' . l:BufferNumber
-            return 'error'
-        endif
-    else
-        return 'error'
-    endif
-endfunction
-
-function! SetMyTermBindings()
-    for l:KeyBinding in s:MyTerminalBindings
-        execute l:KeyBinding
-    endfor
-endfunction
-
-function! TermSendKeys(TargetBuffer, Keys)
-    if !bufexists(a:TargetBuffer)
-        throw "TargetBuffer doesn't exist"
-    endif
-
-    execute 'vsplit'
-    execute 'buffer ' . a:TargetBuffer
-    startinsert
-    call feedkeys(a:Keys, 'n')
-    if getbufvar(a:TargetBuffer, "&buftype") == "terminal"
-        let l:GoToNormalMode = "\<C-\>\<C-n>"
-    else
-        let l:GoToNormalMode = "\<Esc>"
-    endif
-    call feedkeys(l:GoToNormalMode, 'n')
-    call feedkeys(":q\<CR>", 'n')
-endfunction
-
-augroup TermEnterOrLeave
-    autocmd!
-    " The function ToggleTermEnterOrLeave relies on cursor position (line
-    " specifically). When triggered by BufEnter, line('.') always
-    " returns 1. This is probably becuase cursor hasn't been drawn yet or
-    " similar. So add a delay to solve.
-    " Update: this seems to also solve the issue where entering a terminal
-    " buffer through :Buffers doesn't enter terminal mode for some reason.
-    autocmd WinEnter,BufEnter * call timer_start(10, 'ToggleTermEnterOrLeave')
-    autocmd TermOpen * startinsert
-augroup END
-
-function! ToggleTermEnterOrLeave(...)
-    if &buftype == "terminal"
-        let l:FirstTime = !exists("b:NotFirstTime")
-        if (l:FirstTime)
-            startinsert
-            let b:NotFirstTime = "true"
-        elseif exists('b:LeftInTerminalMode')
-            unlet b:LeftInTerminalMode
-            startinsert
-        elseif (line('.') >= GetLastNonEmptyLine())
-            startinsert
-        endif
-    elseif &filetype != "TelescopePrompt" && &filetype != "alpha"
-        stopinsert
-    endif
-endfunction
-
-function! GetLastNonEmptyLine()
-    " Start from the last line in the buffer
-    let l:LastLine = line('$')
-
-    " Loop backwards until a non-empty line is found
-    while l:LastLine > 0
-        if getline(l:LastLine) != ''
-            return l:LastLine
-        endif
-        let l:LastLine -= 1
-    endwhile
-
-    " If no non-empty line is found, return 0
-    return 0
-endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Man pages
