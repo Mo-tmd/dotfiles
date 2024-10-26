@@ -423,12 +423,6 @@ function! GitRecursiveBlame()
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" YankRing
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:yankring_history_dir = "~/dump"
-nnoremap <silent> <leader>p :YRShow<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Man pages
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 autocmd filetype man setlocal number relativenumber | setlocal nowrap
