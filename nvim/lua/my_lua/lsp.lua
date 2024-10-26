@@ -131,4 +131,3 @@ function toggle_diagnostics()
         vim.diagnostic.disable()
     end
 end
-

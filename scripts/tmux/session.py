@@ -16,4 +16,3 @@ class Session:
         for window in self.windows:
             string += window.__str__() + "\n\n"
         return string
-

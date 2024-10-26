@@ -191,4 +191,3 @@ function KillBufferVicmdMode() {
 }
 zle -N KillBufferVicmdMode
 bindkey -M vicmd '^U' KillBufferVicmdMode
-

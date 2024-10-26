@@ -78,4 +78,3 @@ function SourceAllFiles()
     vim.api.nvim_command("so ~/dotfiles/nvim/init.vim")
     vim.api.nvim_command("so ~/dotfiles/nvim/lua/init.lua")
 end
-

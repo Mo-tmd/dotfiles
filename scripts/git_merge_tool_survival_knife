@@ -19,5 +19,3 @@ arg=" edit $MERGED                                                   \
     "
 
 nvim -f -c "$arg"
-
-

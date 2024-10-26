@@ -94,4 +94,3 @@ if [[ $AliasesOrVariables == variables ]]; then
 fi
 
 rm "${OutputFile}.lock"
-

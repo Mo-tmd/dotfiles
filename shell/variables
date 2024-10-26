@@ -52,4 +52,3 @@ endif
 unset InsideNvimPager
 unset InsideNvimGitEditor
 unset OutsideNvimPager
-

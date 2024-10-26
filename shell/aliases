@@ -49,4 +49,3 @@ alias saf='source_tmux_conf; exec `echo $0 | sed "s/^-//"`'
 alias e 'bash -c "[[ -n "\${NVIM}" ]] && { nvr -cc :let\ b:LeftInTerminalMode=1 \!*; } || nvim \!*"'
 alias source_tmux_conf 'bash -c "[[ -n "\${TMUX}" ]] && tmux source-file ~/.tmux.conf"'
 alias saf 'source "${Dotfiles}"/shell/tcsh/rc.tcsh; source_tmux_conf'
-
