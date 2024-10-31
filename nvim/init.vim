@@ -392,6 +392,12 @@ function! FileContentsFunc(query, fullscreen)
     call fzf#vim#grep(initial_command, 1, spec, a:fullscreen)
 endfunction
 
+command! -bang -nargs=* GitGrep
+  \ call fzf#vim#grep(
+  \   'git grep --line-number -v ^$', 0,
+  \   fzf#vim#with_preview({'dir': SystemCmd('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel')}), <bang>0
+  \ )
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Nerd Tree
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
