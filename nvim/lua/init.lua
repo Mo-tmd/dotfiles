@@ -1,9 +1,4 @@
 -------------------------------------------------------------------------------
--- Stuff that needs to be in the beginning
--------------------------------------------------------------------------------
-ToString = require('my_lua/inspect')
-
--------------------------------------------------------------------------------
 -- Load all lua scripts
 -------------------------------------------------------------------------------
 require('my_lua/lsp')
@@ -51,7 +46,7 @@ end
 -- Can be used to print tables for instance
 function Print(arg)
     -- First convert arg to a multiline string
-    local multiline_string = ToString(arg)
+    local multiline_string = vim.inspect(arg)
 
     -- Then convert the multiline string to a table of strings
     local strings = string_to_table(multiline_string)

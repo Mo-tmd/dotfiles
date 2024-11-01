@@ -44,6 +44,12 @@ source $Dotfiles/nvim/vimscript/terminals.vim
 source $Dotfiles/nvim/vimscript/alternate_buffer.vim
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" init.lua
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set runtimepath+=$Dotfiles/nvim
+lua require('init')
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Key mappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set timeoutlen=500
@@ -96,16 +102,6 @@ cnoremap <C-n> <Down>
 nnoremap <leader>le `.
 
 nnoremap <leader>dt :lua toggle_diagnostics()<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Lua Scripts
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let s:OldRuntimePath = &runtimepath
-set runtimepath+=$Dotfiles/nvim
-lua require('init')
-if (s:OldRuntimePath != &runtimepath)
-    set runtimepath-=$Dotfiles/nvim
-endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
