@@ -8,7 +8,7 @@
 {env_var} LESS{separator}"-iR"
 {env_var} MANWIDTH{separator}80
 
-{shell_var}InsideNvimPager="nvr -cc 'let b:LeftInTerminalMode=1' +'Man! | setlocal bufhidden=wipe |  nnoremap <silent> <buffer> q :call GoToPreviousBuffer()<CR>' -"
+{shell_var}InsideNvimPager="nvr -cc 'let b:LeftInTerminalMode=1' +'Man! | setlocal bufhidden=wipe |  nnoremap <silent> <buffer> q :call GoToAlternateBuffer()<CR>' -"
 {shell_var}InsideNvimGitEditor="nvr -cc 'let b:LeftInTerminalMode=1' --remote-wait"
 
 {shell_var}OutsideNvimPager="nvim +'Man! | setlocal bufhidden=wipe' -"

@@ -41,6 +41,7 @@ let mapleader = ","
 
 source $Dotfiles/nvim/vimscript/util.vim
 source $Dotfiles/nvim/vimscript/terminals.vim
+source $Dotfiles/nvim/vimscript/alternate_buffer.vim
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Key mappings
@@ -127,36 +128,17 @@ endfunction
 nnoremap <leader>kb :call KillBuffer()<CR>
 call Tnoremap('<leader>kb', ':call KillBuffer()<CR>')
 function! KillBuffer()
-    let l:BufferNumber = bufnr('%')
-    call GoToPreviousBuffer()
-    if bufexists(l:BufferNumber)
-        execute 'bwipeout! ' . l:BufferNumber
+    let l:BufferToKill = bufnr()
+    let l:AlternateBuffer = GetAlternateBuffer()
+    if l:AlternateBuffer != -1
+        execute 'buffer ' . l:AlternateBuffer
+    else
+        execute 'enew'
+    endif
+    if bufexists(l:BufferToKill)
+        execute 'bwipeout! ' . l:BufferToKill
     else
         : " Probably buhidden=wipe
-    endif
-    " Call GoToPreviousBuffer() twice to get C-^ to work.
-    call GoToPreviousBuffer()
-    call GoToPreviousBuffer()
-endfunction
-
-" TODO: use window specific buffer history and not fzf history. Either do that
-" manually, or look for some plugin.
-function! GoToPreviousBuffer()
-    let l:PreviousBuffer = GetPreviousBuffer()
-    if bufexists(l:PreviousBuffer)
-        execute 'buffer ' . l:PreviousBuffer
-    endif
-endfunction
-function! GetPreviousBuffer()
-    let l:AlternateBuffer = bufnr('#')
-    let l:Buffers = fzf#vim#_buflisted_sorted()
-    if bufexists(l:AlternateBuffer)
-        return l:AlternateBuffer
-    elseif len(l:Buffers) > 1
-        " No alternate buffer. Use last buffer from fzf instead.
-        return l:Buffers[1]
-    else
-        return -1
     endif
 endfunction
 
@@ -172,20 +154,6 @@ function! ScratchBuffer()
         setlocal noswapfile
         setlocal nolist
         setlocal nowrap
-    endif
-endfunction
-
-command! -nargs=1 RenameBuffer call RenameBuffer(<q-args>)
-function! RenameBuffer(NewName)
-    let l:StartBuffer = bufnr('%')
-    let l:AlternateBuffer = bufnr('#')
-    exec 'file ' . a:NewName
-    if bufexists(l:AlternateBuffer) && l:StartBuffer != l:AlternateBuffer
-        " Renaming the buffer messes up <C-6> history.
-        " Switch to PreviousBuffer and then switch back
-        " to fix it.
-        exec 'buffer ' . l:AlternateBuffer
-        exec 'buffer#'
     endif
 endfunction
 
@@ -467,57 +435,44 @@ autocmd filetype man setlocal number relativenumber | setlocal nowrap
 
 command! -nargs=* -complete=customlist,v:lua.require'man'.man_complete Mn call MyMan(<q-args>)
 function! MyMan(Args)
-    let l:StartBuffer = bufnr('%')
-    let l:StartAlternateBuffer = bufnr('#')
     try
         call TryMyMan(a:Args)
     catch
-        if bufexists(l:StartAlternateBuffer)
-            exec 'buffer ' . l:StartAlternateBuffer
-        endif
-        exec 'buffer ' . l:StartBuffer
         echohl ErrorMsg
         echom v:exception
         echohl None
     finally
         if (&filetype == 'man')
-            exec 'nnoremap <silent> <buffer> q :call GoToPreviousBuffer()<CR>'
+            exec 'nnoremap <silent> <buffer> q :call GoToAlternateBuffer()<CR>'
             if bufname() !~ '^\d\+ man'
                 " There's a bug in Man when invoked as a MANPAGER. It would crash if there's
                 " already an existing buffer with the same name as the new man page.
                 " See https://github.com/neovim/neovim/issues/30132
                 " Workaround: prefix buffer name with buffer number to make it unique.
+                execute 'file ' . bufnr() . ' ' . bufname()
                 setlocal bufhidden=
-                call RenameBuffer(bufnr() . ' ' . bufname())
             endif
         endif
     endtry
 endfunction
 
 function! TryMyMan(Args)
-    let l:StartBuffer = bufnr('%')
     let l:FirstManWindow = GetFirstManWindow()
     if (l:FirstManWindow == 0)
         exec 'Man ' . a:Args
-        let l:MyManBufNr = bufnr('%')
+        let l:ManBuffer = bufnr('%')
         q
-        exec 'buffer ' . l:MyManBufNr
+        exec 'buffer ' . l:ManBuffer
     else
-        if (&filetype != 'man')
-            exec 'buffer ' . winbufnr(l:FirstManWindow)
-        endif
+        if (&filetype != 'man') | exec 'buffer ' . winbufnr(l:FirstManWindow) | endif
         exec 'Man ' . a:Args
         for l:Buffer in range(1, bufnr('$'))
             if l:Buffer != bufnr() && bufexists(l:Buffer) && bufname(l:Buffer) =~ '^\d\+ ' . bufname()
-                let l:DuplicateManBuffer = bufnr()
-                exec 'buffer ' . l:StartBuffer
-                exec 'buffer ' . l:Buffer
-                exec 'bwipeout! ' . l:DuplicateManBuffer
+                execute 'bwipeout! %'
+                execute 'buffer ' . l:Buffer
                 return
             endif
         endfor
-        exec 'buffer ' . l:StartBuffer
-        exec 'buffer#'
     endif
 endfunction
 
@@ -557,13 +512,6 @@ highlight ConflictMarkerTheirs              guifg=#2991C1
 highlight ConflictMarkerEnd                 guifg=#7A7979
 
 highlight ConflictMarkerSeparator           guifg=#7A7979
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" General TODOs
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" TODO buffers that get auto wiped (e.g. using bufhidden=wipe) can mess with
-" <C-^> history. Perhaps add some autocmd if possible and manually fix alternate
-" file history. Or perhaps better to make <C-^> use PreviousBuffer() instead.
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Stuff that needs to be at the end

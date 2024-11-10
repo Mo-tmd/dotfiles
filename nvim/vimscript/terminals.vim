@@ -15,7 +15,7 @@ function! Terminal(...)
 
     if GoToBuffer(l:TerminalName) != 'ok'
         execute 'terminal'
-        call RenameBuffer(l:TerminalName)
+        execute 'file ' . l:TerminalName
         for l:Mapping in s:MyTerminalMappings | execute l:Mapping | endfor
         for l:StartAction in l:StartActions
             call feedkeys(l:StartAction . "\<CR>", 'n')
@@ -148,13 +148,9 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call Tnoremap('<C-^>', ':call TerminalGoToAlternateBuffer()<CR>')
 function! TerminalGoToAlternateBuffer()
-    if bufexists(bufnr('#'))
-        let b:LeftInTerminalMode=1
-        execute 'buffer#'
-    else
-        echohl ErrorMsg
-        echo "E23: No alternate file"
-        echohl NONE
+    let b:LeftInTerminalMode=1
+    if GoToAlternateBuffer() == -1
+        unlet b:LeftInTerminalMode
         startinsert
     endif
 endfunction
