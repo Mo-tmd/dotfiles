@@ -30,7 +30,7 @@ alias tmkk{separator}'tmux_kill_session.py'
 alias search{separator}'find . -iname'
 alias searchin{separator}'grep -irn . -e'
 alias untar{separator}'tar -xvf'
-alias ll{separator}'ls -lhA'
+alias ll{separator}'ls -lhAv'
 
 alias path{separator}'echo $PATH | sed "s/:/\n/g"'
 alias windowpid{separator}'xprop _NET_WM_PID | sed "'"s/_NET_WM_PID(CARDINAL) = //"'"'
