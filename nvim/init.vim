@@ -32,6 +32,11 @@ call plug#begin()
 
     " yanky
     Plug 'gbprod/yanky.nvim'
+
+    " telescope
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'nvim-telescope/telescope.nvim', { 'branch': '0.1.x' }
+    Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 call plug#end()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -321,7 +326,7 @@ augroup TrailingSpaces
 augroup END
 
 function! ToggleTrailingSpaces()
-    if &modifiable && &buftype !=# 'terminal'
+    if &modifiable && &buftype !=# 'terminal' && &filetype !=# 'TelescopeResults'
         call HighlightTrailingSpaces()
     else
         call ClearTrailingSpaces()

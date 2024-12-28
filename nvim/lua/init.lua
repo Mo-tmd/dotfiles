@@ -4,6 +4,22 @@
 require('my_lua/lsp')
 
 -------------------------------------------------------------------------------
+-- telescope
+-------------------------------------------------------------------------------
+require('telescope').setup{
+  defaults = {
+    mappings = {
+      i = {
+        ["<ESC>"] = require('telescope.actions').close,
+        ["<C-j>"] = require('telescope.actions').move_selection_next,
+        ["<C-k>"] = require('telescope.actions').move_selection_previous
+      }
+    }
+  }
+}
+require('telescope').load_extension('fzf')
+
+-------------------------------------------------------------------------------
 -- Yanky
 -------------------------------------------------------------------------------
 require("yanky").setup({
