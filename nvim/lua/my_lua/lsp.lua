@@ -2,22 +2,22 @@
 -- General
 -------------------------------------------------------------------------------
 local keymap_settings = {
-    preserve_mappings = false,
-    omit = {},
+  preserve_mappings = false,
+  omit = {},
 }
 
 local lsp = require('lsp-zero').preset({
-    float_border = 'rounded',
-    call_servers = 'local',
-    configure_diagnostics = true,
-    setup_servers_on_start = true,
-    set_lsp_keymaps = keymap_settings
+  float_border = 'rounded',
+  call_servers = 'local',
+  configure_diagnostics = true,
+  setup_servers_on_start = true,
+  set_lsp_keymaps = keymap_settings
 })
 
 lsp.on_attach(function(client, bufnr)
-    lsp.default_keymaps({buffer = bufnr})
-    vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev({severity={min=vim.diagnostic.severity.INFO}})<CR>', {buffer = true})
-    vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next({severity={min=vim.diagnostic.severity.INFO}})<CR>', {buffer = true})
+  lsp.default_keymaps({buffer = bufnr})
+  vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev({severity={min=vim.diagnostic.severity.INFO}})<CR>', {buffer = true})
+  vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next({severity={min=vim.diagnostic.severity.INFO}})<CR>', {buffer = true})
 end)
 
 -------------------------------------------------------------------------------
@@ -30,13 +30,13 @@ lspconfig.lua_ls.setup(lsp.nvim_lua_ls())
 -- erlang_ls
 -------------------------------------------------------------------------------
 local function root_dir(_)
-    return vim.g.ErlangLsRootDir
+  return vim.g.ErlangLsRootDir
 end
 
 if (vim.g.ErlangLsRootDir) == nil then
-    Options = {}
+  Options = {}
 else
-    Options = {root_dir = root_dir}
+  Options = {root_dir = root_dir}
 end
 
 lspconfig.erlangls.setup(Options)
@@ -45,10 +45,10 @@ lspconfig.erlangls.setup(Options)
 -- vim-language-server
 -------------------------------------------------------------------------------
 local function nvim_dir(_)
-    return '/home/user/dotfiles/nvim'
+  return '/home/user/dotfiles/nvim'
 end
 lspconfig.vimls.setup({
-    root_dir = nvim_dir
+  root_dir = nvim_dir
 })
 
 -------------------------------------------------------------------------------
@@ -60,9 +60,9 @@ lspconfig.bashls.setup({})
 -- jdtls (Java)
 -------------------------------------------------------------------------------
 if (vim.g.JdtlsCmd) == nil then
-    Options = {}
+  Options = {}
 else
-    Options = {cmd = {vim.g.JdtlsCmd}}
+  Options = {cmd = {vim.g.JdtlsCmd}}
 end
 lspconfig.jdtls.setup(Options)
 
@@ -75,11 +75,10 @@ lsp.setup()
 -- Cmp and luasnip
 -------------------------------------------------------------------------------
 local cmp = require('cmp')
-local cmp_action = require('lsp-zero').cmp_action()
 
-paths = {os.getenv("Dotfiles") .. "/nvim/snippets"}
+local paths = {os.getenv("Dotfiles") .. "/nvim/snippets"}
 if (os.getenv("WorkDotfiles") ~= nil) then
-    table.insert(paths, os.getenv("WorkDotfiles") .. "/nvim/snippets")
+  table.insert(paths, os.getenv("WorkDotfiles") .. "/nvim/snippets")
 end
 require('luasnip.loaders.from_vscode').lazy_load({paths=paths})
 
@@ -103,21 +102,21 @@ STab = cmp.mapping(function(fallback)
       end
     end, { "i", "s" })
 local mappings = {
-    ['<CR>']    = cmp.mapping.confirm({select=false}),
-    ['<Tab>']   = Tab,
-    ['<S-Tab>'] = STab,
+  ['<CR>']    = cmp.mapping.confirm({select=false}),
+  ['<Tab>']   = Tab,
+  ['<S-Tab>'] = STab,
 }
 
 local sources = {
-    {name = 'luasnip', keyword_length = 2},
-    {name = 'path'},
-    {name = 'nvim_lsp'},
-    {name = 'buffer', keyword_length = 3}
+  {name = 'luasnip', keyword_length = 2},
+  {name = 'path'},
+  {name = 'nvim_lsp'},
+  {name = 'buffer', keyword_length = 3}
 }
 
 cmp.setup({
-    mapping = mappings,
-    sources = sources
+  mapping = mappings,
+  sources = sources
 })
 
 -------------------------------------------------------------------------------
@@ -125,9 +124,9 @@ cmp.setup({
 -------------------------------------------------------------------------------
 -- Toggle diagnostics
 function toggle_diagnostics()
-    if vim.diagnostic.is_disabled() then
-        vim.diagnostic.enable()
-    else
-        vim.diagnostic.disable()
-    end
+  if vim.diagnostic.is_disabled() then
+    vim.diagnostic.enable()
+  else
+    vim.diagnostic.disable()
+  end
 end
