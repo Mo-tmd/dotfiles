@@ -20,20 +20,28 @@ require('telescope').setup{
 require('telescope').load_extension('fzf')
 
 -------------------------------------------------------------------------------
--- Yanky
+-- yanky
 -------------------------------------------------------------------------------
 require("yanky").setup({
-  highlight = {on_put=false, on_yank=false}
+  highlight = {on_put=false, on_yank=false},
+  picker = {
+    telescope = {
+      use_default_mappings = false,
+      mappings = {default = require("yanky.telescope.mapping").put("p")}
+    }
+  }
 })
+
 vim.keymap.set({"n","x"}, "p", "<Plug>(YankyPutAfter)")
 vim.keymap.set({"n","x"}, "P", "<Plug>(YankyPutBefore)")
 vim.keymap.set({"n","x"}, "gp", "<Plug>(YankyGPutAfter)")
 vim.keymap.set({"n","x"}, "gP", "<Plug>(YankyGPutBefore)")
-
 vim.keymap.set("n", "<c-p>", "<Plug>(YankyPreviousEntry)")
 vim.keymap.set("n", "<c-n>", "<Plug>(YankyNextEntry)")
-
 vim.keymap.set({"n","x"}, "y", "<Plug>(YankyYank)")
+
+require("telescope").load_extension("yank_history")
+vim.keymap.set("n", "<leader>p", ":Telescope yank_history<CR>", {silent=true})
 
 -------------------------------------------------------------------------------
 -- User Interface
