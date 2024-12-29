@@ -191,3 +191,6 @@ function KillBufferVicmdMode() {
 }
 zle -N KillBufferVicmdMode
 bindkey -M vicmd '^U' KillBufferVicmdMode
+
+# Numeric sort completion: e.g. (1.1  1.2  1.13) instead of (1.1  1.13  1.2)
+zstyle ':completion:*' sort numeric
