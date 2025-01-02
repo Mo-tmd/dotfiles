@@ -4,9 +4,10 @@
 "     * :call Terminal('Terminal name', 'Start action', 'Another start action')
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 command! -nargs=? Term call Terminal(<q-args>)
+command! -nargs=? TermHere call Terminal(<q-args>, "cd ".expand("%:h"))
 function! Terminal(...)
-    if len(a:000) > 0 && len(a:000[0]) > 0
-        let l:TerminalName = GetFullTerminalName(a:000[0])
+    if len(a:000) > 0
+        let l:TerminalName = (len(a:000[0]) > 0 ? GetFullTerminalName(a:000[0]) : MakeTerminalName())
         let l:StartActions = a:000[1:]
     else
         let l:TerminalName = MakeTerminalName()
