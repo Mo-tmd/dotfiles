@@ -12,7 +12,7 @@ function! GoToAlternateBuffer()
         return 0
     else
         echohl ErrorMsg
-        echo "E23: No alternate file"
+        echo 'E23: No alternate file'
         echohl NONE
         return -1
     endif

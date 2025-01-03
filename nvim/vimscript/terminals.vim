@@ -4,7 +4,7 @@
 "     * :call Terminal('Terminal name', 'Start action', 'Another start action')
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 command! -nargs=? Term call Terminal(<q-args>)
-command! -nargs=? TermHere call Terminal(<q-args>, "cd ".expand("%:h"))
+command! -nargs=? TermHere call Terminal(<q-args>, 'cd '.expand('%:h'))
 function! Terminal(...)
     if len(a:000) > 0
         let l:TerminalName = (len(a:000[0]) > 0 ? GetFullTerminalName(a:000[0]) : MakeTerminalName())
@@ -96,18 +96,18 @@ augroup TermEnterOrLeave
 augroup END
 
 function! ToggleTermEnterOrLeave(...)
-    if &buftype == "terminal"
-        let l:FirstTime = !exists("b:NotFirstTime")
+    if &buftype == 'terminal'
+        let l:FirstTime = !exists('b:NotFirstTime')
         if (l:FirstTime)
             startinsert
-            let b:NotFirstTime = "true"
+            let b:NotFirstTime = 'true'
         elseif exists('b:LeftInTerminalMode')
             unlet b:LeftInTerminalMode
             startinsert
         elseif (line('.') >= GetLastNonEmptyLine())
             startinsert
         endif
-    elseif &filetype != "TelescopePrompt" && &filetype != "alpha"
+    elseif &filetype != 'TelescopePrompt' && &filetype != 'alpha'
         stopinsert
     endif
 endfunction
@@ -133,14 +133,14 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! TermSendKeys(TargetBuffer, Keys)
     if !bufexists(a:TargetBuffer)
-        throw "TargetBuffer doesn't exist"
+        throw 'TargetBuffer doesn''t exist'
     endif
 
     execute 'vsplit'
     execute 'buffer ' . a:TargetBuffer
     startinsert
     call feedkeys(a:Keys, 'n')
-    if getbufvar(a:TargetBuffer, "&buftype") == "terminal"
+    if getbufvar(a:TargetBuffer, '&buftype') == 'terminal'
         let l:GoToNormalMode = "\<C-\>\<C-n>"
     else
         let l:GoToNormalMode = "\<Esc>"

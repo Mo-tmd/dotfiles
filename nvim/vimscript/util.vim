@@ -16,14 +16,14 @@ function! PrintBufferInfoToFile(FileName)
     let l:Output = []
 
     " Collect buffer-local variables
-    call add(l:Output, "Buffer Variables:")
+    call add(l:Output, 'Buffer Variables:')
     for l:Key in keys(b:)
         call add(l:Output, l:Key . ': ' . string(get(b:, l:Key)))
     endfor
 
     " Collect buffer options and properties
     call add(l:Output, '')
-    call add(l:Output, "Buffer Options and Properties:")
+    call add(l:Output, 'Buffer Options and Properties:')
     call add(l:Output, 'bufhidden: ' . &l:bufhidden)
     call add(l:Output, 'buflisted: ' . &l:buflisted)
     call add(l:Output, 'bufname: ' . bufname('%'))
@@ -35,7 +35,7 @@ function! PrintBufferInfoToFile(FileName)
     call add(l:Output, '-------------------------------')
 
     " Write the output list to the specified file
-    call writefile(l:Output, a:FileName, "a")
+    call writefile(l:Output, a:FileName, 'a')
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

@@ -42,7 +42,7 @@ call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Stuff that needs to be in the beginning
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let mapleader = ","
+let mapleader = ','
 
 source $Dotfiles/nvim/vimscript/util.vim
 source $Dotfiles/nvim/vimscript/terminals.vim
@@ -235,7 +235,7 @@ let g:lightline.tab_component_function = {
             \ }
 
 function! TabName(n)
-    if exists("g:is_merging")
+    if exists('g:is_merging')
         if a:n == 1
             return 'MERGED'
         elseif a:n == 2
@@ -295,14 +295,14 @@ autocmd BufNewFile,BufRead *shell/variables,*shell/aliases set filetype=bash
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
 "(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
 "if (empty($TMUX))
-    if (has("nvim"))
+    if (has('nvim'))
         "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
         let $NVIM_TUI_ENABLE_TRUE_COLOR=1
     endif
     "For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
     "Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
     " < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
-    if (has("termguicolors"))
+    if (has('termguicolors'))
         set termguicolors
     endif
 "endif
@@ -347,7 +347,7 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <silent> <leader>af
   \ :call FzfFindFiles(
-  \   {'search_dirs': ["~", getcwd()],
+  \   {'search_dirs': ['~', getcwd()],
   \    'rg_exclude_paths': []
   \   }
   \  )<CR>
@@ -356,7 +356,7 @@ call Tmap('<leader>af', ':let b:LeftInTerminalMode=1<CR><leader>af', 1)
 let g:MyRgExcludePaths = ['.git/', '**/.m2/repository/', '**/python*/site-packages/', '.cache/', '**/mason/packages/', '**/.config/google-chrome/', '**/.config/Code/', '**/.config/nvim/', '.eclipse/']
 nnoremap <silent> <leader>f
   \ :call FzfFindFiles(
-  \   {'search_dirs': ["~", getcwd()],
+  \   {'search_dirs': ['~', getcwd()],
   \    'rg_exclude_paths': g:MyRgExcludePaths
   \   }
   \  )<CR>
@@ -365,14 +365,14 @@ call Tmap('<leader>f', ':let b:LeftInTerminalMode=1<CR><leader>f', 1)
 nnoremap <leader>b :Buffers<CR>
 call Tmap('<leader>b', ':let b:LeftInTerminalMode=1<CR>:Buffers<CR>')
 
-let g:MyRgCmd = "rg --no-config --hidden --no-ignore --follow --no-messages"
+let g:MyRgCmd = 'rg --no-config --hidden --no-ignore --follow --no-messages'
 function! FzfFindFiles(Args)
     let l:SearchDirectories = get(a:Args, 'search_dirs',      [])
     let l:RgExcludePaths    = get(a:Args, 'rg_exclude_paths', [])
 
     let l:SearchDirectories = s:ProcessSearchDirectories(l:SearchDirectories)
     let l:RgExcludePaths = s:ProcessRgExcludePaths(l:RgExcludePaths)
-    let l:RgCmd = printf("%s %s --files -- %s", g:MyRgCmd, l:RgExcludePaths, l:SearchDirectories)
+    let l:RgCmd = printf('%s %s --files -- %s', g:MyRgCmd, l:RgExcludePaths, l:SearchDirectories)
     call fzf#run(fzf#wrap(fzf#vim#with_preview({'source': l:RgCmd})))
 endfunction
 
@@ -383,12 +383,12 @@ function! s:ProcessSearchDirectories(Directories)
     call map(l:Directories, 'expand(v:val)') " Expand paths.
 
     " Remove duplicates and directories whose parents are already in search_dirs
-    call map(l:Directories, "substitute(v:val, '/$', '', '')") " Remove trailing slashes.
+    call map(l:Directories, 'substitute(v:val, "/$", "", "")') " Remove trailing slashes.
     call sort(l:Directories)
     if len(l:Directories) > 1
         for l:PossibleChildIndex in reverse(range(1, len(l:Directories)-1))
             for l:PossibleParentIndex in range(0, l:PossibleChildIndex-1)
-                if l:Directories[l:PossibleChildIndex] =~# "^" . l:Directories[l:PossibleParentIndex] . '\(/\|$\)'
+                if l:Directories[l:PossibleChildIndex] =~# '^' . l:Directories[l:PossibleParentIndex] . '\(/\|$\)'
                     call remove(l:Directories, l:PossibleChildIndex)
                     break
                 endif
@@ -412,7 +412,7 @@ endfunction
 
 command! -bang -nargs=* GitGrep
   \ call fzf#vim#grep(
-  \   (<q-args> == "" ? "git grep --line-number -v ^$" : "git grep --line-number -- ".fzf#shellescape(<q-args>)),
+  \   (<q-args> == '' ? 'git grep --line-number -v ^$' : 'git grep --line-number -- '.fzf#shellescape(<q-args>)),
   \   fzf#vim#with_preview({'dir': systemlist('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel')[0]}),
   \   <bang>0
   \ )
@@ -433,7 +433,7 @@ nnoremap <leader>nc :NERDTreeFind<CR>
 exe 'command! -bar -bang -nargs=* -complete=customlist,fugitive#EditComplete Gd exe MyDiffsplit(0, <bang>0, "vertical <mods>", <q-args>)'
 function! MyDiffsplit(...) abort
     set nosplitright
-    call call("fugitive#Diffsplit", a:000)
+    call call('fugitive#Diffsplit', a:000)
     set splitright
     wincmd l
 endfunction
@@ -459,9 +459,9 @@ endfunction
 
 command! -nargs=* Gs call GitShow(<f-args>)
 function! GitShow(...)
-    let l:Commit = len(a:000) > 0 ? a:000[0] : "HEAD"
-    let l:File = len(a:000) > 1 ? a:000[1] : ""
-    exec printf("G difftool -y %s~1 %s %s", l:Commit, l:Commit, l:File)
+    let l:Commit = len(a:000) > 0 ? a:000[0] : 'HEAD'
+    let l:File = len(a:000) > 1 ? a:000[1] : ''
+    exec printf('G difftool -y %s~1 %s %s', l:Commit, l:Commit, l:File)
 endfunction
 
 " TODO this doesn't handle renames.
