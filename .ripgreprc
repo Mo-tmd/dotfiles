@@ -1,5 +1,5 @@
 --hidden
---glob=!.git/
 --follow
 --smart-case
 --no-messages
+--glob=!.git/

@@ -71,10 +71,10 @@ nnoremap <C-j> <C-W>j
 nnoremap <C-k> <C-W>k
 nnoremap <C-h> <C-W>h
 nnoremap <C-l> <C-W>l
-call Tnoremap('<C-j>', ':call TerminalMoveWindow("j")<CR>')
-call Tnoremap('<C-k>', ':call TerminalMoveWindow("k")<CR>')
-call Tnoremap('<C-h>', ':call TerminalMoveWindow("h")<CR>')
-call Tnoremap('<C-l>', ':call TerminalMoveWindow("l")<CR>')
+call Tmap('<C-j>', ':call TerminalMoveWindow("j")<CR>')
+call Tmap('<C-k>', ':call TerminalMoveWindow("k")<CR>')
+call Tmap('<C-h>', ':call TerminalMoveWindow("h")<CR>')
+call Tmap('<C-l>', ':call TerminalMoveWindow("l")<CR>')
 function! TerminalMoveWindow(Direction)
     let l:CurrentWindow = winnr()
     let l:TargetWindow = winnr(a:Direction)
@@ -95,7 +95,7 @@ nnoremap <leader>iv :e ~/dotfiles/nvim/init.vim<CR>
 nnoremap <leader>il :e ~/dotfiles/nvim/lua/init.lua<CR>
 
 inoremap ii <Esc>
-call Tnoremap('ii', '<C-\><C-n>')
+call Tmap('ii', '')
 nnoremap <silent> <CR> :noh<CR><CR>
 
 nnoremap <leader>q :q<CR>
@@ -127,7 +127,7 @@ endfunction
 
 " Kill buffer
 nnoremap <leader>kb :call KillBuffer()<CR>
-call Tnoremap('<leader>kb', ':call KillBuffer()<CR>')
+call Tmap('<leader>kb', ':call KillBuffer()<CR>')
 function! KillBuffer()
     let l:BufferToKill = bufnr()
     let l:AlternateBuffer = GetAlternateBuffer()
@@ -345,26 +345,76 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nnoremap <leader>af :Files<CR>
-nnoremap <leader>df :Files ~/dotfiles<CR>
-nnoremap <leader>b :Buffers<CR>
-tnoremap <leader>b <C-\><C-n>:let b:LeftInTerminalMode=1<CR>:Buffers<CR>
+nnoremap <silent> <leader>af
+  \ :call FzfFindFiles(
+  \   {'search_dirs': ["~", getcwd()],
+  \    'rg_exclude_paths': []
+  \   }
+  \  )<CR>
+call Tmap('<leader>af', ':let b:LeftInTerminalMode=1<CR><leader>af', 1)
 
-" Below is copied from Oskar, I have no idea what it does for now
-command! -nargs=* -bang FileContents call FileContentsFunc(<q-args>, <bang>0)
-function! FileContentsFunc(query, fullscreen)
-    let command_fmt = 'rg --column --line-number --no-heading --color=always -- %s || true'
-    let initial_command = printf(command_fmt, shellescape(a:query))
-    let reload_command = printf(command_fmt, '{q}')
-    let spec = {'options': ['--disabled', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
-    let spec = fzf#vim#with_preview(spec, 'right', 'ctrl-/')
-    call fzf#vim#grep(initial_command, 1, spec, a:fullscreen)
+let g:MyRgExcludePaths = ['.git/', '**/.m2/repository/', '**/python*/site-packages/', '.cache/', '**/mason/packages/', '**/.config/google-chrome/', '**/.config/Code/', '**/.config/nvim/', '.eclipse/']
+nnoremap <silent> <leader>f
+  \ :call FzfFindFiles(
+  \   {'search_dirs': ["~", getcwd()],
+  \    'rg_exclude_paths': g:MyRgExcludePaths
+  \   }
+  \  )<CR>
+call Tmap('<leader>f', ':let b:LeftInTerminalMode=1<CR><leader>f', 1)
+
+nnoremap <leader>b :Buffers<CR>
+call Tmap('<leader>b', ':let b:LeftInTerminalMode=1<CR>:Buffers<CR>')
+
+let g:MyRgCmd = "rg --no-config --hidden --no-ignore --follow --no-messages"
+function! FzfFindFiles(Args)
+    let l:SearchDirectories = get(a:Args, 'search_dirs',      [])
+    let l:RgExcludePaths    = get(a:Args, 'rg_exclude_paths', [])
+
+    let l:SearchDirectories = s:ProcessSearchDirectories(l:SearchDirectories)
+    let l:RgExcludePaths = s:ProcessRgExcludePaths(l:RgExcludePaths)
+    let l:RgCmd = printf("%s %s --files -- %s", g:MyRgCmd, l:RgExcludePaths, l:SearchDirectories)
+    call fzf#run(fzf#wrap(fzf#vim#with_preview({'source': l:RgCmd})))
+endfunction
+
+" e.g. s:ProcessSearchDirectories(['~', '/home/<User>', '/path with spaces', '~/dotfiles']) returns a string:
+" `'/home/<User>' '/path with spaces'`
+function! s:ProcessSearchDirectories(Directories)
+    let l:Directories = copy(a:Directories)
+    call map(l:Directories, 'expand(v:val)') " Expand paths.
+
+    " Remove duplicates and directories whose parents are already in search_dirs
+    call map(l:Directories, "substitute(v:val, '/$', '', '')") " Remove trailing slashes.
+    call sort(l:Directories)
+    if len(l:Directories) > 1
+        for l:PossibleChildIndex in reverse(range(1, len(l:Directories)-1))
+            for l:PossibleParentIndex in range(0, l:PossibleChildIndex-1)
+                if l:Directories[l:PossibleChildIndex] =~# "^" . l:Directories[l:PossibleParentIndex] . '\(/\|$\)'
+                    call remove(l:Directories, l:PossibleChildIndex)
+                    break
+                endif
+            endfor
+        endfor
+    endif
+
+    call map(l:Directories, 'fzf#shellescape(v:val)')
+    return join(l:Directories, ' ') " Convert the list to a string with space separated directories
+endfunction
+
+" e.g. s:ProcessRgExcludePaths(['some_dir/', '**/some dir/*.beam']) returns a string:
+" `-g '!some_dir' -g '!**/some folder/*.beam'`
+function! s:ProcessRgExcludePaths(Paths)
+    let l:Paths = copy(a:Paths)
+    call map(l:Paths, '"!" . v:val') " Prefix with `!`
+    call map(l:Paths, 'fzf#shellescape(v:val)')
+    call map(l:Paths, '"-g " . v:val') " Prefix with `-g `
+    return join(l:Paths, ' ') " Convert the list to a string with space separated arguments
 endfunction
 
 command! -bang -nargs=* GitGrep
   \ call fzf#vim#grep(
-  \   'git grep --line-number -v ^$', 0,
-  \   fzf#vim#with_preview({'dir': SystemCmd('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel')}), <bang>0
+  \   (<q-args> == "" ? "git grep --line-number -v ^$" : "git grep --line-number -- ".fzf#shellescape(<q-args>)),
+  \   fzf#vim#with_preview({'dir': systemlist('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel')[0]}),
+  \   <bang>0
   \ )
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

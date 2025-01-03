@@ -58,9 +58,13 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Creates a terminal mode mapping only for terminals started through Terminal(...)
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! Tnoremap(Lhs, Rhs)
+function! Tmap(Lhs, Rhs, Remap=0)
     if !exists('s:MyTerminalMappings') | let s:MyTerminalMappings = [] | endif
-    let l:Mapping = 'tnoremap <silent> <buffer> ' . a:Lhs . ' <C-\><C-n>' . a:Rhs
+    let l:Mapping = printf('%s <silent> <buffer> %s <C-\><C-n>%s',
+                          \(a:Remap ? 'tmap' : 'tnoremap'),
+                          \a:Lhs,
+                          \a:Rhs
+                         \)
     let s:MyTerminalMappings += [l:Mapping]
 endfunction
 
@@ -68,11 +72,12 @@ endfunction
 " Creates a mapping in both normal and terminal modes to start/go_to a terminal.
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! CreateMapForStartingTerminal(Lhs, TerminalName, ...)
-    let l:Args = [a:TerminalName] + a:000
+    let l:StartActions = a:000
+    let l:Args = [a:TerminalName] + l:StartActions
     let l:QuotedArgs = map(l:Args, 'printf("\"%s\"", v:val)')
     let l:ArgsString = join(l:QuotedArgs, ',')
     exec printf('nnoremap <silent> %s :call call("Terminal", [%s])<CR>', a:Lhs, l:ArgsString)
-    call Tnoremap(a:Lhs, printf(':execute (bufname("%") == "%s" ? "startinsert" : ''let b:LeftInTerminalMode=1 \| call call("Terminal", [%s])'')<CR>', GetFullTerminalName(a:TerminalName), l:ArgsString))
+    call Tmap(a:Lhs, printf(':execute (bufname("%") == "%s" ? "startinsert" : ''let b:LeftInTerminalMode=1 \| call call("Terminal", [%s])'')<CR>', GetFullTerminalName(a:TerminalName), l:ArgsString))
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -147,7 +152,7 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Misc
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call Tnoremap('<C-^>', ':call TerminalGoToAlternateBuffer()<CR>')
+call Tmap('<C-^>', ':call TerminalGoToAlternateBuffer()<CR>')
 function! TerminalGoToAlternateBuffer()
     let b:LeftInTerminalMode=1
     if GoToAlternateBuffer() == -1
