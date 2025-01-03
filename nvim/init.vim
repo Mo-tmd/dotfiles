@@ -4,7 +4,6 @@
 call plug#begin()
     " FZF
     Plug 'junegunn/fzf', { 'do': { -> fzf#install()  }  }
-    Plug 'ibhagwan/fzf-lua', {'branch': 'main'}
     Plug 'junegunn/fzf.vim'
 
     " Gruvbox
