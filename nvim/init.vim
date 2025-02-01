@@ -348,7 +348,8 @@ endfunction
 nnoremap <silent> <leader>af
   \ :call FzfFindFiles(
   \   {'search_dirs': ['~', getcwd()],
-  \    'rg_exclude_paths': []
+  \    'rg_exclude_paths': [],
+  \    'rg_no_ignore': 1
   \   }
   \  )<CR>
 call Tmap('<leader>af', ':let b:LeftInTerminalMode=1<CR><leader>af', 1)
@@ -357,7 +358,8 @@ let g:MyRgExcludePaths = ['.git/', '**/.m2/repository/', '**/python*/site-packag
 nnoremap <silent> <leader>f
   \ :call FzfFindFiles(
   \   {'search_dirs': ['~', getcwd()],
-  \    'rg_exclude_paths': g:MyRgExcludePaths
+  \    'rg_exclude_paths': g:MyRgExcludePaths,
+  \    'rg_no_ignore': 0
   \   }
   \  )<CR>
 call Tmap('<leader>f', ':let b:LeftInTerminalMode=1<CR><leader>f', 1)
@@ -365,14 +367,16 @@ call Tmap('<leader>f', ':let b:LeftInTerminalMode=1<CR><leader>f', 1)
 nnoremap <leader>b :Buffers<CR>
 call Tmap('<leader>b', ':let b:LeftInTerminalMode=1<CR>:Buffers<CR>')
 
-let g:MyRgCmd = 'rg --no-config --hidden --no-ignore --follow --no-messages'
+let g:MyRgCmd = 'rg --no-config --hidden --follow --no-messages'
 function! FzfFindFiles(Args)
     let l:SearchDirectories = get(a:Args, 'search_dirs',      [])
     let l:RgExcludePaths    = get(a:Args, 'rg_exclude_paths', [])
+    let l:RgNoIgnore        = get(a:Args, 'rg_no_ignore')
 
     let l:SearchDirectories = s:ProcessSearchDirectories(l:SearchDirectories)
     let l:RgExcludePaths = s:ProcessRgExcludePaths(l:RgExcludePaths)
-    let l:RgCmd = printf('%s %s --files -- %s', g:MyRgCmd, l:RgExcludePaths, l:SearchDirectories)
+    let l:RgCmd = (l:RgNoIgnore ? g:MyRgCmd.' --no-ignore' : g:MyRgCmd)
+    let l:RgCmd = printf('%s %s --files -- %s', l:RgCmd, l:RgExcludePaths, l:SearchDirectories)
     call fzf#run(fzf#wrap(fzf#vim#with_preview({'source': l:RgCmd})))
 endfunction
 
