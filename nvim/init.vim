@@ -345,11 +345,14 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <leader>b :Buffers<CR>
+call Tmap('<leader>b', ':let b:LeftInTerminalMode=1<CR>:Buffers<CR>')
+
 nnoremap <silent> <leader>af
   \ :call FzfFindFiles(
   \   {'search_dirs': ['~', getcwd()],
   \    'rg_exclude_paths': [],
-  \    'rg_no_ignore': 1
+  \    'full': 1
   \   }
   \  )<CR>
 call Tmap('<leader>af', ':let b:LeftInTerminalMode=1<CR><leader>af', 1)
@@ -359,23 +362,19 @@ nnoremap <silent> <leader>f
   \ :call FzfFindFiles(
   \   {'search_dirs': ['~', getcwd()],
   \    'rg_exclude_paths': g:MyRgExcludePaths,
-  \    'rg_no_ignore': 0
+  \    'full': 0
   \   }
   \  )<CR>
 call Tmap('<leader>f', ':let b:LeftInTerminalMode=1<CR><leader>f', 1)
 
-nnoremap <leader>b :Buffers<CR>
-call Tmap('<leader>b', ':let b:LeftInTerminalMode=1<CR>:Buffers<CR>')
-
-let g:MyRgCmd = 'rg --no-config --hidden --follow --no-messages'
+let s:MyRgCmd = 'rg --no-config --hidden --follow --no-messages'
 function! FzfFindFiles(Args)
     let l:SearchDirectories = get(a:Args, 'search_dirs',      [])
     let l:RgExcludePaths    = get(a:Args, 'rg_exclude_paths', [])
-    let l:RgNoIgnore        = get(a:Args, 'rg_no_ignore')
-
+    let l:Full              = get(a:Args, 'full')
     let l:SearchDirectories = s:ProcessSearchDirectories(l:SearchDirectories)
     let l:RgExcludePaths = s:ProcessRgExcludePaths(l:RgExcludePaths)
-    let l:RgCmd = (l:RgNoIgnore ? g:MyRgCmd.' --no-ignore' : g:MyRgCmd)
+    let l:RgCmd = (l:Full ? s:MyRgCmd.' --no-ignore' : s:MyRgCmd)
     let l:RgCmd = printf('%s %s --files -- %s', l:RgCmd, l:RgExcludePaths, l:SearchDirectories)
     call fzf#run(fzf#wrap(fzf#vim#with_preview({'source': l:RgCmd})))
 endfunction
@@ -385,7 +384,6 @@ endfunction
 function! s:ProcessSearchDirectories(Directories)
     let l:Directories = copy(a:Directories)
     call map(l:Directories, 'expand(v:val)') " Expand paths.
-
     " Remove duplicates and directories whose parents are already in search_dirs
     call map(l:Directories, 'substitute(v:val, "/$", "", "")') " Remove trailing slashes.
     call sort(l:Directories)
@@ -399,7 +397,6 @@ function! s:ProcessSearchDirectories(Directories)
             endfor
         endfor
     endif
-
     call map(l:Directories, 'fzf#shellescape(v:val)')
     return join(l:Directories, ' ') " Convert the list to a string with space separated directories
 endfunction
@@ -414,7 +411,31 @@ function! s:ProcessRgExcludePaths(Paths)
     return join(l:Paths, ' ') " Convert the list to a string with space separated arguments
 endfunction
 
-command! -bang -nargs=* GitGrep
+" e.g. :Mrg ~/path\ with\ spaces some search query
+command! -bang -nargs=+ -complete=file Mrg call MyRipGrep(<q-args>, <bang>0)
+function! MyRipGrep(PathAndQuery, Full)
+    for i in range(0, len(a:PathAndQuery)-1)
+        if a:PathAndQuery[i] == ' ' && a:PathAndQuery[i-1] != '\'
+            let l:Path = strpart(a:PathAndQuery, 0, i)
+            let l:Query = strpart(a:PathAndQuery, i+1)
+            break
+        elseif i == len(a:PathAndQuery)-1
+            let l:Path = a:PathAndQuery
+            let l:Query = ''
+        endif
+    endfor
+    let l:Path = substitute(l:Path, '\\ ', ' ', 'g') " Unescape spaces.
+    let l:Path = expand(l:Path)
+    let l:Cmd = printf('%s %s --column --line-number --no-heading --with-filename --color=always --smart-case -- %s %s || true',
+      \                s:MyRgCmd,
+      \                (a:Full ? '--no-ignore --binary' : '-g '.fzf#shellescape('!.git/')),
+      \                fzf#shellescape(l:Query),
+      \                fzf#shellescape(l:Path)
+      \               )
+    call fzf#vim#grep(l:Cmd, fzf#vim#with_preview(), 0)
+endfunction
+
+command! -bang -nargs=* Gg
   \ call fzf#vim#grep(
   \   (<q-args> == '' ? 'git grep --line-number -v ^$' : 'git grep --line-number -- '.fzf#shellescape(<q-args>)),
   \   fzf#vim#with_preview({'dir': systemlist('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel')[0]}),
