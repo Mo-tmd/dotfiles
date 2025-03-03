@@ -132,7 +132,7 @@ function! KillBuffer()
     let l:BufferToKill = bufnr()
     let l:AlternateBuffer = GetAlternateBuffer()
     if l:AlternateBuffer != -1
-        execute 'buffer ' . l:AlternateBuffer
+        execute 'buffer! ' . l:AlternateBuffer
     else
         execute 'enew'
     endif
@@ -532,14 +532,14 @@ function! TryMyMan(Args)
         exec 'Man ' . a:Args
         let l:ManBuffer = bufnr('%')
         q
-        exec 'buffer ' . l:ManBuffer
+        exec 'buffer! ' . l:ManBuffer
     else
-        if (&filetype != 'man') | exec 'buffer ' . winbufnr(l:FirstManWindow) | endif
+        if (&filetype != 'man') | exec 'buffer! ' . winbufnr(l:FirstManWindow) | endif
         exec 'Man ' . a:Args
         for l:Buffer in range(1, bufnr('$'))
             if l:Buffer != bufnr() && bufexists(l:Buffer) && bufname(l:Buffer) =~ '^\d\+ ' . bufname()
                 execute 'bwipeout! %'
-                execute 'buffer ' . l:Buffer
+                execute 'buffer! ' . l:Buffer
                 return
             endif
         endfor

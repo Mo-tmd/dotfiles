@@ -44,7 +44,7 @@ function! GoToBuffer(BufferName)
     let l:BufferNumber = bufnr('^' . a:BufferName . '$')
     if l:BufferNumber > 0
         if bufloaded(l:BufferNumber) || buflisted(l:BufferNumber)
-            execute 'buffer ' . l:BufferNumber
+            execute 'buffer! ' . l:BufferNumber
             return 'ok'
         else
             execute 'bwipeout ' . l:BufferNumber
@@ -137,7 +137,7 @@ function! TermSendKeys(TargetBuffer, Keys)
     endif
 
     execute 'vsplit'
-    execute 'buffer ' . a:TargetBuffer
+    execute 'buffer! ' . a:TargetBuffer
     startinsert
     call feedkeys(a:Keys, 'n')
     if getbufvar(a:TargetBuffer, '&buftype') == 'terminal'

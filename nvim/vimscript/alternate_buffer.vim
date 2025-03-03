@@ -8,7 +8,7 @@ nnoremap <silent> <C-^> :call GoToAlternateBuffer()<CR>
 function! GoToAlternateBuffer()
     let l:AlternateBuffer = GetAlternateBuffer()
     if l:AlternateBuffer != -1
-        execute 'buffer ' . l:AlternateBuffer
+        execute 'buffer! ' . l:AlternateBuffer
         return 0
     else
         echohl ErrorMsg
