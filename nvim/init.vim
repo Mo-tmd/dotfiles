@@ -472,7 +472,7 @@ function! CloseDiff()
             let l:AllBufferWindows = win_findbuf(l:Buffer)
             if len(l:AllBufferWindows) == 1
                 " The buffer doesn't exist in other windows, just wipeout.
-                execute 'bwipeout ' . l:Buffer
+                execute 'bwipeout! ' . l:Buffer
             elseif len(l:AllBufferWindows) > 1
                 " The buffer exists in other windows. Just close the window.
                 call win_execute(win_getid(l:Window), 'close')
