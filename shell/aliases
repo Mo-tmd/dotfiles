@@ -33,6 +33,7 @@ alias search{separator}'find . -iname'
 alias searchin{separator}'grep -irn . -e'
 alias untar{separator}'tar -xvf'
 alias ll{separator}'ls -lhAv'
+alias get_chmod_number{separator}'stat --format "%a"'
 
 alias path{separator}'echo $PATH | sed "s/:/\n/g"'
 alias windowpid{separator}'xprop _NET_WM_PID | sed "'"s/_NET_WM_PID(CARDINAL) = //"'"'
