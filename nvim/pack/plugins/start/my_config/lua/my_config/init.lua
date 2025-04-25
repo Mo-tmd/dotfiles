@@ -40,6 +40,9 @@ require('telescope').load_extension('fzf')
 -- yanky
 -------------------------------------------------------------------------------
 require("yanky").setup({
+  ring = {
+    history_length = 1000
+  },
   highlight = {on_put=false, on_yank=false},
   picker = {
     telescope = {
