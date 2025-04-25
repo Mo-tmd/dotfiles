@@ -12,3 +12,5 @@
     hide-dirty = 1
 [color]
     ui = always
+[safe]
+    directory = *
