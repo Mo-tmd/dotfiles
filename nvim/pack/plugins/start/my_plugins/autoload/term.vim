@@ -1,16 +1,22 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Start/go_to a terminal. Usage examples:
-"     * :Term Terminal name
-"     * :call Terminal('Terminal name', 'Start action', 'Another start action')
+" setup
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-command! -nargs=? Term call Terminal(<q-args>)
-command! -nargs=? TermHere call Terminal(<q-args>, 'cd '.expand('%:h'))
-function! Terminal(...)
+function! term#setup()
+endfunction
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Start/go_to a terminal. Usage examples:
+"     * :T Terminal name
+"     * :call term#new('Terminal name', 'Start action', 'Another start action')
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+command! -nargs=? T call term#new(<q-args>)
+command! -nargs=? TH call term#new(<q-args>, 'cd '.expand('%:h'))
+function! term#new(...)
     if len(a:000) > 0
-        let l:TerminalName = (len(a:000[0]) > 0 ? GetFullTerminalName(a:000[0]) : MakeTerminalName())
+        let l:TerminalName = (len(a:000[0]) > 0 ? s:get_full_terminal_name(a:000[0]) : s:make_terminal_name())
         let l:StartActions = a:000[1:]
     else
-        let l:TerminalName = MakeTerminalName()
+        let l:TerminalName = s:make_terminal_name()
         let l:StartActions = []
     endif
 
@@ -24,13 +30,13 @@ function! Terminal(...)
     endif
 endfunction
 
-function! MakeTerminalName()
+function! s:make_terminal_name()
     if !exists('s:TerminalNumber') | let s:TerminalNumber = 0 | endif
     let s:TerminalNumber += 1
-    return GetFullTerminalName(string(s:TerminalNumber))
+    return s:get_full_terminal_name(string(s:TerminalNumber))
 endfunction
 
-function! GetFullTerminalName(TerminalName)
+function! s:get_full_terminal_name(TerminalName)
     return 'Term: ' . a:TerminalName
 endfunction
 
@@ -56,9 +62,9 @@ function! GoToBuffer(BufferName)
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Creates a terminal mode mapping only for terminals started through Terminal(...)
+" Creates a terminal mode mapping only for terminals started through term#new(...)
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! Tmap(Lhs, Rhs, Remap=0)
+function! term#map(Lhs, Rhs, Remap=0)
     if !exists('s:MyTerminalMappings') | let s:MyTerminalMappings = [] | endif
     let l:Mapping = printf('%s <silent> <buffer> %s <C-\><C-n>%s',
                           \(a:Remap ? 'tmap' : 'tnoremap'),
@@ -71,31 +77,31 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Creates a mapping in both normal and terminal modes to start/go_to a terminal.
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! CreateMapForStartingTerminal(Lhs, TerminalName, ...)
+function! term#define(Lhs, TerminalName, ...)
     let l:StartActions = a:000
     let l:Args = [a:TerminalName] + l:StartActions
     let l:QuotedArgs = map(l:Args, 'printf("\"%s\"", v:val)')
     let l:ArgsString = join(l:QuotedArgs, ',')
-    exec printf('nnoremap <silent> %s :call call("Terminal", [%s])<CR>', a:Lhs, l:ArgsString)
-    call Tmap(a:Lhs, printf(':execute (bufname("%") == "%s" ? "startinsert" : ''let b:LeftInTerminalMode=1 \| call call("Terminal", [%s])'')<CR>', GetFullTerminalName(a:TerminalName), l:ArgsString))
+    exec printf('nnoremap <silent> %s :call call("term#new", [%s])<CR>', a:Lhs, l:ArgsString)
+    call term#map(a:Lhs, printf(':execute (bufname("%") == "%s" ? "startinsert" : ''let b:LeftInTerminalMode=1 \| call call("term#new", [%s])'')<CR>', s:get_full_terminal_name(a:TerminalName), l:ArgsString))
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Automatically enter insert mode when entering a terminal window/buffer
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-augroup TermEnterOrLeave
+augroup MaybeEnteredTerminalBuffer
     autocmd!
-    " The function ToggleTermEnterOrLeave relies on cursor position (line
+    " The function s:maybe_entered_terminal_buffer relies on cursor position (line
     " specifically). When triggered by BufEnter, line('.') always
-    " returns 1. This is probably becuase cursor hasn't been drawn yet or
+    " returns 1. This is probably because cursor hasn't been drawn yet or
     " similar. So add a delay to solve.
     " Update: this seems to also solve the issue where entering a terminal
     " buffer through :Buffers doesn't enter terminal mode for some reason.
-    autocmd WinEnter,BufEnter * call timer_start(10, 'ToggleTermEnterOrLeave')
+    autocmd WinEnter,BufEnter * call timer_start(10, function('s:maybe_entered_terminal_buffer'))
     autocmd TermOpen * startinsert
 augroup END
 
-function! ToggleTermEnterOrLeave(...)
+function! s:maybe_entered_terminal_buffer(...)
     if &buftype == 'terminal'
         let l:FirstTime = !exists('b:NotFirstTime')
         if (l:FirstTime)
@@ -104,7 +110,7 @@ function! ToggleTermEnterOrLeave(...)
         elseif exists('b:LeftInTerminalMode')
             unlet b:LeftInTerminalMode
             startinsert
-        elseif (line('.') >= GetLastNonEmptyLine())
+        elseif (line('.') >= s:get_last_non_empty_line())
             startinsert
         endif
     elseif &filetype != 'TelescopePrompt' && &filetype != 'alpha'
@@ -112,7 +118,7 @@ function! ToggleTermEnterOrLeave(...)
     endif
 endfunction
 
-function! GetLastNonEmptyLine()
+function! s:get_last_non_empty_line()
     " Start from the last line in the buffer
     let l:LastLine = line('$')
 
@@ -131,7 +137,7 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " A hacky port of https://vimhelp.org/terminal.txt.html#term_sendkeys%28%29
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! TermSendKeys(TargetBuffer, Keys)
+function! term#send_keys(TargetBuffer, Keys)
     if !bufexists(a:TargetBuffer)
         throw 'TargetBuffer doesn''t exist'
     endif
@@ -150,15 +156,33 @@ function! TermSendKeys(TargetBuffer, Keys)
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Move from terminal buffer window to another window. Example usage:
+" call term#map('<C-j>', ':call term#move_to_window("j")<CR>')
+" call term#map('<C-k>', ':call term#move_to_window("k")<CR>')
+" call term#map('<C-h>', ':call term#move_to_window("h")<CR>')
+" call term#map('<C-l>', ':call term#move_to_window("l")<CR>')
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! term#move_to_window(Direction)
+    let l:CurrentWindow = winnr()
+    let l:TargetWindow = winnr(a:Direction)
+    if (l:CurrentWindow == l:TargetWindow)
+        " There's no window in that direction. Do nothing
+        " and go back to terminal mode.
+        startinsert
+    else
+        let b:LeftInTerminalMode=1
+        exec 'wincmd ' . a:Direction
+    endif
+endfunction
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Misc
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call Tmap('<C-^>', ':call TerminalGoToAlternateBuffer()<CR>')
-function! TerminalGoToAlternateBuffer()
+function! term#go_to_alternate_buffer()
     let b:LeftInTerminalMode=1
-    if GoToAlternateBuffer() == -1
+    " A bit ugly to depend on another plugin
+    if alternate_buffer#go() == -1
         unlet b:LeftInTerminalMode
         startinsert
     endif
 endfunction
-
-call CreateMapForStartingTerminal('<leader>td', 'Dotfiles', 'cd ~/dotfiles')

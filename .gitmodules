@@ -7,3 +7,63 @@
 [submodule "shell/zsh/ohmyzsh_custom/plugins/zsh-syntax-highlighting"]
 	path = shell/zsh/ohmyzsh_custom/plugins/zsh-syntax-highlighting
 	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
+[submodule "nvim/pack/plugins/start/conflict-marker.vim"]
+	path = nvim/pack/plugins/start/conflict-marker.vim
+	url = https://github.com/rhysd/conflict-marker.vim.git
+[submodule "nvim/pack/plugins/start/yanky.nvim"]
+	path = nvim/pack/plugins/start/yanky.nvim
+	url = https://github.com/gbprod/yanky.nvim.git
+[submodule "nvim/pack/plugins/start/fzf"]
+	path = nvim/pack/plugins/start/fzf
+	url = https://github.com/junegunn/fzf.git
+[submodule "nvim/pack/plugins/start/fzf.vim"]
+	path = nvim/pack/plugins/start/fzf.vim
+	url = https://github.com/junegunn/fzf.vim.git
+[submodule "nvim/pack/plugins/start/gruvbox"]
+	path = nvim/pack/plugins/start/gruvbox
+	url = https://github.com/morhetz/gruvbox.git
+[submodule "nvim/pack/plugins/start/vim-fugitive"]
+	path = nvim/pack/plugins/start/vim-fugitive
+	url = https://github.com/tpope/vim-fugitive.git
+[submodule "nvim/pack/plugins/start/nvim-lspconfig"]
+	path = nvim/pack/plugins/start/nvim-lspconfig
+	url = https://github.com/neovim/nvim-lspconfig.git
+[submodule "nvim/pack/plugins/start/mason.nvim"]
+	path = nvim/pack/plugins/start/mason.nvim
+	url = https://github.com/williamboman/mason.nvim.git
+[submodule "nvim/pack/plugins/start/mason-lspconfig"]
+	path = nvim/pack/plugins/start/mason-lspconfig
+	url = https://github.com/williamboman/mason-lspconfig.git
+[submodule "nvim/pack/plugins/start/nvim-cmp"]
+	path = nvim/pack/plugins/start/nvim-cmp
+	url = https://github.com/hrsh7th/nvim-cmp.git
+[submodule "nvim/pack/plugins/start/cmp-nvim-lsp"]
+	path = nvim/pack/plugins/start/cmp-nvim-lsp
+	url = https://github.com/hrsh7th/cmp-nvim-lsp.git
+[submodule "nvim/pack/plugins/start/LuaSnip"]
+	path = nvim/pack/plugins/start/LuaSnip
+	url = https://github.com/L3MON4D3/LuaSnip.git
+[submodule "nvim/pack/plugins/start/cmp_luasnip"]
+	path = nvim/pack/plugins/start/cmp_luasnip
+	url = https://github.com/saadparwaiz1/cmp_luasnip.git
+[submodule "nvim/pack/plugins/start/lsp-zero.nvim"]
+	path = nvim/pack/plugins/start/lsp-zero.nvim
+	url = https://github.com/VonHeikemen/lsp-zero.nvim.git
+[submodule "nvim/pack/plugins/start/nerdtree"]
+	path = nvim/pack/plugins/start/nerdtree
+	url = https://github.com/preservim/nerdtree.git
+[submodule "nvim/pack/plugins/start/lightline.vim"]
+	path = nvim/pack/plugins/start/lightline.vim
+	url = https://github.com/itchyny/lightline.vim.git
+[submodule "nvim/pack/plugins/start/plenary.nvim"]
+	path = nvim/pack/plugins/start/plenary.nvim
+	url = https://github.com/nvim-lua/plenary.nvim.git
+[submodule "nvim/pack/plugins/start/telescope-fzf-native.nvim"]
+	path = nvim/pack/plugins/start/telescope-fzf-native.nvim
+	url = https://github.com/nvim-telescope/telescope-fzf-native.nvim.git
+[submodule "nvim/pack/plugins/start/vim-plug"]
+	path = nvim/pack/plugins/start/vim-plug
+	url = git@github.com:Mo-tmd/vim-plug.git
+[submodule "nvim/pack/plugins/start/telescope.nvim"]
+	path = nvim/pack/plugins/start/telescope.nvim
+	url = https://github.com/nvim-telescope/telescope.nvim.git

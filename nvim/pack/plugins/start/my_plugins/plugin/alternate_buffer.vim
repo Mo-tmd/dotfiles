@@ -4,9 +4,8 @@
 "   * Falls back to a global buffer history if no buffer is found in the
 "     window history.
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nnoremap <silent> <C-^> :call GoToAlternateBuffer()<CR>
-function! GoToAlternateBuffer()
-    let l:AlternateBuffer = GetAlternateBuffer()
+function! alternate_buffer#go()
+    let l:AlternateBuffer = alternate_buffer#get()
     if l:AlternateBuffer != -1
         execute 'buffer! ' . l:AlternateBuffer
         return 0
@@ -18,7 +17,7 @@ function! GoToAlternateBuffer()
     endif
 endfunction
 
-function! GetAlternateBuffer()
+function! alternate_buffer#get()
     let l:Buffers = s:GlobalBufferHistory + get(s:WindowsBufferHistory,win_getid())
     for l:Buffer in reverse(l:Buffers)
         if bufexists(l:Buffer) && l:Buffer != bufnr()
@@ -28,16 +27,16 @@ function! GetAlternateBuffer()
     return -1
 endfunction
 
-autocmd BufWinEnter,WinEnter * call UpdateBufferHistory()
-function! UpdateBufferHistory()
-    call UpdateWindowsBufferHistory()
-    call UpdateGlobalBufferHistory()
+autocmd BufWinEnter,WinEnter * call s:update_buffer_history()
+function! s:update_buffer_history()
+    call s:update_windows_buffer_history()
+    call s:update_global_buffer_history()
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Keeps a window specific buffer history (buffers visited inside specific windows).
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! UpdateWindowsBufferHistory()
+function! s:update_windows_buffer_history()
     if !exists('s:WindowsBufferHistory') | let s:WindowsBufferHistory = {} | endif
     let l:Win = win_getid()
     let l:Buffer = bufnr()
@@ -51,7 +50,7 @@ endfunction
 " Keeps a global buffer history (not specific to windows). GoToAlternateBuffer()
 " falls back to it if there are no existing buffers in the window specific history.
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! UpdateGlobalBufferHistory()
+function! s:update_global_buffer_history()
     if !exists('s:GlobalBufferHistory') | let s:GlobalBufferHistory = [] | endif
     let l:Buffer = bufnr()
     call RemoveElement(s:GlobalBufferHistory, l:Buffer)
