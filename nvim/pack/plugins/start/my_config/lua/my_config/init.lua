@@ -12,8 +12,25 @@ require('telescope').setup{
       i = {
         ["<ESC>"] = require('telescope.actions').close,
         ["<C-j>"] = require('telescope.actions').move_selection_next,
-        ["<C-k>"] = require('telescope.actions').move_selection_previous
+        ["<C-k>"] = require('telescope.actions').move_selection_previous,
+        ["<leader>kb"] = require('telescope.actions').delete_buffer
+      },
+      n = {
+        ["<leader>kb"] = require('telescope.actions').delete_buffer
       }
+    },
+    layout_config = {
+      width = {padding=0},
+      height = {padding=0}
+    },
+    path_display = {
+      filename_first = true
+    }
+  },
+  pickers = {
+    buffers = {
+      sort_mru = true,
+      disable_coordinates = true
     }
   }
 }

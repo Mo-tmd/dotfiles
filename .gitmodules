@@ -66,4 +66,4 @@
 	url = git@github.com:Mo-tmd/vim-plug.git
 [submodule "nvim/pack/plugins/start/telescope.nvim"]
 	path = nvim/pack/plugins/start/telescope.nvim
-	url = https://github.com/nvim-telescope/telescope.nvim.git
+	url = git@github.com:Mo-tmd/telescope.nvim.git

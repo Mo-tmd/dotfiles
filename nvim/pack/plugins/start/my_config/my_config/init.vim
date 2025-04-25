@@ -294,8 +294,8 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nnoremap <leader>b :Buffers<CR>
-call term#map('<leader>b', ':let b:LeftInTerminalMode=1<CR>:Buffers<CR>')
+nnoremap <leader>b :Telescope buffers<CR>
+call term#map('<leader>b', ':let b:LeftInTerminalMode=1<CR>:Telescope buffers<CR>')
 
 nnoremap <silent> <leader>af
   \ :call FzfFindFiles(
