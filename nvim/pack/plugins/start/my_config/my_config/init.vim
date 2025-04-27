@@ -386,7 +386,7 @@ endfunction
 
 command! -bang -nargs=* Gg
   \ call fzf#vim#grep(
-  \   (<q-args> == '' ? 'git grep --line-number -v ^$' : 'git grep --line-number -- '.fzf#shellescape(<q-args>)),
+  \   (<q-args> == '' ? 'git grep --recurse-submodules --line-number -v ^$' : 'git grep --recurse-submodules --line-number -- '.fzf#shellescape(<q-args>)),
   \   fzf#vim#with_preview({'dir': systemlist('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel')[0]}),
   \   <bang>0
   \ )
