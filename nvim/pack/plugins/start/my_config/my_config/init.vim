@@ -110,7 +110,7 @@ endfunction
 
 " trigger `autoread` when files changes on disk. Inspired by https://stackoverflow.com/a/62936797
 set autoread
-autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * call timer_start(1, { -> execute('if mode() !=# "c" | checktime | endif') })
+autocmd FocusGained,BufEnter,WinEnter,CursorHold,CursorHoldI * call timer_start(1, { -> execute('if getcmdwintype() == "" | checktime | endif') })
 
 call term#define('<leader>td', 'Dotfiles', 'cd ~/dotfiles')
 
