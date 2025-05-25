@@ -1,132 +1,116 @@
 -------------------------------------------------------------------------------
--- General
+-- mason
 -------------------------------------------------------------------------------
-local keymap_settings = {
-  preserve_mappings = false,
-  omit = {},
-}
-
-local lsp = require('lsp-zero').preset({
-  float_border = 'rounded',
-  call_servers = 'local',
-  configure_diagnostics = true,
-  setup_servers_on_start = true,
-  set_lsp_keymaps = keymap_settings
-})
-
-lsp.on_attach(function(client, bufnr)
-  lsp.default_keymaps({buffer = bufnr})
-  vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev({severity={min=vim.diagnostic.severity.INFO}})<CR>', {buffer = true})
-  vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next({severity={min=vim.diagnostic.severity.INFO}})<CR>', {buffer = true})
-end)
+require("mason").setup()
+require("mason-lspconfig").setup()
 
 -------------------------------------------------------------------------------
--- lua_ls
+-- lsp config
 -------------------------------------------------------------------------------
-local lspconfig = require('lspconfig')
-lspconfig.lua_ls.setup(lsp.nvim_lua_ls())
-
--------------------------------------------------------------------------------
--- erlang_ls
--------------------------------------------------------------------------------
-local function root_dir(_)
-  return vim.g.ErlangLsRootDir
-end
-
-if (vim.g.ErlangLsRootDir) == nil then
-  Options = {}
-else
-  Options = {root_dir = root_dir}
-end
-
-lspconfig.erlangls.setup(Options)
-
--------------------------------------------------------------------------------
--- vim-language-server
--------------------------------------------------------------------------------
-local function nvim_dir(_)
-  return '/home/user/dotfiles/nvim'
-end
-lspconfig.vimls.setup({
-  root_dir = nvim_dir
-})
-
--------------------------------------------------------------------------------
--- bashls
--------------------------------------------------------------------------------
-lspconfig.bashls.setup({})
-
--------------------------------------------------------------------------------
--- jdtls (Java)
--------------------------------------------------------------------------------
-if (vim.g.JdtlsCmd) == nil then
-  Options = {}
-else
-  Options = {cmd = {vim.g.JdtlsCmd}}
-end
-lspconfig.jdtls.setup(Options)
-
--------------------------------------------------------------------------------
---
--------------------------------------------------------------------------------
-lsp.setup()
-
--------------------------------------------------------------------------------
--- Cmp and luasnip
--------------------------------------------------------------------------------
-local cmp = require('cmp')
-
-local paths = {os.getenv("Dotfiles") .. "/nvim/snippets"}
-if (os.getenv("WorkDotfiles") ~= nil) then
-  table.insert(paths, os.getenv("WorkDotfiles") .. "/nvim/snippets")
-end
-require('luasnip.loaders.from_vscode').lazy_load({paths=paths})
-
-local luasnip = require('luasnip')
-Tab = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
-    end, { "i", "s" })
-STab = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
-    end, { "i", "s" })
-local mappings = {
-  ['<CR>']    = cmp.mapping.confirm({select=false}),
-  ['<Tab>']   = Tab,
-  ['<S-Tab>'] = STab,
-}
-
-local sources = {
-  {name = 'luasnip', keyword_length = 2},
-  {name = 'path'},
-  {name = 'nvim_lsp'},
-  {name = 'buffer', keyword_length = 3}
-}
-
-cmp.setup({
-  mapping = mappings,
-  sources = sources
-})
-
--------------------------------------------------------------------------------
--- Misc
--------------------------------------------------------------------------------
--- Toggle diagnostics
-function toggle_diagnostics()
-  if vim.diagnostic.is_disabled() then
-    vim.diagnostic.enable()
+function FindRootPreferDotfiles(bufnr, root_markers)
+  local bufname = vim.api.nvim_buf_get_name(bufnr)
+  local WorkDotfiles = os.getenv("WorkDotfiles")
+  local Dotfiles = os.getenv("Dotfiles")
+  if WorkDotfiles and string.match(bufname, "^"..WorkDotfiles) then
+    return WorkDotfiles
+  elseif Dotfiles and string.match(bufname, "^"..Dotfiles) then
+    return Dotfiles
   else
-    vim.diagnostic.disable()
+    return vim.fs.root(bufname, root_markers)
   end
 end
+
+vim.lsp.config("*", {
+  capabilities = require("cmp_nvim_lsp").default_capabilities()
+})
+
+vim.lsp.enable("luals")
+vim.lsp.enable("vimls")
+vim.lsp.enable("clangd")
+vim.lsp.enable("bashls")
+vim.lsp.enable("erlangls")
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(event)
+    local opts = {buffer=event.buf}
+
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+    vim.keymap.set("n", "gtd", vim.lsp.buf.type_definition, opts)
+    vim.keymap.set("n", "gdc", vim.lsp.buf.declaration, opts)
+    vim.keymap.set("n", "gri", vim.lsp.buf.implementation, opts)
+
+    vim.keymap.set("n", "]d", function() vim.diagnostic.jump({count=1,  float=true, severity={min=vim.diagnostic.severity.INFO}}) end, opts)
+    vim.keymap.set("n", "[d", function() vim.diagnostic.jump({count=-1, float=true, severity={min=vim.diagnostic.severity.INFO}}) end, opts)
+
+    vim.keymap.set("n", "grn", vim.lsp.buf.rename, opts)
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    vim.keymap.set("i", "<C-S>", vim.lsp.buf.signature_help, opts)
+    vim.keymap.set("n", "grr", vim.lsp.buf.references, opts)
+    vim.keymap.set({"n","x"}, "gq", function() vim.lsp.buf.format({async = true}) end, opts)
+    vim.keymap.set("n", "gra", vim.lsp.buf.code_action, opts)
+    vim.keymap.set("n", "gO", vim.lsp.buf.document_symbol, opts)
+  end,
+})
+
+-------------------------------------------------------------------------------
+-- luasnip
+-------------------------------------------------------------------------------
+local paths = {os.getenv("Dotfiles").."/nvim/snippets"}
+if (os.getenv("WorkDotfiles") ~= nil) then
+  table.insert(paths, os.getenv("WorkDotfiles").."/nvim/snippets")
+end
+require("luasnip.loaders.from_vscode").lazy_load({paths=paths})
+
+local luasnip = require("luasnip")
+luasnip.setup({
+  delete_check_events = {"TextChanged","TextChangedI"},
+  link_children = true
+})
+
+-------------------------------------------------------------------------------
+-- cmp
+-------------------------------------------------------------------------------
+local cmp = require("cmp")
+cmp.setup({
+  completion = {
+    keyword_length = 2
+  },
+  snippet = {
+    expand = function(args)
+      luasnip.lsp_expand(args.body)
+    end
+  },
+  sources = {
+    {name="luasnip"},
+    {name="nvim_lsp"}
+  },
+  mapping = {
+    ["<C-Space>"] = cmp.mapping.complete(),
+    ["<CR>"] = cmp.mapping.confirm({select=true}),
+    ["<C-e>"] = cmp.mapping.abort(),
+    ["<Tab>"] = cmp.mapping(
+      function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        elseif luasnip.expand_or_locally_jumpable() then
+          luasnip.expand_or_jump()
+        else
+          fallback()
+        end
+      end,
+      {"i", "s"}
+    ),
+    ["<S-Tab>"] = cmp.mapping(
+      function(fallback)
+          if cmp.visible() then
+            cmp.select_prev_item()
+          elseif luasnip.jumpable(-1) then
+            luasnip.jump(-1)
+          else
+            fallback()
+          end
+      end,
+      {"i", "s"}
+    )
+  }
+})

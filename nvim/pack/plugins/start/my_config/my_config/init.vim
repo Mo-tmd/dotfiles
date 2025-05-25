@@ -47,7 +47,9 @@ cnoremap <C-n> <Down>
 
 nnoremap <leader>le `.
 
-nnoremap <leader>dt :lua toggle_diagnostics()<CR>
+nnoremap <silent> <leader>dt :lua vim.diagnostic.enable(not vim.diagnostic.is_enabled({bufnr=0}), {bufnr=0})<CR>
+
+nnoremap gd <C-]>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
@@ -112,6 +114,7 @@ endfunction
 set autoread
 autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * call timer_start(1, { -> execute('if mode() !=# "c" | checktime | endif') })
 
+au TermOpen * setlocal number relativenumber
 call term#define('<leader>td', 'Dotfiles', 'cd ~/dotfiles')
 
 function! PlugPostHooks()
