@@ -16,7 +16,7 @@ function FindRootPreferDotfiles(bufnr, root_markers)
   elseif Dotfiles and string.match(bufname, "^"..Dotfiles) then
     return Dotfiles
   else
-    return vim.fs.root(bufname, root_markers)
+    return vim.fs.root(bufnr, root_markers)
   end
 end
 
