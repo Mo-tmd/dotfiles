@@ -119,17 +119,20 @@ return {
     get_jdtls_jvm_args(),
   },
   filetypes = { 'java' },
-  root_markers = {
-    -- Multi-module projects
-    '.git',
-    'build.gradle',
-    'build.gradle.kts',
-    -- Single-module projects
-    'build.xml', -- Ant
-    'pom.xml', -- Maven
-    'settings.gradle', -- Gradle
-    'settings.gradle.kts', -- Gradle
-  },
+  root_dir = function(bufnr, cb)
+    local root_markers = {
+      -- Multi-module projects
+      '.git',
+      'build.gradle',
+      'build.gradle.kts',
+      -- Single-module projects
+      'build.xml', -- Ant
+      'pom.xml', -- Maven
+      'settings.gradle', -- Gradle
+      'settings.gradle.kts', -- Gradle
+    }
+    cb(MyLspRootDir(bufnr, root_markers))
+  end,
   init_options = {
     workspace = get_jdtls_workspace_dir(),
     jvm_args = {},

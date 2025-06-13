@@ -2,7 +2,9 @@ return {
   cmd = {"vim-language-server", "--stdio"},
   filetypes = {"vim"},
   root_dir = function(bufnr, cb)
-    local root_markers = {".git"}
+    local root_markers = {
+      ".git"
+    }
     cb(MyLspRootDir(bufnr, root_markers))
   end,
   init_options = {

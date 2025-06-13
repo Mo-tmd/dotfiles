@@ -60,15 +60,18 @@ end
 return {
   cmd = { 'clangd' },
   filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda', 'proto' },
-  root_markers = {
-    '.clangd',
-    '.clang-tidy',
-    '.clang-format',
-    'compile_commands.json',
-    'compile_flags.txt',
-    'configure.ac', -- AutoTools
-    '.git',
-  },
+  root_dir = function(bufnr, cb)
+    local root_markers = {
+      '.clangd',
+      '.clang-tidy',
+      '.clang-format',
+      'compile_commands.json',
+      'compile_flags.txt',
+      'configure.ac', -- AutoTools
+      '.git'
+    }
+    cb(MyLspRootDir(bufnr, root_markers))
+  end,
   capabilities = {
     textDocument = {
       completion = {
