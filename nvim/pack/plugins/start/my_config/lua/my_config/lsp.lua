@@ -7,7 +7,7 @@ require("mason-lspconfig").setup()
 -------------------------------------------------------------------------------
 -- lsp config
 -------------------------------------------------------------------------------
-function FindRootPreferDotfiles(bufnr, root_markers)
+function MyLspRootDir(bufnr, root_markers)
   local bufname = vim.api.nvim_buf_get_name(bufnr)
   local WorkDotfiles = os.getenv("WorkDotfiles")
   local Dotfiles = os.getenv("Dotfiles")
@@ -15,9 +15,18 @@ function FindRootPreferDotfiles(bufnr, root_markers)
     return WorkDotfiles
   elseif Dotfiles and string.match(bufname, "^"..Dotfiles) then
     return Dotfiles
-  else
-    return vim.fs.root(bufnr, root_markers)
   end
+
+  if vim.bo[bufnr].buftype ~= '' then
+    return nil
+  end
+
+  local is_uri = bufname:match('%w+:')
+  if is_uri and vim.uri_to_fname(bufname) == bufname then
+    return nil
+  end
+
+  return vim.fs.root(bufnr, root_markers)
 end
 
 vim.lsp.config("*", {

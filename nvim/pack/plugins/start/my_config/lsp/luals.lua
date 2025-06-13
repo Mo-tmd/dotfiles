@@ -12,7 +12,7 @@ return {
       "selene.yml",
       ".git",
     }
-    cb(FindRootPreferDotfiles(bufnr, root_markers))
+    cb(MyLspRootDir(bufnr, root_markers))
   end,
   settings = {
     Lua = {
@@ -27,6 +27,6 @@ return {
     }
   },
   before_init = function(init_params, config)
-     table.insert(config.settings.Lua.workspace.library, init_params.rootPath)
+     table.insert(config.settings.Lua.workspace.library, config.root_dir)
   end
 }

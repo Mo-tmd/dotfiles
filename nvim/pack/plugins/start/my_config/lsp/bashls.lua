@@ -15,6 +15,6 @@ return {
   filetypes = {"bash", "sh"},
   root_dir = function(bufnr, cb)
     local root_markers = {".git"}
-    cb(FindRootPreferDotfiles(bufnr, root_markers))
+    cb(MyLspRootDir(bufnr, root_markers))
   end
 }
