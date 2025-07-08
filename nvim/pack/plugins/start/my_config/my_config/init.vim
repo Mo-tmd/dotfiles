@@ -157,16 +157,15 @@ exec 'set spellfile=' . g:SpellDir . '/general.en.add'
 
 nnoremap <silent> <leader>cs :call ToggleSpellCheck()<CR>
 
-autocmd BufNew * call MaybeEnableSpell()
+autocmd TermOpen * setlocal nospell
+autocmd BufEnter * call MaybeEnableSpell()
 function! MaybeEnableSpell()
-    let l:Buffer = expand('<abuf>')
-    let l:IsModifiable = getbufvar(l:Buffer, '&modifiable')
-    if !l:IsModifiable | return | endif
+    let l:Path = expand('%:p')
+    if l:Path == "" | return | endif
 
-    let l:Path = expand('<afile>:p')
-    let l:IsExcludedFromSpell = l:Path != "" &&
-                              \ filereadable(s:SpellExcludedFilesDb) &&
-                              \ index(readfile(s:SpellExcludedFilesDb), l:Path) >= 0
+    let l:IsExcludedFromSpell =
+      \ filereadable(s:SpellExcludedFilesDb) &&
+      \ index(readfile(s:SpellExcludedFilesDb), l:Path) >= 0
     if l:IsExcludedFromSpell | return | endif
 
     setlocal spell spelloptions=camel
