@@ -6,6 +6,7 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 alias gs{separator}'git status'
 alias gd{separator}'git diff'
+alias gdp{separator}'gd -p --color=never'
 alias ga{separator}'git add'
 alias gc{separator}'git commit'
 alias push{separator}'git push'
@@ -43,6 +44,7 @@ alias suicide{separator}'pkill -u $USER'
 # Aliases specific to ZSH
 ################################################################################
 e() { [[ -n "${NVIM}" ]] && nvr -cc "let b:LeftInTerminalMode=1" "${@}" || nvim "${@}" }
+coa() { git checkout "$1" "$(git rev-parse --show-toplevel)" && git commit -m "Set/Revert all files to $1" }
 alias source_tmux_conf='[[ -n "${TMUX}" ]] && tmux source-file ~/.tmux.conf'
 alias saf='source_tmux_conf; exec `echo $0 | sed "s/^-//"`'
 mywhich() { which ${@} | sed 's/^\([^[:space:]]\)\+=//' }
@@ -51,6 +53,7 @@ mywhich() { which ${@} | sed 's/^\([^[:space:]]\)\+=//' }
 # Aliases specific to TCSH
 ################################################################################
 alias e 'bash -c "[[ -n "\${NVIM}" ]] && { nvr -cc :let\ b:LeftInTerminalMode=1 \!*; } || nvim \!*"'
+alias coa 'git checkout \!:1 "`git rev-parse --show-toplevel`" && git commit -m "Set/Revert all files to \!:1"'
 alias source_tmux_conf 'bash -c "[[ -n "\${TMUX}" ]] && tmux source-file ~/.tmux.conf"'
 alias saf 'source "${Dotfiles}"/shell/tcsh/rc.tcsh; source_tmux_conf'
 alias mywhich 'which \!* | sed "s/^[^[:space:]]\+:[[:space:]]\+aliased[[:space:]]\+to[[:space:]]//"'

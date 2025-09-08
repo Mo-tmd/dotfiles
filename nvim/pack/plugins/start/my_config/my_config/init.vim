@@ -157,8 +157,8 @@ exec 'set spellfile=' . g:SpellDir . '/general.en.add'
 
 nnoremap <silent> <leader>cs :call ToggleSpellCheck()<CR>
 
-autocmd TermOpen * setlocal nospell
-autocmd BufEnter * call MaybeEnableSpell()
+"autocmd TermOpen * echom "disabling spell" | setlocal nospell
+autocmd BufNew * call MaybeEnableSpell()
 function! MaybeEnableSpell()
     let l:Path = expand('%:p')
     if l:Path == "" | return | endif
@@ -166,7 +166,7 @@ function! MaybeEnableSpell()
     let l:IsExcludedFromSpell =
       \ filereadable(s:SpellExcludedFilesDb) &&
       \ index(readfile(s:SpellExcludedFilesDb), l:Path) >= 0
-    if l:IsExcludedFromSpell | return | endif
+    if l:IsExcludedFromSpell || &buftype == 'terminal' | return | endif
 
     setlocal spell spelloptions=camel
 endfunction
