@@ -44,7 +44,7 @@ alias suicide{separator}'pkill -u $USER'
 # Aliases specific to ZSH
 ################################################################################
 e() { [[ -n "${NVIM}" ]] && nvr -cc "let b:LeftInTerminalMode=1" "${@}" || nvim "${@}" }
-coa() { git restore --source="$1" --staged --worktree "$(git rev-parse --show-toplevel)" && git commit -m "Set/Revert all files to $1" }
+ra() { git restore --source="$1" --staged --worktree "$(git rev-parse --show-toplevel)" && git commit -m "Restore all files to $1" }
 alias source_tmux_conf='[[ -n "${TMUX}" ]] && tmux source-file ~/.tmux.conf'
 alias saf='source_tmux_conf; exec `echo $0 | sed "s/^-//"`'
 mywhich() { which ${@} | sed 's/^\([^[:space:]]\)\+=//' }
@@ -54,7 +54,7 @@ prettyxml() { if [[ -f "$1" ]]; then; xmllint --format "$1"; else; echo "$1" | x
 # Aliases specific to TCSH
 ################################################################################
 alias e 'bash -c "[[ -n "\${NVIM}" ]] && { nvr -cc :let\ b:LeftInTerminalMode=1 \!*; } || nvim \!*"'
-alias coa 'git restore --source=\!:1 --staged --worktree "`git rev-parse --show-toplevel`" && git commit -m "Set/Revert all files to \!:1"'
+alias ra 'git restore --source=\!:1 --staged --worktree "`git rev-parse --show-toplevel`" && git commit -m "Restore all files to \!:1"'
 alias source_tmux_conf 'bash -c "[[ -n "\${TMUX}" ]] && tmux source-file ~/.tmux.conf"'
 alias saf 'source "${Dotfiles}"/shell/tcsh/rc.tcsh; source_tmux_conf'
 alias mywhich 'which \!* | sed "s/^[^[:space:]]\+:[[:space:]]\+aliased[[:space:]]\+to[[:space:]]//"'
