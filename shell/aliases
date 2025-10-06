@@ -47,6 +47,7 @@ ra() { git restore --source="$1" --staged --worktree "$(git rev-parse --show-top
 alias source_tmux_conf='[[ -n "${TMUX}" ]] && tmux source-file ~/.tmux.conf'
 alias saf='source_tmux_conf; exec `echo $0 | sed "s/^-//"`'
 mywhich() { which ${@} | sed 's/^\([^[:space:]]\)\+=//' }
+prettyxml() { if [[ -f "$1" ]]; then; xmllint --format "$1"; else; echo "$1" | xmllint --format -; fi }
 
 ################################################################################
 # Aliases specific to TCSH
