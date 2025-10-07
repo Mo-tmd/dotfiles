@@ -13,10 +13,10 @@ command! -nargs=? T call term#new(<q-args>)
 command! -nargs=? TH call term#new(<q-args>, 'cd '.expand('%:h'))
 function! term#new(...)
     if len(a:000) > 0
-        let l:TerminalName = (len(a:000[0]) > 0 ? s:get_full_terminal_name(a:000[0]) : s:make_terminal_name())
+        let l:TerminalName = (len(a:000[0]) > 0 ? term#buffer_name(a:000[0]) : s:make_buffer_name())
         let l:StartActions = a:000[1:]
     else
-        let l:TerminalName = s:make_terminal_name()
+        let l:TerminalName = s:make_buffer_name()
         let l:StartActions = []
     endif
 
@@ -30,13 +30,13 @@ function! term#new(...)
     endif
 endfunction
 
-function! s:make_terminal_name()
+function! s:make_buffer_name()
     if !exists('s:TerminalNumber') | let s:TerminalNumber = 0 | endif
     let s:TerminalNumber += 1
-    return s:get_full_terminal_name(string(s:TerminalNumber))
+    return term#buffer_name(string(s:TerminalNumber))
 endfunction
 
-function! s:get_full_terminal_name(TerminalName)
+function! term#buffer_name(TerminalName)
     return 'Term: ' . a:TerminalName
 endfunction
 
