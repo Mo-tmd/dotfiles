@@ -83,7 +83,7 @@ function! term#define(Lhs, TerminalName, ...)
     let l:QuotedArgs = map(l:Args, 'printf("\"%s\"", v:val)')
     let l:ArgsString = join(l:QuotedArgs, ',')
     exec printf('nnoremap <silent> %s :call call("term#new", [%s])<CR>', a:Lhs, l:ArgsString)
-    call term#map(a:Lhs, printf(':execute (bufname("%") == "%s" ? "startinsert" : ''let b:LeftInTerminalMode=1 \| call call("term#new", [%s])'')<CR>', s:get_full_terminal_name(a:TerminalName), l:ArgsString))
+    call term#map(a:Lhs, printf(':execute (bufname("%") == "%s" ? "startinsert" : ''let b:LeftInTerminalMode=1 \| call call("term#new", [%s])'')<CR>', term#buffer_name(a:TerminalName), l:ArgsString))
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
