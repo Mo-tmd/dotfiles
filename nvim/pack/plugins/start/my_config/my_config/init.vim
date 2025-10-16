@@ -167,9 +167,12 @@ function! MaybeEnableSpell()
       \ l:Path != '' &&
       \ filereadable(s:SpellExcludedFilesDb) &&
       \ index(readfile(s:SpellExcludedFilesDb), l:Path) >= 0
-    if l:IsExcludedFromSpell | return | endif
 
-    setlocal spell spelloptions=camel
+    if l:IsExcludedFromSpell
+        setlocal nospell
+    else
+        setlocal spell spelloptions=camel
+    endif
 endfunction
 
 function! ToggleSpellCheck()
