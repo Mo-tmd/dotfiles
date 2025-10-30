@@ -6,6 +6,7 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 alias gs{separator}'git status'
 alias gd{separator}'git diff'
+alias gdp{separator}'gd -p --color=never'
 alias ga{separator}'git add'
 alias gc{separator}'git commit'
 alias push{separator}'git push'
