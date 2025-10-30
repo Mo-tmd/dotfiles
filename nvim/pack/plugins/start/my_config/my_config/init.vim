@@ -149,6 +149,8 @@ set smartindent
 
 autocmd BufNewFile,BufRead *shell/variables,*shell/aliases set filetype=bash
 
+call spellcheck#setup()
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Status Line
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
