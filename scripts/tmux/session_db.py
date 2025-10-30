@@ -34,3 +34,10 @@ def remove(session_name:str):
         jason.write(sessions, sessions_file)
     except KeyError:
         return "Session '{}' does not exist".format(session_name)
+
+def rename(old_session_name:str, new_session_name:str):
+    sessions = jason.read(sessions_file)
+    session = sessions[old_session_name]
+    del sessions[old_session_name]
+    sessions[new_session_name] = session
+    jason.write(sessions, sessions_file)

@@ -61,7 +61,7 @@ def parse_args() -> Session:
         if len(session_names) > 1:
             parser.error("--session-name appears more than once")
         session_name = session_names[0][0]
-        session_name = substitue_special_characters(session_name)
+        session_name = Session.substitue_special_characters(session_name)
 
     ## windows
     windows = args.window
@@ -85,13 +85,6 @@ def execute_start_actions(start_actions):
     for start_action in start_actions:
         start_action = start_action.replace("'", "\"")
         cmd("tmux send-keys '{}' C-m".format(start_action))
-
-## Tmux can't handle some character in session names. Substitue with similar looking characters.
-def substitue_special_characters(session_name:str) -> str:
-    session_name1 = session_name.replace(":", "꞉")
-    session_name2 = session_name1.replace(".", "․")
-    session_name3 = session_name2.replace("'", "’")
-    return session_name3
 
 ################################################################################
 # Python ugliness
