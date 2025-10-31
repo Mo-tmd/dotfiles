@@ -152,6 +152,14 @@ autocmd BufNewFile,BufRead *shell/variables,*shell/aliases set filetype=bash
 call spellcheck#setup()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-better-whitespace
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:better_whitespace_enabled = 0
+let g:strip_whitespace_on_save = 1
+let g:strip_only_modified_lines = 1
+let g:strip_whitespace_confirm = 0
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Status Line
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set laststatus=2
@@ -265,33 +273,6 @@ hi DiffAdd      guifg=#5faf5f guibg=#262626
 hi DiffChange   guifg=#767676 guibg=#262626
 hi DiffDelete   guifg=#870000 guibg=#870087
 hi DiffText     guifg=#ffaf00 guibg=#262626
-
-" Highlight trailing spaces.
-augroup TrailingSpaces
-    autocmd!
-    autocmd FileType,BufEnter,WinEnter * call ToggleTrailingSpaces()
-    autocmd TermOpen,TermEnter * call ClearTrailingSpaces()
-
-    autocmd InsertEnter * call ClearTrailingSpaces()
-    autocmd InsertLeave * call ToggleTrailingSpaces()
-augroup END
-
-function! ToggleTrailingSpaces()
-    if &modifiable && &buftype !=# 'terminal' && &filetype !=# 'TelescopeResults'
-        call HighlightTrailingSpaces()
-    else
-        call ClearTrailingSpaces()
-    endif
-endfunction
-
-function! HighlightTrailingSpaces()
-    highlight TrailingSpaces ctermbg=red guibg=Red
-    match TrailingSpaces /\s\+$/
-endfunction
-
-function! ClearTrailingSpaces()
-    call clearmatches()
-endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf
