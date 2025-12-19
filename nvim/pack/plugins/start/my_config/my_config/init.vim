@@ -9,11 +9,6 @@ call term#setup()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set timeoutlen=500
 
-nnoremap <A-Left> <C-o>
-nnoremap 3D <C-o>
-nnoremap <A-Right> <C-i>
-nnoremap 3C <C-i>
-
 nnoremap <leader>sp :vsplit<CR>
 
 " Smart way to move between windows
