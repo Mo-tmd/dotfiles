@@ -194,3 +194,25 @@ bindkey -M vicmd '^U' KillBufferVicmdMode
 
 # Numeric sort completion: e.g. (1.1  1.2  1.13) instead of (1.1  1.13  1.2)
 zstyle ':completion:*' sort numeric
+
+unalias tma
+tma() {
+    [[ -n "$1" ]] && tmux attach -t "$1" || tmux attach
+}
+# Completion function to make tma use the same autocomplete as `tmux attach -t`. Stolen from ChatGPT
+_tma() {
+  # Save the original completion state
+  local -a words_backup
+  local current_backup
+  words_backup=("${words[@]}")
+  current_backup=$CURRENT
+  # Build a fake command line: tmux attach -t <original args>
+  words=( tmux attach -t "${words_backup[@]:1}" )
+  CURRENT=$#words
+  # Call zsh's tmux completion
+  _tmux
+  # Restore state (not strictly necessary but good hygiene)
+  words=("${words_backup[@]}")
+  CURRENT=$current_backup
+}
+compdef _tma tma
