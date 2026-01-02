@@ -425,10 +425,10 @@ function! GitRecursiveBlame()
     call GitShow(expand('<cword>'), l:Path)
 endfunction
 
-nnoremap <leader>gg :G grep -iF <C-r>=shellescape(expand('<cword>'))<CR><CR>
-nnoremap <leader>GG :G grep -F <C-r>=shellescape(expand('<cword>'))<CR><CR>
-xnoremap <silent> <leader>gg y:<C-u>G grep -iF <C-r>=shellescape(@")<CR><CR>
-xnoremap <silent> <leader>GG y:<C-u>G grep -F <C-r>=shellescape(@")<CR><CR>
+nnoremap <leader>gg :G grep -iF -- <C-r>=shellescape(expand('<cword>'))<CR><CR>
+nnoremap <leader>GG :G grep -F -- <C-r>=shellescape(expand('<cword>'))<CR><CR>
+xnoremap <silent> <leader>gg y:<C-u>G grep -iF -- <C-r>=shellescape(@")<CR><CR>
+xnoremap <silent> <leader>GG y:<C-u>G grep -F -- <C-r>=shellescape(@")<CR><CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Man pages
