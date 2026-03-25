@@ -30,7 +30,8 @@ require('telescope').setup{
   pickers = {
     buffers = {
       sort_mru = true,
-      disable_coordinates = true
+      disable_coordinates = true,
+      ignore_current_buffer = true
     }
   }
 }
