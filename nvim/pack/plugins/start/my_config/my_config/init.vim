@@ -373,6 +373,7 @@ command! -bang -nargs=* Gg
 " Nerd Tree
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let NERDTreeShowHidden=1
+let g:NERDTreeWinSize = 40
 
 nnoremap <leader>nt :NERDTreeToggle<CR>
 nnoremap <leader>nc :NERDTreeFind<CR>
