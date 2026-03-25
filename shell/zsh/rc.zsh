@@ -1,32 +1,4 @@
 ################################################################################
-# Stuff that needs to be in the beginning
-################################################################################
-if [[ ! -v Dotfiles ]]; then
-    [[ -e ~/.zshrc.user ]] && ThisFile=~/.zshrc.user || ThisFile=~/.zshrc
-    ThisFile=$(readlink -f $ThisFile)
-    ThisDir=$(dirname "${ThisFile}")
-    unset ThisFile
-    export Dotfiles=$(readlink -f "${ThisDir}/../..")
-else
-    ThisDir="${Dotfiles}/shell/zsh"
-fi
-
-PATH=`"${Dotfiles}/scripts/path/set_path.sh" "${Dotfiles}/shell/path"`
-
-################################################################################
-# Source rc_common.zsh if running a non-interactive shell.
-################################################################################
-if [[ $- == *i* ]]; then
-    # Interactive shell, do nothing (continue)
-    :
-else
-    # Non interactive shell, source common rc and exit script.
-    source "${ThisDir}/rc_common.zsh"
-    unset ThisDir
-    return
-fi
-
-################################################################################
 # Pre Oh My Zsh
 ################################################################################
 export ZSH_COMPDUMP="${HOME}/dump/zsh/zcompdump-${HOST}-${ZSH_VERSION}"
@@ -53,7 +25,7 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=105,underline'
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="${ThisDir}/ohmyzsh"
+export ZSH="${Dotfiles}/shell/zsh/ohmyzsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -114,7 +86,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM="${ThisDir}/ohmyzsh_custom"
+ZSH_CUSTOM="${Dotfiles}/shell/zsh/ohmyzsh_custom"
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -155,8 +127,7 @@ source $ZSH/oh-my-zsh.sh
 ############################## END Oh My Zsh ###################################
 ################################################################################
 ################################################################################
-source "${ThisDir}/rc_common.zsh"
-unset ThisDir
+source "${Dotfiles}/shell/zsh/rc_common.zsh"
 
 unset RPS1
 
