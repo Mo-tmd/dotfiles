@@ -17,6 +17,6 @@ def main():
 def cmd(cmd):
     subprocess.check_output(cmd, shell=True, text=True).rstrip("\n")
 
-## Python ugliness.
+# Python ugliness.
 if __name__ == "__main__":
     main()

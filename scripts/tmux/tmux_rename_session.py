@@ -28,6 +28,6 @@ def parse_new_name():
         print("Error: New session name is required.")
         sys.exit(1)
 
-## Python ugliness.
+# Python ugliness.
 if __name__ == "__main__":
     main()

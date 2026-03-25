@@ -8,6 +8,6 @@ def main():
     for session in session_db.list():
         tmux_new_session.new_session(session)
 
-## Python ugliness
+# Python ugliness
 if __name__ == "__main__":
     main()
