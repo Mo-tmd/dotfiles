@@ -11,8 +11,8 @@ fi
 # Set the "PATH" environment variable.
 PATH=`"${Dotfiles}/scripts/path/set_path.sh" "${Dotfiles}/shell/path"`
 
-# Source rc_common.zsh only if we are in a non-interactive shell.
-# For interactive shells, it will be sourced in rc.zsh
+# Set aliases and variables only if we are in a non-interactive shell.
+# For interactive shells, they will be set in rc.zsh
 if [[ $- != *i* ]]; then
-    source "${Dotfiles}/shell/zsh/rc_common.zsh"
+    source "${Dotfiles}/shell/zsh/set_aliases_and_variables.zsh" "${Dotfiles}" ""
 fi
