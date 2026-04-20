@@ -1,14 +1,14 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " setup
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! term#setup()
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Start/go_to a terminal. Usage examples:
 "     * :T Terminal name
 "     * :call term#new('Terminal name', 'Start action', 'Another start action')
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 command! -nargs=? T call term#new(<q-args>)
 command! -nargs=? TH call term#new(<q-args>, 'cd '.expand('%:h'))
 function! term#new(...)
@@ -61,9 +61,9 @@ function! GoToBuffer(BufferName)
     endif
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Creates a terminal mode mapping only for terminals started through term#new(...)
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! term#map(Lhs, Rhs, Remap=0)
     if !exists('s:MyTerminalMappings') | let s:MyTerminalMappings = [] | endif
     let l:Mapping = printf('%s <silent> <buffer> %s <C-\><C-n>%s',
@@ -74,9 +74,9 @@ function! term#map(Lhs, Rhs, Remap=0)
     let s:MyTerminalMappings += [l:Mapping]
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Creates a mapping in both normal and terminal modes to start/go_to a terminal.
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! term#define(Lhs, TerminalName, ...)
     let l:StartActions = a:000
     let l:Args = [a:TerminalName] + l:StartActions
@@ -86,9 +86,9 @@ function! term#define(Lhs, TerminalName, ...)
     call term#map(a:Lhs, printf(':execute (bufname("%") == "%s" ? "startinsert" : ''let b:LeftInTerminalMode=1 \| call call("term#new", [%s])'')<CR>', term#buffer_name(a:TerminalName), l:ArgsString))
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Automatically enter insert mode when entering a terminal window/buffer
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup MaybeEnteredTerminalBuffer
     autocmd!
     " The function s:maybe_entered_terminal_buffer relies on cursor position (line
@@ -134,9 +134,9 @@ function! s:get_last_non_empty_line()
     return 0
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " A hacky port of https://vimhelp.org/terminal.txt.html#term_sendkeys%28%29
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! term#send_keys(TargetBuffer, Keys)
     if !bufexists(a:TargetBuffer)
         throw 'TargetBuffer doesn''t exist'
@@ -155,13 +155,13 @@ function! term#send_keys(TargetBuffer, Keys)
     call feedkeys(":q\<CR>", 'n')
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Move from terminal buffer window to another window. Example usage:
 " call term#map('<C-j>', ':call term#move_to_window("j")<CR>')
 " call term#map('<C-k>', ':call term#move_to_window("k")<CR>')
 " call term#map('<C-h>', ':call term#move_to_window("h")<CR>')
 " call term#map('<C-l>', ':call term#move_to_window("l")<CR>')
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! term#move_to_window(Direction)
     let l:CurrentWindow = winnr()
     let l:TargetWindow = winnr(a:Direction)
@@ -175,9 +175,9 @@ function! term#move_to_window(Direction)
     endif
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Misc
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! term#go_to_alternate_buffer()
     let b:LeftInTerminalMode=1
     " A bit ugly to depend on another plugin

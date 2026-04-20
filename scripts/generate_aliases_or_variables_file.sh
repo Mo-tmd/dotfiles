@@ -11,7 +11,7 @@ OutputFile=$4
 ################################################################################
 # Do nothing if checksum hasn't changed
 ################################################################################
-function get_checksum() {
+get_checksum() {
     echo `md5sum "$InputFile" | awk '{ print $1 }'`
 }
 if [[ -f "$OutputFile" ]]; then
@@ -44,7 +44,7 @@ echo "# checksum: `get_checksum`" > "$OutputFile"
 ################################################################################
 # Start extracting and tranforming
 ################################################################################
-function extract_section() {
+extract_section() {
     Section=$1
     # Explanation for the awk below because I will probably not understand it after a few days:
     # * Put all lines in "lines" array
