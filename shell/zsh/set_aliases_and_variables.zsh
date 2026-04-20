@@ -2,15 +2,15 @@ DotfilesDir="$1"
 Prefix="$2"
 GeneratedFilesDir=~/dump/zsh/aliases_and_variables
 
-mkdir -p "${GeneratedFilesDir}"
+mkdir -p "$GeneratedFilesDir"
 
-GeneratedAliases="${GeneratedFilesDir}/${Prefix}aliases"
-generate_aliases_or_variables_file.sh aliases ZSH "${DotfilesDir}"/shell/aliases "${GeneratedAliases}"
-source "${GeneratedAliases}"
+GeneratedAliases="$GeneratedFilesDir/${Prefix}aliases"
+generate_aliases_or_variables_file.sh aliases ZSH "$DotfilesDir"/shell/aliases "$GeneratedAliases"
+source "$GeneratedAliases"
 
-GeneratedVariables="${GeneratedFilesDir}/${Prefix}variables"
-generate_aliases_or_variables_file.sh variables ZSH "${DotfilesDir}"/shell/variables "${GeneratedVariables}"
-source "${GeneratedVariables}"
+GeneratedVariables="$GeneratedFilesDir/${Prefix}variables"
+generate_aliases_or_variables_file.sh variables ZSH "$DotfilesDir"/shell/variables "$GeneratedVariables"
+source "$GeneratedVariables"
 
 unset GeneratedAliases
 unset GeneratedVariables

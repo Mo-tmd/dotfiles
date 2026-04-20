@@ -12,21 +12,22 @@ OutputFile=$4
 # Do nothing if checksum hasn't changed
 ################################################################################
 function get_checksum() {
-    echo `md5sum "${InputFile}" | awk '{ print $1 }'`
+    echo `md5sum "$InputFile" | awk '{ print $1 }'`
 }
-if [[ -f "${OutputFile}" ]]; then
+if [[ -f "$OutputFile" ]]; then
     NewChecksum=`get_checksum`
-    OldChecksum=`grep --max-count=1 -oP '#+\s*checksum:\s+\K.*' "${OutputFile}" || echo ''`
-    [[ "${NewChecksum}" == "${OldChecksum}" ]] && exit 0
+    OldChecksum=`grep --max-count=1 -oP '#+\s*checksum:\s+\K.*' "$OutputFile" || echo ''`
+    [[ "$NewChecksum" == "$OldChecksum" ]] && exit 0
 fi
 
 ################################################################################
 # Wait for lock if it exists.
 ################################################################################
-if [[ -f "${OutputFile}.lock" ]]; then
+LockFile="$OutputFile.lock"
+if [[ -f "$LockFile" ]]; then
     sleep 1
-    if [[ -f "${OutputFile}.lock" ]]; then
-        echo "Wait for lock file \`${OutputFile}.lock\` has timed out"
+    if [[ -f "$LockFile" ]]; then
+        echo "Wait for lock file \`$LockFile\` has timed out"
         exit "1"
     fi
 fi
@@ -34,11 +35,11 @@ fi
 ################################################################################
 # Create new output file and add checksum
 ################################################################################
-echo "Generating ${AliasesOrVariables} file for ${Shell}"
-touch "${OutputFile}.lock"
-[[ -f "${OutputFile}" ]] && rm "${OutputFile}"
-touch "${OutputFile}"
-echo "# checksum: `get_checksum`" > "${OutputFile}"
+echo "Generating $AliasesOrVariables file for $Shell"
+touch "$LockFile"
+[[ -f "$OutputFile" ]] && rm "$OutputFile"
+touch "$OutputFile"
+echo "# checksum: `get_checksum`" > "$OutputFile"
 
 ################################################################################
 # Start extracting and tranforming
@@ -58,18 +59,18 @@ function extract_section() {
              if (end); else end=NR; \
              for (i=start; i<=end; i++) {print lines[i]} \
          }" \
-         "${InputFile}" \
-    >> "${OutputFile}"
+         "$InputFile" \
+    >> "$OutputFile"
 }
 
 if [[ $AliasesOrVariables == aliases ]]; then
     extract_section "Aliases common for all shells"
     if [[ $Shell == zsh ]]; then
-        sed -i 's/{separator}/=/g' "${OutputFile}"
+        sed -i 's/{separator}/=/g' "$OutputFile"
         extract_section "Aliases specific to ZSH"
     fi
     if [[ $Shell == tcsh ]]; then
-        sed -i 's/{separator}/ /g' "${OutputFile}"
+        sed -i 's/{separator}/ /g' "$OutputFile"
         extract_section "Aliases specific to TCSH"
     fi
 fi
@@ -80,17 +81,17 @@ if [[ $AliasesOrVariables == variables ]]; then
         sed -i -e 's/{env_var}/export/g' \
                -e 's/{separator}/=/g'    \
                -e 's/{shell_var}//g'     \
-               "${OutputFile}"
+               "$OutputFile"
         extract_section "Variables specific to ZSH"
     fi
     if [[ $Shell == tcsh ]]; then
-        sed -i -e 's/{env_var}/setenv/g' "${OutputFile}" \
+        sed -i -e 's/{env_var}/setenv/g' "$OutputFile" \
                -e 's/{separator}/ /g'                    \
                -e 's/{shell_var}/set /g'                 \
-               "${OutputFile}"
+               "$OutputFile"
         extract_section "Variables specific to TCSH"
     fi
     extract_section "Unset variables"
 fi
 
-rm "${OutputFile}.lock"
+rm "$LockFile"

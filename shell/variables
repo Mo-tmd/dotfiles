@@ -16,9 +16,9 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Misc
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-{env_var} RIPGREP_CONFIG_PATH{separator}"${Dotfiles}/.ripgreprc"
+{env_var} RIPGREP_CONFIG_PATH{separator}"$Dotfiles/.ripgreprc"
 {env_var} FZF_DEFAULT_COMMAND{separator}'rg --files'
-{env_var} TMUX_TMPDIR{separator}"${HOME}/tmux_sessions/${HOST}"
+{env_var} TMUX_TMPDIR{separator}"$HOME/tmux_sessions/$HOST"
 {env_var} LESSHISTFILE{separator}~/dump/.lesshst
 {env_var} PYTHON_HISTORY{separator}~/dump/.python_history
 
@@ -26,7 +26,7 @@
 # Variables specific to ZSH
 ################################################################################
 HISTFILE=~/dump/.zsh_history
-if [[ -n "${NVIM}" ]]; then
+if [[ -n "$NVIM" ]]; then
     export MANPAGER=$InsideNvimPager
     export GIT_EDITOR=$InsideNvimGitEditor
 else
@@ -40,10 +40,10 @@ set histfile = ~/dump/.tcsh_history
 set histdup = erase # Remove duplicate entries in history
 set savehist = (500 merge lock)
 if ($?NVIM) then
-    setenv MANPAGER "${InsideNvimPager}"
-    setenv GIT_EDITOR "${InsideNvimGitEditor}"
+    setenv MANPAGER "$InsideNvimPager"
+    setenv GIT_EDITOR "$InsideNvimGitEditor"
 else
-    setenv MANPAGER "${OutsideNvimPager}"
+    setenv MANPAGER "$OutsideNvimPager"
 endif
 
 ################################################################################

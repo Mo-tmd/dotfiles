@@ -25,7 +25,7 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=105,underline'
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="${Dotfiles}/shell/zsh/ohmyzsh"
+export ZSH="$Dotfiles/shell/zsh/ohmyzsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -86,7 +86,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM="${Dotfiles}/shell/zsh/ohmyzsh_custom"
+ZSH_CUSTOM="$Dotfiles/shell/zsh/ohmyzsh_custom"
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -127,7 +127,7 @@ source $ZSH/oh-my-zsh.sh
 ############################## END Oh My Zsh ###################################
 ################################################################################
 ################################################################################
-source "${Dotfiles}/shell/zsh/set_aliases_and_variables.zsh" "${Dotfiles}" ""
+source "$Dotfiles/shell/zsh/set_aliases_and_variables.zsh" "$Dotfiles" ""
 
 unset RPS1
 

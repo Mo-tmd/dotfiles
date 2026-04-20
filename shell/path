@@ -1,6 +1,6 @@
 ~/bin
 ~/.cargo/bin
 /snap/bin
-"${Dotfiles}/scripts"
-"${Dotfiles}/scripts/tmux"
-"${Dotfiles}/scripts/path"
+"$Dotfiles/scripts"
+"$Dotfiles/scripts/tmux"
+"$Dotfiles/scripts/path"
