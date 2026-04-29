@@ -2,7 +2,7 @@
 # Pre Oh My Zsh
 ################################################################################
 export ZSH_COMPDUMP="${HOME}/dump/zsh/zcompdump-${HOST}-${ZSH_VERSION}"
-mkdir -p `dirname $ZSH_COMPDUMP`
+mkdir -p "$(dirname "$ZSH_COMPDUMP")"
 
 # Disables some check that shows strange errors.
 export ZSH_DISABLE_COMPFIX="true"

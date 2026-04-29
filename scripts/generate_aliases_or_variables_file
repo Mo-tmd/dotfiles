@@ -12,11 +12,11 @@ OutputFile=$4
 # Do nothing if checksum hasn't changed
 ################################################################################
 get_checksum() {
-    echo `md5sum "$InputFile" | awk '{ print $1 }'`
+    md5sum "$InputFile" | awk '{ print $1 }'
 }
 if [[ -f "$OutputFile" ]]; then
-    NewChecksum=`get_checksum`
-    OldChecksum=`grep --max-count=1 -oP '#+\s*checksum:\s+\K.*' "$OutputFile" || echo ''`
+    NewChecksum=$(get_checksum)
+    OldChecksum=$(grep --max-count=1 -oP '#+\s*checksum:\s+\K.*' "$OutputFile" || echo '')
     [[ "$NewChecksum" == "$OldChecksum" ]] && exit 0
 fi
 
@@ -39,7 +39,7 @@ echo "Generating $AliasesOrVariables file for $Shell"
 touch "$LockFile"
 [[ -f "$OutputFile" ]] && rm "$OutputFile"
 touch "$OutputFile"
-echo "# checksum: `get_checksum`" > "$OutputFile"
+echo "# checksum: $(get_checksum)" > "$OutputFile"
 
 ################################################################################
 # Start extracting and tranforming

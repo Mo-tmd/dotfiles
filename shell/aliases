@@ -12,7 +12,7 @@ alias gc{separator}'git commit'
 alias push{separator}'git push'
 alias pull{separator}'git pull'
 alias gl{separator}'git log'
-alias gll{separator}'git log origin/`get_foundation_branch`.. --first-parent HEAD --no-merges'
+alias gll{separator}'git log origin/$(get_foundation_branch).. --first-parent HEAD --no-merges'
 alias co{separator}'git checkout'
 alias gr{separator}'git revert'
 alias rh{separator}'git reset --hard'
@@ -46,7 +46,7 @@ alias suicide{separator}'pkill -u $USER'
 e() { [[ -n "$NVIM" ]] && nvr -cc "let b:LeftInTerminalMode=1" "$@" || nvim "$@" }
 ra() { git restore --source="$1" --staged --worktree "$(git rev-parse --show-toplevel)" && git commit -m "Restore all files to $1" }
 alias source_tmux_conf='[[ -n "$TMUX" ]] && tmux source-file ~/.tmux.conf'
-alias saf='source_tmux_conf; exec `echo $0 | sed "s/^-//"`'
+alias saf='source_tmux_conf; exec $(echo $0 | sed "s/^-//")'
 mywhich() { which $@ | sed 's/^\([^[:space:]]\)\+=//' }
 prettyxml() { if [[ -f "$1" ]]; then; xmllint --format "$1"; else; echo "$1" | xmllint --format -; fi }
 
