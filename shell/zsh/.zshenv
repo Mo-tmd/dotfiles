@@ -9,7 +9,7 @@ if [[ ! -v Dotfiles ]]; then
 fi
 
 # Set the "PATH" environment variable.
-PATH=`"$Dotfiles/scripts/path/set_path.sh" "$Dotfiles/shell/path"`
+PATH=`"$Dotfiles/scripts/path/set_path" "$Dotfiles/shell/path"`
 
 # Set aliases and variables only if we are in a non-interactive shell.
 # For interactive shells, they will be set in rc.zsh

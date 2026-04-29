@@ -13,7 +13,7 @@ if (! $?Dotfiles) then
     setenv Dotfiles `readlink -f "$ThisDir/../.."`
     unset ThisDir
 endif
-setenv PATH `"$Dotfiles/scripts/path/set_path.sh" "$Dotfiles/shell/path"`
+setenv PATH `"$Dotfiles/scripts/path/set_path" "$Dotfiles/shell/path"`
 
 ################################################################################
 # Variables and aliases
@@ -22,12 +22,12 @@ set GeneratedFilesDir=~/dump/tcsh/aliases_and_variables
 mkdir -p "$GeneratedFilesDir"
 
 set GeneratedAliases="$GeneratedFilesDir/aliases"
-generate_aliases_or_variables_file.sh aliases tcsh "$Dotfiles"/shell/aliases "$GeneratedAliases"
+generate_aliases_or_variables_file aliases tcsh "$Dotfiles"/shell/aliases "$GeneratedAliases"
 source "$GeneratedAliases"
 unset GeneratedAliases
 
 set GeneratedVariables="$GeneratedFilesDir/variables"
-generate_aliases_or_variables_file.sh variables tcsh "$Dotfiles"/shell/variables "$GeneratedVariables"
+generate_aliases_or_variables_file variables tcsh "$Dotfiles"/shell/variables "$GeneratedVariables"
 source "$GeneratedVariables"
 unset GeneratedVariables
 unset GeneratedFilesDir

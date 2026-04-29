@@ -5,11 +5,11 @@ GeneratedFilesDir=~/dump/zsh/aliases_and_variables
 mkdir -p "$GeneratedFilesDir"
 
 GeneratedAliases="$GeneratedFilesDir/${Prefix}aliases"
-generate_aliases_or_variables_file.sh aliases ZSH "$DotfilesDir"/shell/aliases "$GeneratedAliases"
+generate_aliases_or_variables_file aliases ZSH "$DotfilesDir"/shell/aliases "$GeneratedAliases"
 source "$GeneratedAliases"
 
 GeneratedVariables="$GeneratedFilesDir/${Prefix}variables"
-generate_aliases_or_variables_file.sh variables ZSH "$DotfilesDir"/shell/variables "$GeneratedVariables"
+generate_aliases_or_variables_file variables ZSH "$DotfilesDir"/shell/variables "$GeneratedVariables"
 source "$GeneratedVariables"
 
 unset GeneratedAliases

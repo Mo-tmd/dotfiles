@@ -12,7 +12,7 @@ alias gc{separator}'git commit'
 alias push{separator}'git push'
 alias pull{separator}'git pull'
 alias gl{separator}'git log'
-alias gll{separator}'git log origin/`get_foundation_branch.py`.. --first-parent HEAD --no-merges'
+alias gll{separator}'git log origin/`get_foundation_branch`.. --first-parent HEAD --no-merges'
 alias co{separator}'git checkout'
 alias gr{separator}'git revert'
 alias rh{separator}'git reset --hard'
@@ -25,7 +25,7 @@ alias svg{separator}'git add -u; git commit -m "Save game"'
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 alias tma{separator}'tmux attach -t'
 alias tml{separator}'tmux list-sessions'
-alias tmkk{separator}'tmux_kill_session.py'
+alias tmkk{separator}'tmux_kill_session'
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Misc
