@@ -127,7 +127,7 @@ source $ZSH/oh-my-zsh.sh
 ############################## END Oh My Zsh ###################################
 ################################################################################
 ################################################################################
-source "$Dotfiles/shell/zsh/set_aliases_and_variables.zsh" "$Dotfiles" ""
+source "$Dotfiles/shell/set_aliases_and_variables.sh" "$Dotfiles" "" zsh
 
 unset RPS1
 

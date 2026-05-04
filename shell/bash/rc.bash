@@ -1,9 +1,9 @@
 ################################################################################
 # Set the "Dotfiles" environment variable.
 ################################################################################
-if [[ ! -v Dotfiles ]]; then
-    [[ -e ~/.zshrc.user ]] && ThisFile=~/.zshrc.user || ThisFile=~/.zshrc
-    ThisFile=$(readlink -f $ThisFile)
+if [[ -z "$Dotfiles" ]]; then
+    [[ -e ~/.bashrc.user ]] && ThisFile=~/.bashrc.user || ThisFile=~/.bashrc
+    ThisFile=$(readlink -f "$ThisFile")
     ThisDir=$(dirname "$ThisFile")
     export Dotfiles=$(readlink -f "$ThisDir/../..")
     unset ThisFile
@@ -16,9 +16,11 @@ fi
 PATH=$("$Dotfiles/scripts/path/set_path" "$Dotfiles/shell/path")
 
 ################################################################################
-# Set aliases and variables only if we are in a non-interactive shell.
-# For interactive shells, they will be set in rc.zsh
+# Set aliases and variables.
 ################################################################################
-if [[ $- != *i* ]]; then
-    source "$Dotfiles/shell/set_aliases_and_variables.sh" "$Dotfiles" "" zsh
-fi
+source "$Dotfiles/shell/set_aliases_and_variables.sh" "$Dotfiles" "" bash
+
+################################################################################
+# Key bindings
+################################################################################
+set -o vi

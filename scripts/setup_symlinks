@@ -28,7 +28,11 @@ create_symlink $CshRcFile "$DotfilesDir/shell/tcsh/rc.tcsh"
 [[ -e ~/.zshrc.user || -L ~/.zshrc.user ]] && ZshRcFile=~/.zshrc.user || ZshRcFile=~/.zshrc
 create_symlink $ZshRcFile "$DotfilesDir/shell/zsh/rc.zsh"
 
+[[ -e ~/.bashrc.user || -L ~/.bashrc.user ]] && BashRcFile=~/.bashrc.user || BashRcFile=~/.bashrc
+create_symlink $BashRcFile "$DotfilesDir/shell/bash/rc.bash"
+
 create_symlink ~/.zshenv "$DotfilesDir/shell/zsh/.zshenv"
+create_symlink ~/.bash_profile "$DotfilesDir/shell/bash/.bash_profile"
 create_symlink ~/.config/nvim "$DotfilesDir/nvim"
 create_symlink ~/.tmux.conf "$DotfilesDir/.tmux/.tmux.conf"
 create_symlink ~/.tmux.conf.local "$DotfilesDir/.tmux/.tmux.conf.local"

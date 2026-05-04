@@ -23,9 +23,8 @@
 {env_var} PYTHON_HISTORY{separator}~/dump/.python_history
 
 ################################################################################
-# Variables specific to ZSH
+# Variables for POSIX shells
 ################################################################################
-HISTFILE=~/dump/.zsh_history
 if [[ -n "$NVIM" ]]; then
     export MANPAGER=$InsideNvimPager
     export GIT_EDITOR=$InsideNvimGitEditor
@@ -34,7 +33,17 @@ else
 fi
 
 ################################################################################
-# Variables specific to TCSH
+# Variables specific to zsh
+################################################################################
+HISTFILE=~/dump/.zsh_history
+
+################################################################################
+# Variables specific to bash
+################################################################################
+HISTFILE=~/dump/.bash_history
+
+################################################################################
+# Variables specific to tcsh
 ################################################################################
 set histfile = ~/dump/.tcsh_history
 set histdup = erase # Remove duplicate entries in history
