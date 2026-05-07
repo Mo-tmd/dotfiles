@@ -147,100 +147,11 @@ autocmd BufNewFile,BufRead *shell/variables,*shell/aliases set filetype=bash
 call spellcheck#setup()
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vim-better-whitespace
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:better_whitespace_enabled = 0
-let g:strip_whitespace_on_save = 1
-let g:strip_only_modified_lines = 1
-let g:strip_whitespace_confirm = 0
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Status Line
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set laststatus=2
-
 set statusline=\ %F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l\ \ Column:\ %c
 set noshowmode
-
-" Copied from https://vi.stackexchange.com/questions/22398/disable-lightline-on-nerdtree
-augroup filetype_nerdtree
-    au!
-    au FileType nerdtree call s:disable_lightline_on_nerdtree()
-    au WinEnter,BufWinEnter,TabEnter * call s:disable_lightline_on_nerdtree()
-augroup END
-
-fu s:disable_lightline_on_nerdtree() abort
-    let nerdtree_winnr = index(map(range(1, winnr('$')), {_,v -> getbufvar(winbufnr(v), '&ft')}), 'nerdtree') + 1
-    call timer_start(0, {-> nerdtree_winnr && setwinvar(nerdtree_winnr, '&stl', '%#Normal#')})
-endfu
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Lightline
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:lightline = {
-      \ 'colorscheme': 'gruvbox',
-      \ 'active': {
-      \   'left': [ ['mode'],
-      \             ['readonly', 'filename', 'modified'] ],
-      \   'right': [ [ 'lineinfo' ], ['percent'] ]
-      \ },
-      \ 'inactive': {
-      \   'left': [ ['mode'],
-      \             ['readonly', 'filename', 'modified'] ],
-      \   'right': [ [ 'lineinfo' ], ['percent'] ]
-      \ },
-      \ 'tabline': {
-         \ 'left': [ [ 'tabs' ] ],
-         \ 'right': [ [ 'cwd' ] ]
-      \ },
-      \ 'component': {
-      \   'cwd': 'CWD: %{getcwd()}',
-      \   'readonly': '%{&filetype=="help"?"":&readonly?"🔒":""}',
-      \   'modified': '%{&filetype=="help"||&buftype=="terminal"?"":&modified?"+":&modifiable?"":"-"}',
-      \   'fugitive': '%{exists("*FugitiveHead")?FugitiveHead():""}'
-      \ },
-      \ 'component_visible_condition': {
-      \   'readonly': '(&filetype!="help"&& &readonly)',
-      \   'modified': '(&filetype!="help"&&(&modified||!&modifiable))',
-      \   'fugitive': '(exists("*FugitiveHead") && ""!=FugitiveHead())',
-      \ },
-      \ 'separator': { 'left': ' ', 'right': ' ' },
-      \ 'subseparator': { 'left': ' ', 'right': ' ' }
-      \ }
-
-let g:lightline.tab = {
-		    \ 'active': [ 'tabnum',  'tabname', 'modified' ],
-		    \ 'inactive': [ 'tabnum',  'tabname', 'modified' ] }
-
-let g:lightline.tab_component_function = {
-            \  'tabname': 'TabName',
-            \ }
-
-function! TabName(n)
-    if exists('g:is_merging')
-        if a:n == 1
-            return 'MERGED'
-        elseif a:n == 2
-            return 'BASE LOCAL'
-        elseif a:n == 3
-            return 'BASE REMOTE'
-        elseif a:n == 4
-            return 'LOCAL REMOTE'
-        elseif a:n == 5
-            return 'LOCAL BASE REMOTE'
-        elseif a:n == 6
-            return 'LOCAL MERGED'
-        elseif a:n == 7
-            return 'REMOTE MERGED'
-        elseif a:n == 8
-            return 'LOCAL MERGED REMOTE'
-        else
-            return 'error'
-        endif
-    else
-        return lightline#tab#filename(a:n)
-    endif
-endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Colors
@@ -268,6 +179,14 @@ hi DiffAdd      guifg=#5faf5f guibg=#262626
 hi DiffChange   guifg=#767676 guibg=#262626
 hi DiffDelete   guifg=#870000 guibg=#870087
 hi DiffText     guifg=#ffaf00 guibg=#262626
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-better-whitespace
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:better_whitespace_enabled = 0
+let g:strip_whitespace_on_save = 1
+let g:strip_only_modified_lines = 1
+let g:strip_whitespace_confirm = 0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf
