@@ -47,6 +47,9 @@ nnoremap <leader>le `.
 
 nnoremap <leader>dt :lua toggle_diagnostics()<CR>
 
+nnoremap <silent> <leader>gt :tabnew<CR>
+nnoremap <silent> <leader>to :tabonly<CR>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
