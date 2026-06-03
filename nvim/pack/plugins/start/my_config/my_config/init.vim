@@ -30,6 +30,9 @@ call term#map('<C-^>', ':call term#go_to_alternate_buffer()<CR>')
 nnoremap <silent> <leader>vp :e $Dotfiles/nvim/pack/plugins/start/my_config/my_config/init.vim<CR>
 nnoremap <silent> <leader>ip :e $Dotfiles/nvim/pack/plugins/start/my_config/lua/my_config/init.lua<CR>
 
+nnoremap <silent> <leader>yn :let @+ = expand('%:t') \| echo @+<CR>
+nnoremap <silent> <leader>yp :let @+ = expand('%:p') \| echo @+<CR>
+
 inoremap ii <Esc>
 call term#map('ii', '')
 nnoremap <silent> <CR> :noh<CR><CR>
