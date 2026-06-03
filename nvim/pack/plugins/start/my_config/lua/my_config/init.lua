@@ -37,6 +37,13 @@ require('telescope').setup{
 }
 require('telescope').load_extension('fzf')
 
+vim.keymap.set(
+  'n',
+  '<leader>lt',
+  '<cmd>Telescope telescope-tabs list_tabs<cr>',
+  {silent=true, desc='Telescope: List tabs'}
+)
+
 --------------------------------------------------------------------------------
 -- yanky
 --------------------------------------------------------------------------------
