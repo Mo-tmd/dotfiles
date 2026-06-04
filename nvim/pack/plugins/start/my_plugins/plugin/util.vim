@@ -1,16 +1,16 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Wrapper around system() function. It removes the new line character at the
 " end of the output (displayed as ^@)
 " See https://superuser.com/a/935646
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! SystemCmd(...)
     let l:Output = call('system', a:000)
     return substitute(l:Output, '\n$', '', '')
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Prints buffer variables and some 'famous' options/properties to a file.
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! PrintBufferInfoToFile(FileName)
     " Initialize an empty list to hold all lines of output
     let l:Output = []
@@ -38,9 +38,9 @@ function! PrintBufferInfoToFile(FileName)
     call writefile(l:Output, a:FileName, 'a')
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Removes an element from a list or a blob.
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! RemoveElement(ListOrBlob, Value, End=v:null)
     let l:Index = index(a:ListOrBlob, a:Value)
     if l:Index != -1

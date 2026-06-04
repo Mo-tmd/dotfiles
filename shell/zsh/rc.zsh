@@ -1,36 +1,8 @@
 ################################################################################
-# Stuff that needs to be in the beginning
-################################################################################
-if [[ ! -v Dotfiles ]]; then
-    [[ -e ~/.zshrc.user ]] && ThisFile=~/.zshrc.user || ThisFile=~/.zshrc
-    ThisFile=$(readlink -f $ThisFile)
-    ThisDir=$(dirname "${ThisFile}")
-    unset ThisFile
-    export Dotfiles=$(readlink -f "${ThisDir}/../..")
-else
-    ThisDir="${Dotfiles}/shell/zsh"
-fi
-
-PATH=`"${Dotfiles}/scripts/path/set_path.sh" "${Dotfiles}/shell/path"`
-
-################################################################################
-# Source rc_common.zsh if running a non-interactive shell.
-################################################################################
-if [[ $- == *i* ]]; then
-    # Interactive shell, do nothing (continue)
-    :
-else
-    # Non interactive shell, source common rc and exit script.
-    source "${ThisDir}/rc_common.zsh"
-    unset ThisDir
-    return
-fi
-
-################################################################################
 # Pre Oh My Zsh
 ################################################################################
 export ZSH_COMPDUMP="${HOME}/dump/zsh/zcompdump-${HOST}-${ZSH_VERSION}"
-mkdir -p `dirname $ZSH_COMPDUMP`
+mkdir -p "$(dirname "$ZSH_COMPDUMP")"
 
 # Disables some check that shows strange errors.
 export ZSH_DISABLE_COMPFIX="true"
@@ -53,7 +25,7 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=105,underline'
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="${ThisDir}/ohmyzsh"
+export ZSH="$Dotfiles/shell/zsh/ohmyzsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -114,7 +86,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM="${ThisDir}/ohmyzsh_custom"
+ZSH_CUSTOM="$Dotfiles/shell/zsh/ohmyzsh_custom"
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -155,8 +127,7 @@ source $ZSH/oh-my-zsh.sh
 ############################## END Oh My Zsh ###################################
 ################################################################################
 ################################################################################
-source "${ThisDir}/rc_common.zsh"
-unset ThisDir
+source "$Dotfiles/shell/set_aliases_and_variables.sh" "$Dotfiles" "" zsh
 
 unset RPS1
 
@@ -194,3 +165,25 @@ bindkey -M vicmd '^U' KillBufferVicmdMode
 
 # Numeric sort completion: e.g. (1.1  1.2  1.13) instead of (1.1  1.13  1.2)
 zstyle ':completion:*' sort numeric
+
+unalias tma
+tma() {
+    [[ -n "$1" ]] && tmux attach -t "$1" || tmux attach
+}
+# Completion function to make tma use the same autocomplete as `tmux attach -t`. Stolen from ChatGPT
+_tma() {
+  # Save the original completion state
+  local -a words_backup
+  local current_backup
+  words_backup=("${words[@]}")
+  current_backup=$CURRENT
+  # Build a fake command line: tmux attach -t <original args>
+  words=( tmux attach -t "${words_backup[@]:1}" )
+  CURRENT=$#words
+  # Call zsh's tmux completion
+  _tmux
+  # Restore state (not strictly necessary but good hygiene)
+  words=("${words_backup[@]}")
+  CURRENT=$current_backup
+}
+compdef _tma tma

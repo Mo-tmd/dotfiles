@@ -46,9 +46,6 @@
 [submodule "nvim/pack/plugins/start/nerdtree"]
 	path = nvim/pack/plugins/start/nerdtree
 	url = https://github.com/preservim/nerdtree.git
-[submodule "nvim/pack/plugins/start/lightline.vim"]
-	path = nvim/pack/plugins/start/lightline.vim
-	url = https://github.com/itchyny/lightline.vim.git
 [submodule "nvim/pack/plugins/start/plenary.nvim"]
 	path = nvim/pack/plugins/start/plenary.nvim
 	url = https://github.com/nvim-lua/plenary.nvim.git
@@ -61,3 +58,12 @@
 [submodule "nvim/pack/plugins/start/telescope.nvim"]
 	path = nvim/pack/plugins/start/telescope.nvim
 	url = git@github.com:Mo-tmd/telescope.nvim.git
+[submodule "nvim/pack/plugins/start/vim-better-whitespace"]
+	path = nvim/pack/plugins/start/vim-better-whitespace
+	url = https://github.com/ntpeters/vim-better-whitespace.git
+[submodule "nvim/pack/plugins/start/lualine.nvim"]
+	path = nvim/pack/plugins/start/lualine.nvim
+	url = https://github.com/nvim-lualine/lualine.nvim.git
+[submodule "nvim/pack/plugins/start/telescope-tabs"]
+	path = nvim/pack/plugins/start/telescope-tabs
+	url = https://codeberg.org/LukasPietzschmann/telescope-tabs.git

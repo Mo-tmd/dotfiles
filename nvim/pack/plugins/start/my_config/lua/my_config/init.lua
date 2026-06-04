@@ -1,11 +1,11 @@
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Load all lua scripts
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 require("my_config.lsp")
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- telescope
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 require('telescope').setup{
   defaults = {
     mappings = {
@@ -30,15 +30,23 @@ require('telescope').setup{
   pickers = {
     buffers = {
       sort_mru = true,
-      disable_coordinates = true
+      disable_coordinates = true,
+      ignore_current_buffer = true
     }
   }
 }
 require('telescope').load_extension('fzf')
 
--------------------------------------------------------------------------------
+vim.keymap.set(
+  'n',
+  '<leader>lt',
+  '<cmd>Telescope telescope-tabs list_tabs<cr>',
+  {silent=true, desc='Telescope: List tabs'}
+)
+
+--------------------------------------------------------------------------------
 -- yanky
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 require("yanky").setup({
   ring = {
     history_length = 1000
@@ -63,9 +71,121 @@ vim.keymap.set({"n","x"}, "y", "<Plug>(YankyYank)")
 require("telescope").load_extension("yank_history")
 vim.keymap.set("n", "<leader>p", ":Telescope yank_history<CR>", {silent=true})
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- lualine
+--------------------------------------------------------------------------------
+-- Checks if window is floating, e.g. telescope
+local function is_floating_window(win)
+  return vim.api.nvim_win_get_config(win).relative ~= ''
+end
+
+local merge_tab_names = {
+  'MERGED',
+  'BASE LOCAL',
+  'BASE REMOTE',
+  'LOCAL REMOTE',
+  'LOCAL BASE REMOTE',
+  'LOCAL MERGED',
+  'REMOTE MERGED',
+  'LOCAL MERGED REMOTE',
+}
+
+local tab_name_cache = {}
+
+local function tab_name(tab_id)
+  local tabnr = vim.api.nvim_tabpage_get_number(tab_id)
+  if vim.g.is_merging and tabnr <= 8 then
+    return merge_tab_names[tabnr]
+  end
+
+  local win = vim.api.nvim_tabpage_get_win(tab_id)
+
+  -- return old name if the window is floating
+  if is_floating_window(win) then
+    return tab_name_cache[tab_id] or '[No Name]'
+  end
+
+  local buf = vim.api.nvim_win_get_buf(win)
+  local buf_name = vim.api.nvim_buf_get_name(buf)
+  local name = buf_name ~= '' and vim.fs.basename(buf_name) or '[No Name]'
+  if vim.bo[buf].modified then
+    name = name .. ' [+]'
+  end
+
+  tab_name_cache[tab_id] = name
+  return name
+end
+
+local gruvbox = require('lualine.themes.gruvbox')
+gruvbox.terminal = {
+  a = { bg = '#b8bb26', fg = '#282828', gui = 'bold' },
+  b = gruvbox.insert.b,
+  c = gruvbox.insert.c,
+}
+gruvbox.command = gruvbox.normal
+
+local filename = {
+  'filename',
+  file_status = true,
+  path = 0,
+  symbols = { readonly = ' 🔒' },
+  fmt = function(str)
+    if vim.bo.buftype == 'terminal' then
+      return str:gsub(' 🔒', '')
+    end
+    return str
+  end,
+}
+
+require('lualine').setup({
+  options = {
+    theme = gruvbox,
+    component_separators = '',
+    section_separators = '',
+    always_show_tabline = false,
+    disabled_filetypes = {
+      statusline = {'nerdtree'},
+    },
+  },
+  sections = {
+    lualine_a = {'mode'},
+    lualine_b = {filename},
+    lualine_c = {},
+    lualine_x = {},
+    lualine_y = {'progress'},
+    lualine_z = {'location'},
+  },
+  inactive_sections = {
+    lualine_a = {filename},
+    lualine_b = {},
+    lualine_c = {},
+    lualine_x = {},
+    lualine_y = {'progress'},
+    lualine_z = {'location'},
+  },
+  tabline = {
+    lualine_a = {
+      {'tabs',
+       mode = 2,
+       max_length = vim.o.columns,
+       show_modified_status = false,
+       fmt = function(name, context) return tab_name(context.tabId) end
+      }
+    },
+    lualine_z = {function() return 'CWD: ' .. vim.fn.getcwd() end},
+  },
+  extensions = {'fugitive'},
+})
+
+-- Hide the statusline in nerdtree by setting it to an empty Normal highlight
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'nerdtree',
+  callback = function() vim.wo.statusline = '%#Normal#' end,
+})
+
+--------------------------------------------------------------------------------
 -- User Interface
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Print a table in a Scratch buffer
 local function print_to_buffer(arg)
   -- Create a buffer and write to it

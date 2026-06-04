@@ -1,18 +1,13 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Stuff that needs to be in the beginning
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let mapleader = ','
 call term#setup()
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Key mappings
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set timeoutlen=500
-
-nnoremap <A-Left> <C-o>
-nnoremap 3D <C-o>
-nnoremap <A-Right> <C-i>
-nnoremap 3C <C-i>
 
 nnoremap <leader>sp :vsplit<CR>
 
@@ -35,6 +30,9 @@ call term#map('<C-^>', ':call term#go_to_alternate_buffer()<CR>')
 nnoremap <silent> <leader>vp :e $Dotfiles/nvim/pack/plugins/start/my_config/my_config/init.vim<CR>
 nnoremap <silent> <leader>ip :e $Dotfiles/nvim/pack/plugins/start/my_config/lua/my_config/init.lua<CR>
 
+nnoremap <silent> <leader>yn :let @+ = expand('%:t') \| echo @+<CR>
+nnoremap <silent> <leader>yp :let @+ = expand('%:p') \| echo @+<CR>
+
 inoremap ii <Esc>
 call term#map('ii', '')
 nnoremap <silent> <CR> :noh<CR><CR>
@@ -51,9 +49,12 @@ nnoremap <silent> <leader>dt :lua vim.diagnostic.enable(not vim.diagnostic.is_en
 
 nnoremap gd <C-]>
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <silent> <leader>gt :tabnew<CR>
+nnoremap <silent> <leader>to :tabonly<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set number relativenumber
 
 set scrollback=100000
@@ -112,7 +113,7 @@ endfunction
 
 " trigger `autoread` when files changes on disk. Inspired by https://stackoverflow.com/a/62936797
 set autoread
-autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * call timer_start(1, { -> execute('if mode() !=# "c" | checktime | endif') })
+autocmd FocusGained,BufEnter,WinEnter,CursorHold,CursorHoldI * call timer_start(1, { -> execute('if getcmdwintype() == "" | checktime | endif') })
 
 au TermOpen * setlocal number relativenumber
 call term#define('<leader>td', 'Dotfiles', 'cd ~/dotfiles')
@@ -124,9 +125,9 @@ function! PlugPostHooks()
                       \ )
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Text
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ignore case when searching
 set ignorecase
 
@@ -152,97 +153,18 @@ set smartindent
 
 autocmd BufNewFile,BufRead *shell/variables,*shell/aliases set filetype=bash
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Status Line
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set laststatus=2
+call spellcheck#setup()
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Status Line
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set laststatus=2
 set statusline=\ %F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l\ \ Column:\ %c
 set noshowmode
 
-" Copied from https://vi.stackexchange.com/questions/22398/disable-lightline-on-nerdtree
-augroup filetype_nerdtree
-    au!
-    au FileType nerdtree call s:disable_lightline_on_nerdtree()
-    au WinEnter,BufWinEnter,TabEnter * call s:disable_lightline_on_nerdtree()
-augroup END
-
-fu s:disable_lightline_on_nerdtree() abort
-    let nerdtree_winnr = index(map(range(1, winnr('$')), {_,v -> getbufvar(winbufnr(v), '&ft')}), 'nerdtree') + 1
-    call timer_start(0, {-> nerdtree_winnr && setwinvar(nerdtree_winnr, '&stl', '%#Normal#')})
-endfu
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Lightline
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:lightline = {
-      \ 'colorscheme': 'gruvbox',
-      \ 'active': {
-      \   'left': [ ['mode'],
-      \             ['readonly', 'filename', 'modified'] ],
-      \   'right': [ [ 'lineinfo' ], ['percent'] ]
-      \ },
-      \ 'inactive': {
-      \   'left': [ ['mode'],
-      \             ['readonly', 'filename', 'modified'] ],
-      \   'right': [ [ 'lineinfo' ], ['percent'] ]
-      \ },
-      \ 'tabline': {
-         \ 'left': [ [ 'tabs' ] ],
-         \ 'right': [ [ 'cwd' ] ]
-      \ },
-      \ 'component': {
-      \   'cwd': 'CWD: %{getcwd()}',
-      \   'readonly': '%{&filetype=="help"?"":&readonly?"🔒":""}',
-      \   'modified': '%{&filetype=="help"||&buftype=="terminal"?"":&modified?"+":&modifiable?"":"-"}',
-      \   'fugitive': '%{exists("*FugitiveHead")?FugitiveHead():""}'
-      \ },
-      \ 'component_visible_condition': {
-      \   'readonly': '(&filetype!="help"&& &readonly)',
-      \   'modified': '(&filetype!="help"&&(&modified||!&modifiable))',
-      \   'fugitive': '(exists("*FugitiveHead") && ""!=FugitiveHead())',
-      \ },
-      \ 'separator': { 'left': ' ', 'right': ' ' },
-      \ 'subseparator': { 'left': ' ', 'right': ' ' }
-      \ }
-
-let g:lightline.tab = {
-		    \ 'active': [ 'tabnum',  'tabname', 'modified' ],
-		    \ 'inactive': [ 'tabnum',  'tabname', 'modified' ] }
-
-let g:lightline.tab_component_function = {
-            \  'tabname': 'TabName',
-            \ }
-
-function! TabName(n)
-    if exists('g:is_merging')
-        if a:n == 1
-            return 'MERGED'
-        elseif a:n == 2
-            return 'BASE LOCAL'
-        elseif a:n == 3
-            return 'BASE REMOTE'
-        elseif a:n == 4
-            return 'LOCAL REMOTE'
-        elseif a:n == 5
-            return 'LOCAL BASE REMOTE'
-        elseif a:n == 6
-            return 'LOCAL MERGED'
-        elseif a:n == 7
-            return 'REMOTE MERGED'
-        elseif a:n == 8
-            return 'LOCAL MERGED REMOTE'
-        else
-            return 'error'
-        endif
-    else
-        return lightline#tab#filename(a:n)
-    endif
-endfunction
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Colors
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
 "(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
@@ -267,36 +189,17 @@ hi DiffChange   guifg=#767676 guibg=#262626
 hi DiffDelete   guifg=#870000 guibg=#870087
 hi DiffText     guifg=#ffaf00 guibg=#262626
 
-" Highlight trailing spaces.
-augroup TrailingSpaces
-    autocmd!
-    autocmd FileType,BufEnter,WinEnter * call ToggleTrailingSpaces()
-    autocmd TermOpen,TermEnter * call ClearTrailingSpaces()
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-better-whitespace
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:better_whitespace_enabled = 0
+let g:strip_whitespace_on_save = 1
+let g:strip_only_modified_lines = 1
+let g:strip_whitespace_confirm = 0
 
-    autocmd InsertEnter * call ClearTrailingSpaces()
-    autocmd InsertLeave * call ToggleTrailingSpaces()
-augroup END
-
-function! ToggleTrailingSpaces()
-    if &modifiable && &buftype !=# 'terminal' && &filetype !=# 'TelescopeResults'
-        call HighlightTrailingSpaces()
-    else
-        call ClearTrailingSpaces()
-    endif
-endfunction
-
-function! HighlightTrailingSpaces()
-    highlight TrailingSpaces ctermbg=red guibg=Red
-    match TrailingSpaces /\s\+$/
-endfunction
-
-function! ClearTrailingSpaces()
-    call clearmatches()
-endfunction
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <leader>b :Telescope buffers<CR>
 call term#map('<leader>b', ':let b:LeftInTerminalMode=1<CR>:Telescope buffers<CR>')
 
@@ -394,17 +297,18 @@ command! -bang -nargs=* Gg
   \   <bang>0
   \ )
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Nerd Tree
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let NERDTreeShowHidden=1
+let g:NERDTreeWinSize = 40
 
 nnoremap <leader>nt :NERDTreeToggle<CR>
 nnoremap <leader>nc :NERDTreeFind<CR>
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-fugitive
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " The command and function wrappers for diffsplit are ugly, but I found no better
 " way
 exe 'command! -bar -bang -nargs=* -complete=customlist,fugitive#EditComplete Gd exe MyDiffsplit(0, <bang>0, "vertical <mods>", <q-args>)'
@@ -450,9 +354,14 @@ function! GitRecursiveBlame()
     call GitShow(expand('<cword>'), l:Path)
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <leader>gg :G grep -iF -- <C-r>=shellescape(expand('<cword>'))<CR><CR>
+nnoremap <leader>GG :G grep -F -- <C-r>=shellescape(expand('<cword>'))<CR><CR>
+xnoremap <silent> <leader>gg y:<C-u>G grep -iF -- <C-r>=shellescape(@")<CR><CR>
+xnoremap <silent> <leader>GG y:<C-u>G grep -F -- <C-r>=shellescape(@")<CR><CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Man pages
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 autocmd filetype man setlocal number relativenumber | setlocal nowrap
 
 command! -nargs=* -complete=customlist,v:lua.require'man'.man_complete Mn call MyMan(<q-args>)
@@ -508,9 +417,9 @@ function! GetFirstManWindow()
     return 0
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " conflict-marker
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:conflict_marker_highlight_group = ''
 
 let g:conflict_marker_begin = '^<<<<<<< .*$'

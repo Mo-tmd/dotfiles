@@ -1,9 +1,9 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Improves C-^ functionality while still keeping behavior similar to native vim.
 "   * Handles wiped out buffers
 "   * Falls back to a global buffer history if no buffer is found in the
 "     window history.
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! alternate_buffer#go()
     let l:AlternateBuffer = alternate_buffer#get()
     if l:AlternateBuffer != -1
@@ -33,9 +33,9 @@ function! s:update_buffer_history()
     call s:update_global_buffer_history()
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Keeps a window specific buffer history (buffers visited inside specific windows).
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! s:update_windows_buffer_history()
     if !exists('s:WindowsBufferHistory') | let s:WindowsBufferHistory = {} | endif
     let l:Win = win_getid()
@@ -46,10 +46,10 @@ function! s:update_windows_buffer_history()
     let s:WindowsBufferHistory[l:Win] = l:WindowBufferHistory
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Keeps a global buffer history (not specific to windows). GoToAlternateBuffer()
 " falls back to it if there are no existing buffers in the window specific history.
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! s:update_global_buffer_history()
     if !exists('s:GlobalBufferHistory') | let s:GlobalBufferHistory = [] | endif
     let l:Buffer = bufnr()

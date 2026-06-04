@@ -1,0 +1,132 @@
+#!/bin/bash -e
+
+################################################################################
+# Parse arguments
+################################################################################
+error() {
+    echo "$1" >&2
+    exit 1
+}
+
+assert_value_one_of() {
+    local Name=$1; shift
+    local Value=$1; shift
+    for Valid in "$@"; do
+        [[ "$Value" == "$Valid" ]] && return
+    done
+    error "$Name must be one of: $*, got '$Value'"
+}
+
+AliasesOrVariables=$1
+Shell=$2
+InputFile=$3
+OutputFile=$4
+
+assert_value_one_of AliasesOrVariables "$AliasesOrVariables" aliases variables
+assert_value_one_of Shell "$Shell" zsh bash tcsh
+
+################################################################################
+# Do nothing if checksum hasn't changed
+################################################################################
+get_checksum() {
+    md5sum "$InputFile" | awk '{ print $1 }'
+}
+if [[ -f "$OutputFile" ]]; then
+    NewChecksum=$(get_checksum)
+    OldChecksum=$(grep --max-count=1 -oP '#+\s*checksum:\s+\K.*' "$OutputFile" || echo '')
+    [[ "$NewChecksum" == "$OldChecksum" ]] && exit 0
+fi
+
+################################################################################
+# Wait for lock if it exists.
+################################################################################
+LockFile="$OutputFile.lock"
+if [[ -f "$LockFile" ]]; then
+    sleep 1
+    if [[ -f "$LockFile" ]]; then
+        echo "Wait for lock file \`$LockFile\` has timed out"
+        exit "1"
+    fi
+fi
+
+################################################################################
+# Create new output file and add checksum
+################################################################################
+echo "Generating $AliasesOrVariables file for $Shell"
+touch "$LockFile"
+[[ -f "$OutputFile" ]] && rm "$OutputFile"
+touch "$OutputFile"
+echo "# checksum: $(get_checksum)" > "$OutputFile"
+
+################################################################################
+# Start extracting and tranforming
+################################################################################
+extract_section() {
+    Section=$1
+    # Explanation for the awk below because I will probably not understand it after a few days:
+    # * Put all lines in "lines" array
+    # * Search for the section. "start" is the line before (the header).
+    # * Search for the header of the next section. It is the second separator after "start". "end" is the line before.
+    # * If "end" is not defined, it's because the section we're looking for is the last one. So make "end" the last line.
+    # * print all lines between start and end
+    awk "{lines[NR] = \$0} \
+         /${Section}/ {start = NR-1} \
+         /################################################################################/ { if (start && NR>start+2) {end=NR-1;exit} } \
+         END { \
+             if (end); else end=NR; \
+             for (i=start; i<=end; i++) {print lines[i]} \
+         }" \
+         "$InputFile" \
+    >> "$OutputFile"
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## Aliases
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+if [[ $AliasesOrVariables == aliases ]]; then
+    extract_section "Aliases common for all shells"
+
+    if [[ $Shell == zsh || $Shell == bash ]]; then
+        sed -i 's/{separator}/=/g' "$OutputFile"
+        extract_section "Aliases for POSIX shells"
+        [[ $Shell == zsh ]]  && extract_section "Aliases specific to zsh"
+        [[ $Shell == bash ]] && extract_section "Aliases specific to bash"
+    fi
+
+    if [[ $Shell == tcsh ]]; then
+        sed -i 's/{separator}/ /g' "$OutputFile"
+        extract_section "Aliases specific to tcsh"
+    fi
+fi
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## Variables
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+if [[ $AliasesOrVariables == variables ]]; then
+    extract_section "Variables common for all shells"
+
+    if [[ $Shell == zsh || $Shell == bash ]]; then
+        sed -i -e 's/{env_var}/export/g' \
+               -e 's/{separator}/=/g'    \
+               -e 's/{shell_var}//g'     \
+               "$OutputFile"
+        extract_section "Variables for POSIX shells"
+        [[ $Shell == zsh ]]  && extract_section "Variables specific to zsh"
+        [[ $Shell == bash ]] && extract_section "Variables specific to bash"
+    fi
+
+    if [[ $Shell == tcsh ]]; then
+        sed -i -e 's/{env_var}/setenv/g' "$OutputFile" \
+               -e 's/{separator}/ /g'                    \
+               -e 's/{shell_var}/set /g'                 \
+               "$OutputFile"
+        extract_section "Variables specific to tcsh"
+    fi
+
+    extract_section "Unset variables"
+fi
+
+################################################################################
+# Cleanup
+################################################################################
+rm "$LockFile"
