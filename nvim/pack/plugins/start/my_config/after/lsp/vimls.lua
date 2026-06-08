@@ -1,20 +1,13 @@
 ---@type vim.lsp.Config
 return {
-  cmd = { 'vim-language-server', '--stdio' },
-  filetypes = { 'vim' },
-  root_markers = { '.git' },
-  init_options = {
-    isNeovim = true,
-    iskeyword = '@,48-57,_,192-255,-#',
-    vimruntime = '',
-    runtimepath = '',
-    diagnostic = { enable = true },
-    indexes = {
-      runtimepath = true,
-      gap = 100,
-      count = 3,
-      projectRootPatterns = { 'runtime', 'nvim', '.git', 'autoload', 'plugin' },
-    },
-    suggest = { fromVimruntime = true, fromRuntimepath = true },
-  },
+  root_dir = function(bufnr, on_dir)
+    local bufname = vim.api.nvim_buf_get_name(bufnr)
+    local dotfiles = os.getenv("WorkDotfiles") or os.getenv("Dotfiles")
+    if dotfiles and vim.startswith(bufname, dotfiles) then
+      on_dir(dotfiles)
+    else
+      local root_markers = {'.git'}
+      on_dir(vim.fs.root(bufnr, root_markers))
+    end
+  end
 }
