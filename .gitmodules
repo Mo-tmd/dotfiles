@@ -67,3 +67,6 @@
 [submodule "nvim/pack/plugins/start/telescope-tabs"]
 	path = nvim/pack/plugins/start/telescope-tabs
 	url = https://codeberg.org/LukasPietzschmann/telescope-tabs.git
+[submodule "nvim/pack/plugins/start/nvim-lspconfig"]
+	path = nvim/pack/plugins/start/nvim-lspconfig
+	url = https://github.com/neovim/nvim-lspconfig.git

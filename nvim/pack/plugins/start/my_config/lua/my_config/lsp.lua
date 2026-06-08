@@ -7,33 +7,11 @@ require("mason-lspconfig").setup()
 -------------------------------------------------------------------------------
 -- lsp config
 -------------------------------------------------------------------------------
-function MyLspRootDir(bufnr, root_markers)
-  local bufname = vim.api.nvim_buf_get_name(bufnr)
-  local WorkDotfiles = os.getenv("WorkDotfiles")
-  local Dotfiles = os.getenv("Dotfiles")
-  if WorkDotfiles and string.match(bufname, "^"..WorkDotfiles) then
-    return WorkDotfiles
-  elseif Dotfiles and string.match(bufname, "^"..Dotfiles) then
-    return Dotfiles
-  end
-
-  if vim.bo[bufnr].buftype ~= '' then
-    return nil
-  end
-
-  local is_uri = bufname:match('%w+:')
-  if is_uri and vim.uri_to_fname(bufname) == bufname then
-    return nil
-  end
-
-  return vim.fs.root(bufnr, root_markers)
-end
-
 vim.lsp.config("*", {
   capabilities = require("cmp_nvim_lsp").default_capabilities()
 })
 
-vim.lsp.enable("luals")
+vim.lsp.enable("lua_ls")
 vim.lsp.enable("vimls")
 vim.lsp.enable("clangd")
 vim.lsp.enable("bashls")

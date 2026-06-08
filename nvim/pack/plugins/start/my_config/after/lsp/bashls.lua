@@ -1,5 +1,8 @@
+---@type vim.lsp.Config
 return {
-  cmd = {"bash-language-server", "start"},
+  cmd = {'bash-language-server', 'start'},
+  filetypes = { 'bash', 'sh' },
+  root_markers = {'.lsp_root2', '.lsp_root1', '.git'},
   settings = {
     bashIde = {
       -- Glob pattern for finding and parsing shell script files in the workspace.
@@ -9,12 +12,7 @@ return {
       -- directly in the home directory (e.g. ~/foo.sh).
       --
       -- Default upstream pattern is "**/*@(.sh|.inc|.bash|.command)".
-      globPattern = vim.env.GLOB_PATTERN or "*@(.sh|.inc|.bash|.command)",
+      globPattern = vim.env.GLOB_PATTERN or '*@(.sh|.inc|.bash|.command)',
     }
-  },
-  filetypes = {"bash", "sh"},
-  root_dir = function(bufnr, cb)
-    local root_markers = {".git"}
-    cb(MyLspRootDir(bufnr, root_markers))
-  end
+  }
 }
