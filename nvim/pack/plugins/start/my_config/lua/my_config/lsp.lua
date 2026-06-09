@@ -21,21 +21,32 @@ vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(event)
     local opts = {buffer=event.buf}
 
+    -- navigation
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
     vim.keymap.set("n", "gtd", vim.lsp.buf.type_definition, opts)
     vim.keymap.set("n", "gdc", vim.lsp.buf.declaration, opts)
     vim.keymap.set("n", "gri", vim.lsp.buf.implementation, opts)
+    vim.keymap.set("n", "grr", vim.lsp.buf.references, opts)
+    vim.keymap.set("n", "gO", vim.lsp.buf.document_symbol, opts)
 
+    -- diagnostics
     vim.keymap.set("n", "]d", function() vim.diagnostic.jump({count=1,  float=true, severity={min=vim.diagnostic.severity.INFO}}) end, opts)
     vim.keymap.set("n", "[d", function() vim.diagnostic.jump({count=-1, float=true, severity={min=vim.diagnostic.severity.INFO}}) end, opts)
+    vim.keymap.set("n", "]D", function() vim.diagnostic.jump({count=vim._maxint,  wrap=false}) end, opts)
+    vim.keymap.set("n", "[D", function() vim.diagnostic.jump({count=-vim._maxint, wrap=false}) end, opts)
+    vim.keymap.set("n", "<C-W>d", vim.diagnostic.open_float, opts)
+    vim.keymap.set("n", "<C-W><C-D>", vim.diagnostic.open_float, opts)
+    vim.keymap.set("n", "<leader>dt", function() vim.diagnostic.enable(not vim.diagnostic.is_enabled({bufnr=0}), {bufnr=0}) end, opts)
 
-    vim.keymap.set("n", "grn", vim.lsp.buf.rename, opts)
+    -- info
     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("i", "<C-S>", vim.lsp.buf.signature_help, opts)
-    vim.keymap.set("n", "grr", vim.lsp.buf.references, opts)
+    vim.keymap.set({"i","s"}, "<C-S>", vim.lsp.buf.signature_help, opts)
+
+    -- actions
+    vim.keymap.set("n", "grn", vim.lsp.buf.rename, opts)
+    vim.keymap.set("n", "grx", vim.lsp.codelens.run, opts)
+    vim.keymap.set({"n","x"}, "gra", vim.lsp.buf.code_action, opts)
     vim.keymap.set({"n","x"}, "gq", function() vim.lsp.buf.format({async = true}) end, opts)
-    vim.keymap.set("n", "gra", vim.lsp.buf.code_action, opts)
-    vim.keymap.set("n", "gO", vim.lsp.buf.document_symbol, opts)
   end,
 })
 

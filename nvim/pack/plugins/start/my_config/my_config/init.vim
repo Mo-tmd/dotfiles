@@ -45,8 +45,6 @@ cnoremap <C-n> <Down>
 
 nnoremap <leader>le `.
 
-nnoremap <silent> <leader>dt :lua vim.diagnostic.enable(not vim.diagnostic.is_enabled({bufnr=0}), {bufnr=0})<CR>
-
 nnoremap gd <C-]>
 
 nnoremap <silent> <leader>gt :tabnew<CR>
@@ -115,7 +113,7 @@ endfunction
 set autoread
 autocmd FocusGained,BufEnter,WinEnter,CursorHold,CursorHoldI * call timer_start(1, { -> execute('if getcmdwintype() == "" | checktime | endif') })
 
-au TermOpen * setlocal number relativenumber
+au TermOpen * if bufname('%') !~# 'fzf' | setlocal number relativenumber | endif
 call term#define('<leader>td', 'Dotfiles', 'cd ~/dotfiles')
 
 function! PlugPostHooks()

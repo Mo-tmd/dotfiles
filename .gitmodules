@@ -25,6 +25,9 @@
 [submodule "nvim/pack/plugins/start/vim-fugitive"]
 	path = nvim/pack/plugins/start/vim-fugitive
 	url = https://github.com/tpope/vim-fugitive.git
+[submodule "nvim/pack/plugins/start/nvim-lspconfig"]
+	path = nvim/pack/plugins/start/nvim-lspconfig
+	url = https://github.com/neovim/nvim-lspconfig.git
 [submodule "nvim/pack/plugins/start/mason.nvim"]
 	path = nvim/pack/plugins/start/mason.nvim
 	url = https://github.com/williamboman/mason.nvim.git
@@ -67,6 +70,3 @@
 [submodule "nvim/pack/plugins/start/telescope-tabs"]
 	path = nvim/pack/plugins/start/telescope-tabs
 	url = https://codeberg.org/LukasPietzschmann/telescope-tabs.git
-[submodule "nvim/pack/plugins/start/nvim-lspconfig"]
-	path = nvim/pack/plugins/start/nvim-lspconfig
-	url = https://github.com/neovim/nvim-lspconfig.git
