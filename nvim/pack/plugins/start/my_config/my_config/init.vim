@@ -55,7 +55,7 @@ nnoremap <silent> <leader>to :tabonly<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set number relativenumber
 
-set scrollback=100000
+set scrollback=1000000
 
 set mouse= " Disable mouse visual mode
 

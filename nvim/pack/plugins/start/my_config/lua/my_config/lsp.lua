@@ -30,10 +30,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "gO", vim.lsp.buf.document_symbol, opts)
 
     -- diagnostics
-    vim.keymap.set("n", "]d", function() vim.diagnostic.jump({count=1,  float=true, severity={min=vim.diagnostic.severity.INFO}}) end, opts)
-    vim.keymap.set("n", "[d", function() vim.diagnostic.jump({count=-1, float=true, severity={min=vim.diagnostic.severity.INFO}}) end, opts)
-    vim.keymap.set("n", "]D", function() vim.diagnostic.jump({count=vim._maxint,  wrap=false}) end, opts)
-    vim.keymap.set("n", "[D", function() vim.diagnostic.jump({count=-vim._maxint, wrap=false}) end, opts)
+    local on_jump = function() vim.diagnostic.open_float({focus=false}) end
+    local severity = {min=vim.diagnostic.severity.INFO}
+    vim.keymap.set("n", "]d", function() vim.diagnostic.jump({count=1,  on_jump=on_jump, severity=severity}) end, opts)
+    vim.keymap.set("n", "[d", function() vim.diagnostic.jump({count=-1, on_jump=on_jump, severity=severity}) end, opts)
+    vim.keymap.set("n", "]D", function() vim.diagnostic.jump({count=vim._maxint,  on_jump=on_jump, severity=severity, wrap=false}) end, opts)
+    vim.keymap.set("n", "[D", function() vim.diagnostic.jump({count=-vim._maxint, on_jump=on_jump, severity=severity, wrap=false}) end, opts)
     vim.keymap.set("n", "<C-W>d", vim.diagnostic.open_float, opts)
     vim.keymap.set("n", "<C-W><C-D>", vim.diagnostic.open_float, opts)
     vim.keymap.set("n", "<leader>dt", function() vim.diagnostic.enable(not vim.diagnostic.is_enabled({bufnr=0}), {bufnr=0}) end, opts)
