@@ -187,3 +187,18 @@ _tma() {
   CURRENT=$current_backup
 }
 compdef _tma tma
+
+# Ignore terminal focus in/out sequences (\x1b[I and \x1b[O). Programs running
+# in the terminal may enable focus reporting (DEC mode 1004) and not disable it
+# on exit. e.g. https://github.com/aws/amazon-q-developer-cli/issues/3837
+# This leaves the terminal in a state where focus events are sent to
+# zsh. In vi mode, zsh can misinterpret \x1b as Escape (switching to vicmd)
+# followed by O (open line above).
+function IgnoreFocusEvent() { }
+zle -N IgnoreFocusEvent
+bindkey '\e[I' IgnoreFocusEvent
+bindkey '\e[O' IgnoreFocusEvent
+bindkey -M vicmd '\e[I' IgnoreFocusEvent
+bindkey -M vicmd '\e[O' IgnoreFocusEvent
+bindkey -M visual '\e[I' IgnoreFocusEvent
+bindkey -M visual '\e[O' IgnoreFocusEvent
