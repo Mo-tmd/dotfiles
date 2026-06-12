@@ -200,6 +200,9 @@ let g:strip_whitespace_confirm = 0
 nnoremap <leader>b :Telescope buffers<CR>
 call term#map('<leader>b', ':let b:LeftInTerminalMode=1<CR>:Telescope buffers<CR>')
 
+autocmd FileType fzf nnoremap <silent> <buffer> <Esc> :q<CR>
+autocmd FileType fzf autocmd WinLeave <buffer> close
+
 nnoremap <silent> <leader>af
   \ :call FzfFindFiles(
   \   {'search_dirs': ['~', getcwd()],
