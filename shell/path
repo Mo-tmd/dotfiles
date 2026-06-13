@@ -1,6 +1,7 @@
 ~/bin
 ~/.cargo/bin
 /snap/bin
+~/.local/bin
 "$Dotfiles/scripts"
 "$Dotfiles/scripts/tmux"
 "$Dotfiles/scripts/path"
