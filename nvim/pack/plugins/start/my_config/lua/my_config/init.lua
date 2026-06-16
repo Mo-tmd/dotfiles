@@ -167,7 +167,7 @@ require('lualine').setup({
     lualine_a = {
       {'tabs',
        mode = 2,
-       max_length = vim.o.columns,
+       max_length = function() return vim.o.columns end,
        show_modified_status = false,
        fmt = function(name, context) return tab_name(context.tabId) end
       }
