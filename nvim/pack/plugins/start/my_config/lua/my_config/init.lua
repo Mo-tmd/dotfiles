@@ -222,7 +222,7 @@ end
 function ExecuteCommand(...)
   local command = table.concat({...}, " ")
   print("Command:", command)
-  local output = vim.api.nvim_exec(command, true)
+  local output = vim.api.nvim_exec2(command, {output=true}).output
   print_to_buffer(string_to_table(output))
 end
 

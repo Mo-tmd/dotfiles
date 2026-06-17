@@ -45,7 +45,7 @@ cnoremap <C-n> <Down>
 
 nnoremap <leader>le `.
 
-nnoremap <leader>dt :lua toggle_diagnostics()<CR>
+nnoremap gd <C-]>
 
 nnoremap <silent> <leader>gt :tabnew<CR>
 nnoremap <silent> <leader>to :tabonly<CR>
@@ -55,7 +55,7 @@ nnoremap <silent> <leader>to :tabonly<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set number relativenumber
 
-set scrollback=100000
+set scrollback=1000000
 
 set mouse= " Disable mouse visual mode
 
@@ -113,6 +113,7 @@ endfunction
 set autoread
 autocmd FocusGained,BufEnter,WinEnter,CursorHold,CursorHoldI * call timer_start(1, { -> execute('if getcmdwintype() == "" | checktime | endif') })
 
+au TermOpen * if bufname('%') !~# 'fzf' | setlocal number relativenumber | endif
 call term#define('<leader>td', 'Dotfiles', 'cd ~/dotfiles')
 
 function! PlugPostHooks()
