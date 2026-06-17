@@ -27,8 +27,8 @@ autocmd filetype netrw nnoremap <buffer> <C-l> <C-W>l
 nnoremap <silent> <C-^> :call alternate_buffer#go()<CR>
 call term#map('<C-^>', ':call term#go_to_alternate_buffer()<CR>')
 
-nnoremap <silent> <leader>vp :e $Dotfiles/nvim/pack/plugins/start/my_config/my_config/init.vim<CR>
-nnoremap <silent> <leader>ip :e $Dotfiles/nvim/pack/plugins/start/my_config/lua/my_config/init.lua<CR>
+nnoremap <silent> <leader>vp :e $Dotfiles/nvim/my_config/init.vim<CR>
+nnoremap <silent> <leader>ip :e $Dotfiles/nvim/lua/my_config/init.lua<CR>
 
 nnoremap <silent> <leader>yn :let @+ = expand('%:t') \| echo @+<CR>
 nnoremap <silent> <leader>yp :let @+ = expand('%:p') \| echo @+<CR>
