@@ -5,17 +5,46 @@ require("mason").setup()
 require("mason-lspconfig").setup()
 
 -------------------------------------------------------------------------------
+-- lsp root_dir
+-------------------------------------------------------------------------------
+-- Resolves a fugitive:// URI to the real file path, or returns nil.
+local function resolve_fugitive_bufname(bufname)
+  if bufname:find("^fugitive://") then
+    return vim.fn["fugitive#Real"](bufname)
+  end
+end
+
+-- Override vim.fs.root to resolve fugitive:// URIs to real file paths so LSP
+-- finds the correct root_dir.
+local orig_root = vim.fs.root
+---@diagnostic disable-next-line: duplicate-set-field
+vim.fs.root = function(source, marker)
+  if type(source) == "number" then -- lsp only uses buffer number as source.
+    local bufname = vim.api.nvim_buf_get_name(source)
+    source = resolve_fugitive_bufname(bufname) or source
+  end
+  return orig_root(source, marker)
+end
+
+-- Returns the outer dotfiles directory if bufnr is inside it, nil otherwise.
+function DotfilesRoot(bufnr)
+  local bufname = vim.api.nvim_buf_get_name(bufnr)
+  bufname = resolve_fugitive_bufname(bufname) or bufname
+  local dotfiles = os.getenv("WorkDotfiles") or os.getenv("Dotfiles")
+  if dotfiles and vim.startswith(bufname, dotfiles) then
+    return dotfiles
+  end
+end
+
+-------------------------------------------------------------------------------
 -- lsp config
 -------------------------------------------------------------------------------
-vim.lsp.config("*", {
-  capabilities = require("cmp_nvim_lsp").default_capabilities()
-})
-
 vim.lsp.enable("lua_ls")
 vim.lsp.enable("vimls")
 vim.lsp.enable("clangd")
 vim.lsp.enable("bashls")
 vim.lsp.enable("erlangls")
+vim.lsp.enable("jdtls")
 
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(event)
@@ -70,6 +99,10 @@ luasnip.setup({
 -------------------------------------------------------------------------------
 -- cmp
 -------------------------------------------------------------------------------
+vim.lsp.config("*", {
+  capabilities = require("cmp_nvim_lsp").default_capabilities()
+})
+
 local cmp = require("cmp")
 cmp.setup({
   completion = {
@@ -86,7 +119,7 @@ cmp.setup({
   },
   mapping = {
     ["<C-Space>"] = cmp.mapping.complete(),
-    ["<CR>"] = cmp.mapping.confirm({select=true}),
+    ["<CR>"] = cmp.mapping.confirm({select=false}),
     ["<C-e>"] = cmp.mapping.abort(),
     ["<Tab>"] = cmp.mapping(
       function(fallback)

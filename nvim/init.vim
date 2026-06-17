@@ -1,2 +1,2 @@
 runtime my_config/init.vim
-lua require("my_config")
+lua require('my_config')
