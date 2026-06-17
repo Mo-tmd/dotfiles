@@ -20,7 +20,7 @@
     # Idea: if difftool is already open, skip tabnew and go to difftool tab.
     # - How to check if difftool is already open? Perhaps check autocommand exists
     # - How to get the difftool tab?
-    # https://chatgpt.com/share/6a2f19ac-b9e4-83eb-9c6c-519d3daa626b
+    # https://chatgpt.com/share/6a331c73-8980-83eb-9c2d-9200c52947dd
     cmd = "if [ -n \"$NVIM\" ]; then \
                nvr -cc \"packadd nvim.difftool | tabnew | DiffTool $LOCAL $REMOTE\"; \
            else \
