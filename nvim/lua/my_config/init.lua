@@ -184,8 +184,10 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 --------------------------------------------------------------------------------
--- DiffTool — override quickfix highlight colors for nvim.difftool
+-- DiffTool
 --------------------------------------------------------------------------------
+vim.cmd("packadd nvim.difftool")
+
 local group = vim.api.nvim_create_augroup("DiffToolQfColors", {clear=true})
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = group,
@@ -208,7 +210,6 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
       vim.api.nvim_buf_clear_namespace(ev.buf, ns, 0, -1)
 
       local lines = vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false)
-
       for i, line in ipairs(lines) do
         local status = line:match("^(%S)")
         local hl =
