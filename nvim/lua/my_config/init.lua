@@ -199,7 +199,6 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     end
 
     -- vim.schedule ensures this runs after nvim.difftool's own BufWinEnter
-    -- handler which applies its default highlights on the same event.
     vim.schedule(function()
       vim.api.nvim_set_hl(0, "MyDiffMod",    {fg="#fabd2f", bold=true})
       vim.api.nvim_set_hl(0, "MyDiffDelete", {fg="#ff0000", bold=true})
