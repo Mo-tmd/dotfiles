@@ -184,6 +184,48 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 --------------------------------------------------------------------------------
+-- DiffTool — override quickfix highlight colors for nvim.difftool
+--------------------------------------------------------------------------------
+local group = vim.api.nvim_create_augroup("DiffToolQfColors", {clear=true})
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  group = group,
+  pattern = "quickfix",
+  callback = function(ev)
+    local qf = vim.fn.getqflist({ title = 0 })
+    if qf.title ~= "DiffTool" then
+      return
+    end
+
+    -- vim.schedule ensures this runs after nvim.difftool's own BufWinEnter
+    -- handler which applies its default highlights on the same event.
+    vim.schedule(function()
+      vim.api.nvim_set_hl(0, "MyDiffMod",    {fg="#fabd2f", bold=true})
+      vim.api.nvim_set_hl(0, "MyDiffDelete", {fg="#ff0000", bold=true})
+      vim.api.nvim_set_hl(0, "MyDiffAdd",    {fg="#28e90f", bold=true})
+
+      vim.api.nvim_buf_clear_namespace(ev.buf, vim.api.nvim_create_namespace("nvim.difftool.hl"), 0, -1)
+      local ns = vim.api.nvim_create_namespace("my_difftool_override")
+      vim.api.nvim_buf_clear_namespace(ev.buf, ns, 0, -1)
+
+      local lines = vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false)
+
+      for i, line in ipairs(lines) do
+        local status = line:match("^(%S)")
+        local hl =
+          (status == "A" and "MyDiffAdd")
+          or (status == "D" and "MyDiffDelete")
+          or (status == "M" and "MyDiffMod")
+          or (status == "R" and "MyDiffRename")
+
+        if hl then
+          vim.hl.range(ev.buf, ns, hl, { i - 1, 0 }, { i - 1, 1 })
+        end
+      end
+    end)
+  end,
+})
+
+--------------------------------------------------------------------------------
 -- User Interface
 --------------------------------------------------------------------------------
 -- Print a table in a Scratch buffer
