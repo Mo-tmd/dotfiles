@@ -200,9 +200,9 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 
     -- vim.schedule ensures this runs after nvim.difftool's own BufWinEnter
     vim.schedule(function()
-      vim.api.nvim_set_hl(0, "MyDiffMod",    {fg="#fabd2f", bold=true})
-      vim.api.nvim_set_hl(0, "MyDiffDelete", {fg="#ff0000", bold=true})
       vim.api.nvim_set_hl(0, "MyDiffAdd",    {fg="#28e90f", bold=true})
+      vim.api.nvim_set_hl(0, "MyDiffDelete", {fg="#ff0000", bold=true})
+      vim.api.nvim_set_hl(0, "MyDiffText",    {fg="#fabd2f", bold=true})
 
       vim.api.nvim_buf_clear_namespace(ev.buf, vim.api.nvim_create_namespace("nvim.difftool.hl"), 0, -1)
       local ns = vim.api.nvim_create_namespace("my_difftool_override")
@@ -214,8 +214,8 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
         local hl =
           (status == "A" and "MyDiffAdd")
           or (status == "D" and "MyDiffDelete")
-          or (status == "M" and "MyDiffMod")
-          or (status == "R" and "MyDiffRename")
+          or (status == "M" and "MyDiffText")
+          or (status == "R" and "MyDiffText")
 
         if hl then
           vim.hl.range(ev.buf, ns, hl, { i - 1, 0 }, { i - 1, 1 })
