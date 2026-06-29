@@ -188,6 +188,12 @@ vim.api.nvim_create_autocmd('FileType', {
 --------------------------------------------------------------------------------
 vim.cmd("packadd nvim.difftool")
 
+-- TODO this probably doesn't work. I only see empty buffers for the /tmp files.
+-- Should perhaps do --remote-wait and create a dummy buffer and then kill that
+-- buffer when done. Another (better?) option is to make gitconfig call a script
+-- that first copies to tmp files and then call nvr async (no --remote-wait).
+-- Then add an autocmd that cleans up the directories created by the script.
+-- module unload kiro_cli && module load kiro_cli/2.8.1 && cd ~/dotfiles && qwrap --resume-id 27ef8827-ae91-4128-b919-6141aa31c9be
 vim.api.nvim_create_autocmd("FileChangedShell", {
   pattern = "*",
   callback = function(ev)
