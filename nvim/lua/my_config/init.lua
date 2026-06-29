@@ -200,11 +200,14 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 
     -- vim.schedule ensures this runs after nvim.difftool's own BufWinEnter
     vim.schedule(function()
+      -- difftool's setup_layout may destroy and recreate the qf window before
+      -- this callback runs; bail out if the buffer is no longer visible.
+      local win = vim.fn.bufwinid(ev.buf)
+      if win == -1 then return end
+
       vim.api.nvim_set_hl(0, "MyDiffAdd",      {fg="#28e90f", bold=true})
       vim.api.nvim_set_hl(0, "MyDiffDelete",   {fg="#ff0000", bold=true})
       vim.api.nvim_set_hl(0, "MyDiffText",     {fg="#fabd2f", bold=true})
-
-      local win = vim.fn.bufwinid(ev.buf)
       vim.api.nvim_set_hl(0, "MyQuickFixLine", {bg="#504945", bold=true})
       vim.api.nvim_set_option_value("winhl", "QuickFixLine:MyQuickFixLine", {win=win})
 
