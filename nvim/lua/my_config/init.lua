@@ -188,6 +188,33 @@ vim.api.nvim_create_autocmd('FileType', {
 --------------------------------------------------------------------------------
 vim.cmd("packadd nvim.difftool")
 
+vim.api.nvim_create_autocmd("FileChangedShell", {
+  pattern = "*",
+  callback = function(ev)
+    if ev.file:find("^/tmp/git%-difftool") then
+      vim.v.fcs_choice = ""
+    end
+  end,
+})
+
+local function is_difftool_qf(win)
+  local buf = vim.api.nvim_win_get_buf(win)
+  if vim.bo[buf].buftype ~= "quickfix" then return false end
+  local ok, title = pcall(vim.api.nvim_win_get_var, win, "quickfix_title")
+  return ok and title == "DiffTool"
+end
+
+function CloseDiffTool()
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+      if is_difftool_qf(win) then
+        vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
+        return
+      end
+    end
+  end
+end
+
 local group = vim.api.nvim_create_augroup("DiffToolQfColors", {clear=true})
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = group,

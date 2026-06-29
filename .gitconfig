@@ -17,13 +17,9 @@
 [diff]
     tool = nvim_difftool
 [difftool "nvim_difftool"]
-    # Idea: if difftool is already open, skip tabnew and go to difftool tab.
-    # - How to check if difftool is already open? Perhaps check autocommand exists
-    # - How to get the difftool tab?
-    # https://chatgpt.com/share/6a331c73-8980-83eb-9c2d-9200c52947dd
     cmd = "if [ -n \"$NVIM\" ]; then \
-               nvr -cc \"packadd nvim.difftool | tabnew | DiffTool $LOCAL $REMOTE\"; \
+               nvr -cc \"let b:LeftInTerminalMode=1\" -cc \"lua CloseDiffTool()\" -cc \"tabnew\" -cc \"DiffTool $LOCAL $REMOTE\"; \
            else \
-               nvim -c \"packadd nvim.difftool | DiffTool $LOCAL $REMOTE\"; \
+               nvim -c \"DiffTool $LOCAL $REMOTE\"; \
            fi\
           "
