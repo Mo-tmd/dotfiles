@@ -190,27 +190,42 @@ vim.cmd("packadd nvim.difftool")
 
 function CloseDiffTool()
   for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
-    if vim.t[tab].difftool_qf then
+    if vim.t[tab].difftool_tab then
       vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
       return
     end
   end
 end
 
+-- Cleanup tmp_dir and tab-local variables if one of the diff windows is closed.
 vim.api.nvim_create_autocmd("WinClosed", {
   pattern = "*",
   nested = true,
   callback = function(ev)
     local win = tonumber(ev.match) or -1
     local tab = vim.api.nvim_win_get_tabpage(win)
-    if vim.t[tab].difftool_qf then
-      local dir = vim.t[tab].difftool_tmp_dir
-      if dir then
-        vim.fn.delete(dir, "rf")
-      end
-      vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
+
+    if not vim.t[tab].difftool_tab then
+      -- Not a difftool tab
+      return
     end
-  end,
+
+    local diff_wins = vim.iter(vim.api.nvim_tabpage_list_wins(tab))
+      :filter(function(w) return w ~= win and vim.wo[w].diff end)
+      :totable()
+    if #diff_wins >= 2 then
+        -- There are still at least two diff windows
+        return
+    end
+
+    -- We are in a difftool tab and no longer in a diff layout. Cleanup
+    local dir = vim.t[tab].difftool_tmp_dir
+    if dir then
+      vim.fn.delete(dir, "rf")
+    end
+    vim.t[tab].difftool_tab = nil
+    vim.t[tab].difftool_tmp_dir = nil
+  end
 })
 
 local group = vim.api.nvim_create_augroup("DiffToolQfColors", {clear=true})
@@ -223,14 +238,15 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
       return
     end
 
+    vim.t.difftool_tab = true
+
     -- vim.schedule ensures this runs after nvim.difftool's own BufWinEnter
     vim.schedule(function()
       -- difftool's setup_layout may destroy and recreate the qf window before
-      -- this callback runs; bail out if the buffer is no longer visible.
+      -- this callback runs (if DiffTool is called twice?). Bail out if the
+      -- buffer is no longer visible and wait for next BufWinEnter event.
       local win = vim.fn.bufwinid(ev.buf)
       if win == -1 then return end
-
-      vim.t.difftool_qf = true
 
       vim.api.nvim_set_hl(0, "MyDiffAdd",      {fg="#28e90f", bold=true})
       vim.api.nvim_set_hl(0, "MyDiffDelete",   {fg="#ff0000", bold=true})
