@@ -188,38 +188,30 @@ vim.api.nvim_create_autocmd('FileType', {
 --------------------------------------------------------------------------------
 vim.cmd("packadd nvim.difftool")
 
--- TODO this probably doesn't work. I only see empty buffers for the /tmp files.
--- Should perhaps do --remote-wait and create a dummy buffer and then kill that
--- buffer when done. Another (better?) option is to make gitconfig call a script
--- that first copies to tmp files and then call nvr async (no --remote-wait).
--- Then add an autocmd that cleans up the directories created by the script.
--- module unload kiro_cli && module load kiro_cli/2.8.1 && cd ~/dotfiles && qwrap --resume-id 27ef8827-ae91-4128-b919-6141aa31c9be
-vim.api.nvim_create_autocmd("FileChangedShell", {
-  pattern = "*",
-  callback = function(ev)
-    if ev.file:find("^/tmp/git%-difftool") then
-      vim.v.fcs_choice = ""
-    end
-  end,
-})
-
-local function is_difftool_qf(win)
-  local buf = vim.api.nvim_win_get_buf(win)
-  if vim.bo[buf].buftype ~= "quickfix" then return false end
-  local ok, title = pcall(vim.api.nvim_win_get_var, win, "quickfix_title")
-  return ok and title == "DiffTool"
-end
-
 function CloseDiffTool()
   for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
-    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
-      if is_difftool_qf(win) then
-        vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
-        return
-      end
+    if vim.t[tab].difftool_qf then
+      vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
+      return
     end
   end
 end
+
+vim.api.nvim_create_autocmd("WinClosed", {
+  pattern = "*",
+  nested = true,
+  callback = function(ev)
+    local win = tonumber(ev.match) or -1
+    local tab = vim.api.nvim_win_get_tabpage(win)
+    if vim.t[tab].difftool_qf then
+      local dir = vim.t[tab].difftool_tmp_dir
+      if dir then
+        vim.fn.delete(dir, "rf")
+      end
+      vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
+    end
+  end,
+})
 
 local group = vim.api.nvim_create_augroup("DiffToolQfColors", {clear=true})
 vim.api.nvim_create_autocmd("BufWinEnter", {
@@ -237,6 +229,8 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
       -- this callback runs; bail out if the buffer is no longer visible.
       local win = vim.fn.bufwinid(ev.buf)
       if win == -1 then return end
+
+      vim.t.difftool_qf = true
 
       vim.api.nvim_set_hl(0, "MyDiffAdd",      {fg="#28e90f", bold=true})
       vim.api.nvim_set_hl(0, "MyDiffDelete",   {fg="#ff0000", bold=true})
