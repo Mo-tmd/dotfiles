@@ -1,0 +1,25 @@
+#!/bin/bash -e
+
+Local=$1
+Remote=$2
+
+if [[ ! -d "$Local" || ! -d "$Remote" ]]; then
+    echo "Error: nvim_difftool expects directories (use git difftool -d)" >&2
+    exit 1
+fi
+
+if [[ -n "$NVIM" ]]; then
+    TmpDir=$(mktemp -d /tmp/nvim_difftool.XXXXXX)
+    LocalCopy="$TmpDir/left"
+    RemoteCopy="$TmpDir/right"
+    cp -r "$Local" "$LocalCopy"
+    cp -r "$Remote" "$RemoteCopy"
+    echo "$LocalCopy"
+    nvr -cc "if mode()=='t' | let b:LeftInTerminalMode=1 | endif" \
+        -cc "lua CloseDiffTool()" \
+        -cc "tabnew" \
+        -cc "DiffTool $LocalCopy $RemoteCopy" \
+        -cc "let t:difftool_tmp_dir='$TmpDir'"
+else
+    nvim -c "DiffTool $Local $Remote"
+fi
