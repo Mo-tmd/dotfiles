@@ -188,14 +188,61 @@ vim.api.nvim_create_autocmd('FileType', {
 --------------------------------------------------------------------------------
 vim.cmd("packadd nvim.difftool")
 
+vim.api.nvim_create_user_command(
+  "Gdt",
+  function(opts)
+    local dir = vim.fn.FugitiveWorkTree()
+    vim.fn.jobstart(string.format("git -C %s difftool -d -y %s", vim.fn.shellescape(dir), opts.args))
+  end,
+  {nargs = "*",
+   complete =
+     function(lead, cmdline, pos)
+       return vim.fn["fugitive#CompleteObject"](lead, cmdline, pos)
+     end
+  }
+)
+
+local function get_diff_windows(tab)
+  return vim.tbl_filter(function(w) return vim.wo[w].diff end, vim.api.nvim_tabpage_list_wins(tab))
+end
+
+local function close_left_diff_window()
+  local diff_wins = get_diff_windows(0)
+  if #diff_wins >= 2 then
+    local win = diff_wins[1]
+    local buf = vim.api.nvim_win_get_buf(win)
+    if #vim.fn.win_findbuf(buf) == 1 then
+      vim.cmd("bwipeout! " .. buf)
+    else
+      vim.api.nvim_win_close(win, true)
+    end
+  elseif #diff_wins == 1 then
+    vim.api.nvim_win_call(diff_wins[1], function() vim.cmd.diffoff() end)
+  end
+end
+
 function CloseDiffTool()
   for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
     if vim.t[tab].difftool_tab then
-      vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
+      if #vim.api.nvim_list_tabpages() > 1 then
+        vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
+      else
+        close_left_diff_window()
+      end
       return
     end
   end
 end
+
+function CloseDiff()
+  if vim.t.difftool_tab then
+    CloseDiffTool()
+  else
+    close_left_diff_window()
+  end
+end
+
+vim.keymap.set("n", "<leader>cd", CloseDiff)
 
 -- Cleanup tmp_dir and tab-local variables if one of the diff windows is closed.
 vim.api.nvim_create_autocmd("WinClosed", {
@@ -210,12 +257,10 @@ vim.api.nvim_create_autocmd("WinClosed", {
       return
     end
 
-    local diff_wins = vim.iter(vim.api.nvim_tabpage_list_wins(tab))
-      :filter(function(w) return w ~= win and vim.wo[w].diff end)
-      :totable()
+    local diff_wins = vim.tbl_filter(function(w) return w ~= win end, get_diff_windows(tab))
     if #diff_wins >= 2 then
-        -- There are still at least two diff windows
-        return
+      -- There are still at least two diff windows
+      return
     end
 
     -- We are in a difftool tab and no longer in a diff layout. Cleanup
