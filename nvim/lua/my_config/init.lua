@@ -228,7 +228,7 @@ vim.api.nvim_create_autocmd("WinClosed", {
   end
 })
 
-local group = vim.api.nvim_create_augroup("DiffToolQfColors", {clear=true})
+local group = vim.api.nvim_create_augroup("MyDiffTool", {clear=true})
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = group,
   pattern = "quickfix",
