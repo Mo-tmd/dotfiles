@@ -323,11 +323,12 @@ vim.api.nvim_create_user_command(
   end,
   {nargs = "*",
    complete = function(lead, cmdline, pos)
-     local git_cmdline = cmdline:gsub("^%S+", "git difftool")
-     local comp_point = pos + #"git difftool" - #cmdline:match("^%S+")
+     local nvim_cmd_name, args = cmdline:match("^(%S+)(.*)")
+     local cmd = "git difftool" .. args
+     local comp_point = pos + #"git difftool" - #nvim_cmd_name
 
      -- Count words up to cursor; add 1 if cursor is after a space (new word)
-     local before_cursor = git_cmdline:sub(1, comp_point)
+     local before_cursor = cmd:sub(1, comp_point)
      local comp_cword = select(2, before_cursor:gsub("%S+", ""))
      if before_cursor:match("%s$") or before_cursor == "" then
        -- Cursor is after a space: completing a new empty word
@@ -340,7 +341,7 @@ vim.api.nvim_create_user_command(
        'source /usr/share/doc/git/contrib/completion/git-completion.bash;'
        .. ' COMP_WORDS=(%s); COMP_CWORD=%d; COMP_LINE=%s; COMP_POINT=%d;'
        .. ' __git_wrap__git_main; printf "%%s\\n" "${COMPREPLY[@]}"',
-       git_cmdline, comp_cword, vim.fn.shellescape(git_cmdline), comp_point
+       cmd, comp_cword, vim.fn.shellescape(cmd), comp_point
      )})
    end
   }
