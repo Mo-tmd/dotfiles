@@ -323,17 +323,21 @@ vim.api.nvim_create_user_command(
   end,
   {nargs = "*",
    complete = function(lead, cmdline, pos)
+     -- Translate ":Gdt <args>" into "git difftool <args>" for bash completion
      local nvim_cmd_name, args = cmdline:match("^(%S+)(.*)")
      local cmd = "git difftool" .. args
-     local comp_point = pos + #"git difftool" - #nvim_cmd_name
+     pos = pos + #"git difftool" - #nvim_cmd_name
 
-     -- Count words up to cursor; add 1 if cursor is after a space (new word)
-     local before_cursor = cmd:sub(1, comp_point)
-     local comp_cword = select(2, before_cursor:gsub("%S+", ""))
-     if before_cursor:match("%s$") or before_cursor == "" then
-       -- Cursor is after a space: completing a new empty word
-     else
-       -- Cursor is inside a word
+     -- Determine which word the cursor is on (0-indexed for bash COMP_CWORD).
+     -- Count complete words before the cursor position.
+     local text_before_cursor = cmd:sub(1, pos)
+     local comp_cword = 0
+     for _ in text_before_cursor:gmatch("%S+") do
+       comp_cword = comp_cword + 1
+     end
+     -- If cursor is inside a word (no trailing space), it's part of the last
+     -- counted word, so subtract 1 to point to it rather than past it.
+     if not text_before_cursor:match("%s$") then
        comp_cword = comp_cword - 1
      end
 
@@ -341,7 +345,7 @@ vim.api.nvim_create_user_command(
        'source /usr/share/doc/git/contrib/completion/git-completion.bash;'
        .. ' COMP_WORDS=(%s); COMP_CWORD=%d; COMP_LINE=%s; COMP_POINT=%d;'
        .. ' __git_wrap__git_main; printf "%%s\\n" "${COMPREPLY[@]}"',
-       cmd, comp_cword, vim.fn.shellescape(cmd), comp_point
+       cmd, comp_cword, vim.fn.shellescape(cmd), pos
      )})
    end
   }
