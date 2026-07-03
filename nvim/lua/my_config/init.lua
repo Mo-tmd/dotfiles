@@ -188,94 +188,13 @@ vim.api.nvim_create_autocmd('FileType', {
 --------------------------------------------------------------------------------
 vim.cmd("packadd nvim.difftool")
 
-vim.api.nvim_create_user_command(
-  "Gdt",
-  function(opts)
-    local dir = vim.fn.FugitiveWorkTree()
-    vim.fn.jobstart(string.format("git -C %s difftool -d -y %s", vim.fn.shellescape(dir), opts.args))
-  end,
-  {nargs = "*",
-   complete =
-     function(lead, cmdline, pos)
-       return vim.fn["fugitive#CompleteObject"](lead, cmdline, pos)
-     end
-  }
-)
-
 local function get_diff_windows(tab)
   return vim.tbl_filter(function(w) return vim.wo[w].diff end, vim.api.nvim_tabpage_list_wins(tab))
 end
 
-local function close_left_diff_window()
-  local diff_wins = get_diff_windows(0)
-  if #diff_wins >= 2 then
-    local win = diff_wins[1]
-    local buf = vim.api.nvim_win_get_buf(win)
-    if #vim.fn.win_findbuf(buf) == 1 then
-      vim.cmd("bwipeout! " .. buf)
-    else
-      vim.api.nvim_win_close(win, true)
-    end
-  elseif #diff_wins == 1 then
-    vim.api.nvim_win_call(diff_wins[1], function() vim.cmd.diffoff() end)
-  end
-end
-
-function CloseDiffTool()
-  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
-    if vim.t[tab].difftool_tab then
-      if #vim.api.nvim_list_tabpages() > 1 then
-        vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
-      else
-        close_left_diff_window()
-      end
-      return
-    end
-  end
-end
-
-function CloseDiff()
-  if vim.t.difftool_tab then
-    CloseDiffTool()
-  else
-    close_left_diff_window()
-  end
-end
-
-vim.keymap.set("n", "<leader>cd", CloseDiff)
-
--- Cleanup tmp_dir and tab-local variables if one of the diff windows is closed.
-vim.api.nvim_create_autocmd("WinClosed", {
-  pattern = "*",
-  nested = true,
-  callback = function(ev)
-    local win = tonumber(ev.match) or -1
-    local tab = vim.api.nvim_win_get_tabpage(win)
-
-    if not vim.t[tab].difftool_tab then
-      -- Not a difftool tab
-      return
-    end
-
-    local diff_wins = vim.tbl_filter(function(w) return w ~= win end, get_diff_windows(tab))
-    if #diff_wins >= 2 then
-      -- There are still at least two diff windows
-      return
-    end
-
-    -- We are in a difftool tab and no longer in a diff layout. Cleanup
-    local dir = vim.t[tab].difftool_tmp_dir
-    if dir then
-      vim.fn.delete(dir, "rf")
-    end
-    vim.t[tab].difftool_tab = nil
-    vim.t[tab].difftool_tmp_dir = nil
-  end
-})
-
-local group = vim.api.nvim_create_augroup("MyDiffTool", {clear=true})
+local difftool_group = vim.api.nvim_create_augroup("MyDiffTool", {clear=true})
 vim.api.nvim_create_autocmd("BufWinEnter", {
-  group = group,
+  group = difftool_group,
   pattern = "quickfix",
   callback = function(ev)
     local qf = vim.fn.getqflist({ title = 0 })
@@ -319,6 +238,113 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     end)
   end,
 })
+
+-- Cleanup tmp_dir and tab-local variables if one of the diff windows is closed.
+vim.api.nvim_create_autocmd("WinClosed", {
+  group = difftool_group,
+  pattern = "*",
+  nested = true,
+  callback = function(ev)
+    local win = tonumber(ev.match) or -1
+    local tab = vim.api.nvim_win_get_tabpage(win)
+
+    if not vim.t[tab].difftool_tab then
+      -- Not a difftool tab
+      return
+    end
+
+    local diff_wins = vim.tbl_filter(function(w) return w ~= win end, get_diff_windows(tab))
+    if #diff_wins >= 2 then
+      -- There are still at least two diff windows
+      return
+    end
+
+    -- We are in a difftool tab and no longer in a diff layout. Cleanup
+    local dir = vim.t[tab].difftool_tmp_dir
+    if dir then
+      vim.fn.delete(dir, "rf")
+    end
+    vim.t[tab].difftool_tab = nil
+    vim.t[tab].difftool_tmp_dir = nil
+  end
+})
+
+local function close_left_diff_window()
+  local diff_wins = get_diff_windows(0)
+  if #diff_wins < 2 then return end
+  local win = diff_wins[1]
+  local buf = vim.api.nvim_win_get_buf(win)
+  if #vim.fn.win_findbuf(buf) == 1 then
+    vim.cmd("bwipeout! " .. buf)
+  else
+    vim.api.nvim_win_close(win, true)
+  end
+end
+
+function CloseDiffTool()
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    if vim.t[tab].difftool_tab then
+      if #vim.api.nvim_list_tabpages() > 1 then
+        vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
+      else
+        close_left_diff_window()
+      end
+      return
+    end
+  end
+end
+
+function CloseDiff()
+  if vim.t.difftool_tab then
+    CloseDiffTool()
+  else
+    close_left_diff_window()
+  end
+end
+
+vim.keymap.set("n", "<leader>cd", CloseDiff)
+
+vim.api.nvim_create_user_command(
+  "Gdt",
+  function(opts)
+    local dir = vim.fn.FugitiveWorkTree()
+    local stderr = {}
+    vim.fn.jobstart(string.format("git -C %s difftool -d -y %s", vim.fn.shellescape(dir), opts.args), {
+      stderr_buffered = true,
+      on_stderr = function(_, data)
+        stderr = data
+      end,
+      on_exit = function(_, code)
+        if code ~= 0 and #stderr > 0 then
+          vim.notify(table.concat(stderr, "\n"), vim.log.levels.ERROR)
+        end
+      end,
+    })
+  end,
+  {nargs = "*",
+   complete = function(lead, cmdline, pos)
+     local git_cmdline = cmdline:gsub("^%S+", "git difftool")
+     local comp_point = pos + #"git difftool" - #cmdline:match("^%S+")
+
+     -- Count words up to cursor; add 1 if cursor is after a space (new word)
+     local before_cursor = git_cmdline:sub(1, comp_point)
+     local comp_cword = select(2, before_cursor:gsub("%S+", ""))
+     if before_cursor:match("%s$") or before_cursor == "" then
+       -- Cursor is after a space: completing a new empty word
+     else
+       -- Cursor is inside a word
+       comp_cword = comp_cword - 1
+     end
+
+     return vim.fn.systemlist({"bash", "-c", string.format(
+       'source /usr/share/doc/git/contrib/completion/git-completion.bash;'
+       .. ' COMP_WORDS=(%s); COMP_CWORD=%d; COMP_LINE=%s; COMP_POINT=%d;'
+       .. ' __git_wrap__git_main; printf "%%s\\n" "${COMPREPLY[@]}"',
+       git_cmdline, comp_cword, vim.fn.shellescape(git_cmdline), comp_point
+     )})
+   end
+  }
+)
 
 --------------------------------------------------------------------------------
 -- User Interface

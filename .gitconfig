@@ -18,9 +18,3 @@
     tool = nvim_difftool
 [difftool "nvim_difftool"]
     cmd = "nvim_difftool $LOCAL $REMOTE"
-    #cmd = "if [ -n \"$NVIM\" ]; then \
-    #           nvr -cc \"let b:LeftInTerminalMode=1\" -cc \"lua CloseDiffTool()\" -cc \"tabnew\" -cc \"DiffTool $LOCAL $REMOTE\"; \
-    #       else \
-    #           nvim -c \"DiffTool $LOCAL $REMOTE\"; \
-    #       fi\
-    #      "
