@@ -328,25 +328,19 @@ vim.api.nvim_create_user_command(
      local cmd = "git difftool" .. args
      pos = pos + #"git difftool" - #nvim_cmd_name
 
-     -- Determine which word the cursor is on (0-indexed for bash COMP_CWORD).
-     -- Count complete words before the cursor position.
-     local text_before_cursor = cmd:sub(1, pos)
-     local comp_cword = 0
-     for _ in text_before_cursor:gmatch("%S+") do
-       comp_cword = comp_cword + 1
-     end
-     -- If cursor is inside a word (no trailing space), it's part of the last
-     -- counted word, so subtract 1 to point to it rather than past it.
-     if not text_before_cursor:match("%s$") then
-       comp_cword = comp_cword - 1
-     end
+     -- Determine which word the cursor is on
+     local text_until_cursor = cmd:sub(1, pos)
+     local words = vim.split(text_until_cursor, "%s+")
+     local comp_cword = #words - 1 -- 0-based index
 
-     return vim.fn.systemlist({"bash", "-c", string.format(
+     local results = vim.fn.systemlist({"bash", "-c", string.format(
        'source /usr/share/doc/git/contrib/completion/git-completion.bash;'
        .. ' COMP_WORDS=(%s); COMP_CWORD=%d; COMP_LINE=%s; COMP_POINT=%d;'
        .. ' __git_wrap__git_main; printf "%%s\\n" "${COMPREPLY[@]}"',
        cmd, comp_cword, vim.fn.shellescape(cmd), pos
      )})
+     -- Bash's COMPREPLY may include trailing spaces; strip them.
+     return vim.tbl_map(function(r) return r:gsub(" $", "") end, results)
    end
   }
 )
