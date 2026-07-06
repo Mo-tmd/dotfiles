@@ -325,8 +325,9 @@ vim.api.nvim_create_user_command(
    complete = function(lead, cmdline, pos)
      -- Translate ":Gdt <args>" into "git difftool <args>" for bash completion
      local nvim_cmd_name, args = cmdline:match("^(%S+)(.*)")
-     local cmd = "git difftool" .. args
-     pos = pos + #"git difftool" - #nvim_cmd_name
+     local cmd_name = "git difftool"
+     local cmd = cmd_name .. args
+     pos = pos + #cmd_name - #nvim_cmd_name
 
      -- Determine which word the cursor is on
      local text_until_cursor = cmd:sub(1, pos)
