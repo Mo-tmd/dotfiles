@@ -323,9 +323,9 @@ vim.api.nvim_create_user_command(
   end,
   {nargs = "*",
    complete = function(_, cmdline, pos)
-     local git_completion = "/usr/share/bash-completion/completions/git"
-     if vim.fn.filereadable(git_completion) == 0 then
-       vim.notify(git_completion .. " not found", vim.log.levels.ERROR)
+     local completion_script = "/usr/share/bash-completion/completions/git"
+     if vim.fn.filereadable(completion_script) == 0 then
+       vim.notify(completion_script .. " not found", vim.log.levels.ERROR)
        return {}
      end
 
@@ -344,7 +344,7 @@ vim.api.nvim_create_user_command(
        'source %s;'
        .. ' COMP_WORDS=(%s); COMP_CWORD=%d; COMP_LINE=%s; COMP_POINT=%d;'
        .. ' __git_wrap__git_main; printf "%%s\\n" "${COMPREPLY[@]}"',
-       git_completion, cmd, comp_cword, vim.fn.shellescape(cmd), pos
+       completion_script, cmd, comp_cword, vim.fn.shellescape(cmd), pos
      )})
      -- Bash's COMPREPLY may include trailing spaces; strip them.
      return vim.tbl_map(function(r) return r:gsub(" $", "") end, results)
