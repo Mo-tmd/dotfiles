@@ -9,7 +9,10 @@ if [[ ! -d "$Local" || ! -d "$Remote" ]]; then
 fi
 
 TmpDir=$(mktemp -d /tmp/nvim_difftool.XXXXXX)
+trap 'rm -rf "$TmpDir" 2>/dev/null' ERR INT
+
 LocalCopy="$TmpDir/left"
+echo "$LocalCopy" ## TODO remove
 RemoteCopy="$TmpDir/right"
 cp -r "$Local" "$LocalCopy"
 cp -r "$Remote" "$RemoteCopy"
@@ -20,7 +23,6 @@ SetTmpDir="let t:difftool_tmp_dir='$TmpDir'"
 SetWorkTree="let t:difftool_work_tree='$WorkTree'"
 
 if [[ -n "$NVIM" ]]; then
-    echo "$LocalCopy"
     nvr -cc "if mode()=='t' | let b:LeftInTerminalMode=1 | endif" \
         -cc "lua CloseDiffTool()" \
         -cc "tabnew" \

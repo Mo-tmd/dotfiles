@@ -7,29 +7,46 @@ require("mason-lspconfig").setup()
 -------------------------------------------------------------------------------
 -- lsp root_dir
 -------------------------------------------------------------------------------
--- Resolves a fugitive:// URI to the real file path, or returns nil.
+-- Map a fugitive:// URI bufname to the file path in the working tree.
 local function resolve_fugitive_bufname(bufname)
   if bufname:find("^fugitive://") then
     return vim.fn["fugitive#Real"](bufname)
   end
 end
 
--- Override vim.fs.root to resolve fugitive:// URIs to real file paths so LSP
--- finds the correct root_dir.
+-- Map an nvim_difftool bufname to the file path in the working tree.
+local function resolve_difftool_bufname(bufname)
+  local relative_path = bufname:match("/tmp/nvim_difftool%..*/[^/]+/(.+)$")
+  if not relative_path then return nil end
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    local work_tree = vim.t[tab].difftool_work_tree
+    if work_tree then
+      return work_tree .. "/" .. relative_path
+    end
+  end
+end
+
+-- Map a diff bufname (fugitive or difftool) to the file path in the working tree.
+local function resolve_diff_bufname(bufname)
+  return resolve_fugitive_bufname(bufname) or resolve_difftool_bufname(bufname)
+end
+
+-- Override vim.fs.root to resolve a diff bufname to the file path in the
+-- working tree so LSP finds the correct root_dir.
 local orig_root = vim.fs.root
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.fs.root = function(source, marker)
   if type(source) == "number" then -- lsp only uses buffer number as source.
     local bufname = vim.api.nvim_buf_get_name(source)
-    source = resolve_fugitive_bufname(bufname) or source
+    source = resolve_diff_bufname(bufname) or source
   end
   return orig_root(source, marker)
 end
 
--- Returns the outer dotfiles directory if bufnr is inside it, nil otherwise.
+-- Return the outer dotfiles directory if bufnr is inside it.
 function DotfilesRoot(bufnr)
   local bufname = vim.api.nvim_buf_get_name(bufnr)
-  bufname = resolve_fugitive_bufname(bufname) or bufname
+  bufname = resolve_diff_bufname(bufname) or bufname
   local dotfiles = os.getenv("WorkDotfiles") or os.getenv("Dotfiles")
   if dotfiles and vim.startswith(bufname, dotfiles) then
     return dotfiles
