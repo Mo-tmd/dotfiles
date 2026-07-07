@@ -352,12 +352,17 @@ vim.api.nvim_create_user_command(
      local words = vim.split(text_until_cursor, "%s+")
      local comp_cword = #words - 1 -- 0-based index
 
-     local results = vim.fn.systemlist({"bash", "-c", string.format(
-       'source %s;'
-       .. ' COMP_WORDS=(%s); COMP_CWORD=%d; COMP_LINE=%s; COMP_POINT=%d;'
-       .. ' __git_wrap__git_main; printf "%%s\\n" "${COMPREPLY[@]}"',
-       completion_script, cmd, comp_cword, vim.fn.shellescape(cmd), pos
-     )})
+     local results = vim.fn.systemlist(
+       {"bash",
+        "-c",
+        string.format('source %s; ' ..
+                      'COMP_WORDS=(%s); COMP_CWORD=%d; COMP_LINE=%s; COMP_POINT=%d; ' ..
+                      '__git_wrap__git_main; printf "%%s\\n" "${COMPREPLY[@]}"',
+                      completion_script, cmd, comp_cword, vim.fn.shellescape(cmd), pos
+                     )
+       }
+     )
+
      -- Bash's COMPREPLY may include trailing spaces; strip them.
      return vim.tbl_map(function(r) return r:gsub(" $", "") end, results)
    end
