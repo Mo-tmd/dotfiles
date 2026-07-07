@@ -8,18 +8,25 @@ if [[ ! -d "$Local" || ! -d "$Remote" ]]; then
     exit 1
 fi
 
+TmpDir=$(mktemp -d /tmp/nvim_difftool.XXXXXX)
+LocalCopy="$TmpDir/left"
+RemoteCopy="$TmpDir/right"
+cp -r "$Local" "$LocalCopy"
+cp -r "$Remote" "$RemoteCopy"
+WorkTree=$(git rev-parse --show-toplevel)
+
+DiffToolCmd="DiffTool $LocalCopy $RemoteCopy"
+SetTmpDir="let t:difftool_tmp_dir='$TmpDir'"
+SetWorkTree="let t:difftool_work_tree='$WorkTree'"
+
 if [[ -n "$NVIM" ]]; then
-    TmpDir=$(mktemp -d /tmp/nvim_difftool.XXXXXX)
-    LocalCopy="$TmpDir/left"
-    RemoteCopy="$TmpDir/right"
-    cp -r "$Local" "$LocalCopy"
-    cp -r "$Remote" "$RemoteCopy"
     echo "$LocalCopy"
     nvr -cc "if mode()=='t' | let b:LeftInTerminalMode=1 | endif" \
         -cc "lua CloseDiffTool()" \
         -cc "tabnew" \
-        -cc "DiffTool $LocalCopy $RemoteCopy" \
-        -cc "let t:difftool_tmp_dir='$TmpDir'"
+        -cc "$SetTmpDir" \
+        -cc "$SetWorkTree" \
+        -cc "$DiffToolCmd"
 else
-    nvim -c "DiffTool $Local $Remote"
+    nvim -c "$SetTmpDir" -c "$SetWorkTree" -c "$DiffToolCmd"
 fi

@@ -192,6 +192,9 @@ local function get_diff_windows(tab)
   return vim.tbl_filter(function(w) return vim.wo[w].diff end, vim.api.nvim_tabpage_list_wins(tab))
 end
 
+-- Setup difftool when it's opened:
+-- * Setup colors for the quickfix window.
+-- * Set tab-local variables.
 local difftool_group = vim.api.nvim_create_augroup("MyDiffTool", {clear=true})
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = difftool_group,
@@ -239,7 +242,9 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   end,
 })
 
--- Cleanup tmp_dir and tab-local variables if one of the diff windows is closed.
+-- Cleanup difftool when it's closed:
+-- * Unset tab-local variables.
+-- * Remove tmp_dir and wipeout all buffers under it.
 vim.api.nvim_create_autocmd("WinClosed", {
   group = difftool_group,
   pattern = "*",
@@ -259,10 +264,17 @@ vim.api.nvim_create_autocmd("WinClosed", {
       return
     end
 
-    -- We are in a difftool tab and no longer in a diff layout. Cleanup
-    local dir = vim.t[tab].difftool_tmp_dir
-    if dir then
-      vim.fn.delete(dir, "rf")
+    -- We are in a difftool tab and no longer in a diff layout.
+    -- i.e. difftool is closed. Cleanup
+    local tmp_dir = vim.t[tab].difftool_tmp_dir
+    if tmp_dir then
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        local name = vim.api.nvim_buf_get_name(buf)
+        if name:find(tmp_dir, 1, true) then
+          vim.api.nvim_buf_delete(buf, {force=true})
+        end
+      end
+      vim.fn.delete(tmp_dir, "rf")
     end
     vim.t[tab].difftool_tab = nil
     vim.t[tab].difftool_tmp_dir = nil
