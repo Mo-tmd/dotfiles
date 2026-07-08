@@ -319,17 +319,27 @@ vim.keymap.set("n", "<leader>cd", CloseDiff)
 vim.api.nvim_create_user_command(
   "Gdt",
   function(opts)
-    local dir = vim.fn.FugitiveWorkTree()
-    local stderr = {}
-    vim.fn.jobstart(string.format("git -C %s difftool -d -y %s", vim.fn.shellescape(dir), opts.args), {
-      stderr_buffered = true,
-      on_stderr = function(_, data)
-        stderr = data
-      end,
+    local work_tree = vim.fn.shellescape(vim.fn.FugitiveWorkTree())
+
+    vim.fn.jobstart(string.format("git -C %s diff --quiet %s", work_tree, opts.args), {
       on_exit = function(_, code)
-        if code ~= 0 and #stderr > 0 then
-          vim.notify(table.concat(stderr, "\n"), vim.log.levels.ERROR)
+        if code == 0 then
+          vim.notify("No differences", vim.log.levels.INFO)
+          return
         end
+
+        local stderr = {}
+        vim.fn.jobstart(string.format("git -C %s difftool -d -y %s", work_tree, opts.args), {
+          stderr_buffered = true,
+          on_stderr = function(_, data)
+            stderr = data
+          end,
+          on_exit = function(_, exit_code)
+            if exit_code ~= 0 and #stderr > 0 then
+              vim.notify(table.concat(stderr, "\n"), vim.log.levels.ERROR)
+            end
+          end,
+        })
       end,
     })
   end,
