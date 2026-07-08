@@ -16,7 +16,7 @@ end
 
 -- Map an nvim_difftool bufname to the file path in the working tree.
 local function resolve_difftool_bufname(bufname)
-  local relative_path = bufname:match("/tmp/nvim_difftool%..*/[^/]+/(.+)$")
+  local relative_path = bufname:match("/tmp/nvim_difftool%.[^/]+/[^/]+/(.+)$")
   if not relative_path then return nil end
   for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
     local work_tree = vim.t[tab].difftool_work_tree
