@@ -12,7 +12,6 @@ TmpDir=$(mktemp -d /tmp/nvim_difftool.XXXXXX)
 trap 'rm -rf "$TmpDir" 2>/dev/null' ERR INT
 
 LocalCopy="$TmpDir/left"
-echo "$LocalCopy" ## TODO remove
 RemoteCopy="$TmpDir/right"
 cp -r "$Local" "$LocalCopy"
 cp -r "$Remote" "$RemoteCopy"

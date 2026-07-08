@@ -281,41 +281,6 @@ vim.api.nvim_create_autocmd("WinClosed", {
   end
 })
 
-local function close_left_diff_window()
-  local diff_wins = get_diff_windows(0)
-  if #diff_wins < 2 then return end
-  local win = diff_wins[1]
-  local buf = vim.api.nvim_win_get_buf(win)
-  if #vim.fn.win_findbuf(buf) == 1 then
-    vim.cmd("bwipeout! " .. buf)
-  else
-    vim.api.nvim_win_close(win, true)
-  end
-end
-
-function CloseDiffTool()
-  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
-    if vim.t[tab].difftool_tab then
-      if #vim.api.nvim_list_tabpages() > 1 then
-        vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
-      else
-        close_left_diff_window()
-      end
-      return
-    end
-  end
-end
-
-function CloseDiff()
-  if vim.t.difftool_tab then
-    CloseDiffTool()
-  else
-    close_left_diff_window()
-  end
-end
-
-vim.keymap.set("n", "<leader>cd", CloseDiff)
-
 vim.api.nvim_create_user_command(
   "Gdt",
   function(opts)
@@ -378,6 +343,41 @@ vim.api.nvim_create_user_command(
    end
   }
 )
+
+local function close_left_diff_window()
+  local diff_wins = get_diff_windows(0)
+  if #diff_wins < 2 then return end
+  local win = diff_wins[1]
+  local buf = vim.api.nvim_win_get_buf(win)
+  if #vim.fn.win_findbuf(buf) == 1 then
+    vim.cmd("bwipeout! " .. buf)
+  else
+    vim.api.nvim_win_close(win, true)
+  end
+end
+
+function CloseDiffTool()
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    if vim.t[tab].difftool_tab then
+      if #vim.api.nvim_list_tabpages() > 1 then
+        vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
+      else
+        close_left_diff_window()
+      end
+      return
+    end
+  end
+end
+
+function CloseDiff()
+  if vim.t.difftool_tab then
+    CloseDiffTool()
+  else
+    close_left_diff_window()
+  end
+end
+
+vim.keymap.set("n", "<leader>cd", CloseDiff)
 
 --------------------------------------------------------------------------------
 -- User Interface
