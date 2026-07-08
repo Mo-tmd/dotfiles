@@ -5,8 +5,9 @@
 ## Git
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 alias gs{separator}'git status'
-alias gd{separator}'git difftool -d'
-alias gdp{separator}'git diff -p --color=never'
+alias gd{separator}'git diff'
+alias gdt{separator}'git difftool -d'
+alias gdp{separator}'gd -p --color=never'
 alias ga{separator}'git add'
 alias gc{separator}'git commit'
 alias push{separator}'git push'
