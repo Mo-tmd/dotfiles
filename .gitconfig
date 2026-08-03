@@ -14,3 +14,8 @@
     ui = always
 [safe]
     directory = *
+[diff]
+    tool = nvim_difftool
+    trustExitCode = true
+[difftool "nvim_difftool"]
+    cmd = "nvim_difftool $LOCAL $REMOTE"

@@ -184,6 +184,209 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 --------------------------------------------------------------------------------
+-- DiffTool
+--------------------------------------------------------------------------------
+vim.cmd("packadd nvim.difftool")
+
+DiffToolState = {
+  tab = nil,
+  tmp_dir = nil,
+  work_tree = nil,
+}
+
+local function get_diff_windows(tab)
+  return vim.tbl_filter(function(w) return vim.wo[w].diff end, vim.api.nvim_tabpage_list_wins(tab))
+end
+
+-- Setup difftool when it's opened:
+-- * Setup colors for the quickfix window.
+-- * Set DiffToolState.
+local difftool_group = vim.api.nvim_create_augroup("MyDiffTool", {clear=true})
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  group = difftool_group,
+  pattern = "quickfix",
+  callback = function(ev)
+    local qf = vim.fn.getqflist({ title = 0 })
+    if qf.title ~= "DiffTool" then
+      return
+    end
+
+    DiffToolState.tab = vim.api.nvim_get_current_tabpage()
+
+    -- vim.schedule ensures this runs after nvim.difftool's own BufWinEnter
+    vim.schedule(function()
+      -- difftool's setup_layout may destroy and recreate the qf window before
+      -- this callback runs (if DiffTool is called twice?). Bail out if the
+      -- buffer is no longer visible and wait for next BufWinEnter event.
+      local win = vim.fn.bufwinid(ev.buf)
+      if win == -1 then return end
+
+      vim.api.nvim_set_hl(0, "MyDiffAdd",      {fg="#28e90f", bold=true})
+      vim.api.nvim_set_hl(0, "MyDiffDelete",   {fg="#ff0000", bold=true})
+      vim.api.nvim_set_hl(0, "MyDiffText",     {fg="#fabd2f", bold=true})
+      vim.api.nvim_set_hl(0, "MyQuickFixLine", {bg="#504945", bold=true})
+      vim.api.nvim_set_option_value("winhl", "QuickFixLine:MyQuickFixLine", {win=win})
+
+      vim.api.nvim_buf_clear_namespace(ev.buf, vim.api.nvim_create_namespace("nvim.difftool.hl"), 0, -1)
+      local ns = vim.api.nvim_create_namespace("my_difftool_override")
+      vim.api.nvim_buf_clear_namespace(ev.buf, ns, 0, -1)
+
+      local lines = vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false)
+      for i, line in ipairs(lines) do
+        local status = line:match("^(%S)")
+        local hl =
+          (status == "A" and "MyDiffAdd")
+          or (status == "D" and "MyDiffDelete")
+          or (status == "M" and "MyDiffText")
+          or (status == "R" and "MyDiffText")
+
+        if hl then
+          vim.hl.range(ev.buf, ns, hl, { i - 1, 0 }, { i - 1, 1 })
+        end
+      end
+    end)
+  end,
+})
+
+-- Cleanup difftool when it's closed:
+-- * Clear DiffToolState.
+-- * Remove tmp_dir and wipeout all buffers under it.
+vim.api.nvim_create_autocmd("WinClosed", {
+  group = difftool_group,
+  pattern = "*",
+  callback = function(ev)
+    local win = tonumber(ev.match) or -1
+    if is_floating_window(win) then
+      return
+    end
+    local tab = vim.api.nvim_win_get_tabpage(win)
+
+    if DiffToolState.tab ~= tab then
+      -- Not a difftool tab
+      return
+    end
+
+    local diff_wins = vim.tbl_filter(function(w) return w ~= win end, get_diff_windows(tab))
+    if #diff_wins >= 2 then
+      -- There are still at least two diff windows
+      return
+    end
+
+    -- We are in a difftool tab and no longer in a diff layout.
+    -- i.e. difftool is closed. Cleanup
+    vim.schedule(function()
+      if DiffToolState.tmp_dir then
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+          local name = vim.api.nvim_buf_get_name(buf)
+          if name:find(DiffToolState.tmp_dir, 1, true) then
+            vim.api.nvim_buf_delete(buf, {force=true})
+          end
+        end
+        vim.fn.delete(DiffToolState.tmp_dir, "rf")
+      end
+      DiffToolState.tab = nil
+      DiffToolState.tmp_dir = nil
+      DiffToolState.work_tree = nil
+    end)
+  end
+})
+
+vim.api.nvim_create_user_command(
+  "Gdt",
+  function(opts)
+    local work_tree = vim.fn.shellescape(vim.fn.FugitiveWorkTree())
+
+    vim.fn.jobstart(string.format("git -C %s diff --quiet %s", work_tree, opts.args), {
+      on_exit = function(_, code)
+        if code == 0 then
+          vim.notify("No differences", vim.log.levels.INFO)
+          return
+        end
+
+        local stderr = {}
+        vim.fn.jobstart(string.format("git -C %s difftool -d -y %s", work_tree, opts.args), {
+          stderr_buffered = true,
+          on_stderr = function(_, data)
+            stderr = data
+          end,
+          on_exit = function(_, exit_code)
+            if exit_code ~= 0 and #stderr > 0 then
+              vim.notify(table.concat(stderr, "\n"), vim.log.levels.ERROR)
+            end
+          end,
+        })
+      end,
+    })
+  end,
+  {nargs = "*",
+   complete = function(_, cmdline, pos)
+     local completion_script = "/usr/share/bash-completion/completions/git"
+     if vim.fn.filereadable(completion_script) == 0 then
+       vim.notify(completion_script .. " not found", vim.log.levels.ERROR)
+       return {}
+     end
+
+     -- Translate ":Gdt <args>" into "git -C <dir> difftool <args>" for bash completion
+     local nvim_cmd_prefix, args = cmdline:match("^(%S+)(.*)")
+     local cmd_prefix = string.format("git -C %s difftool", vim.fn.shellescape(vim.fn.FugitiveWorkTree()))
+     local cmd = cmd_prefix .. args
+     pos = pos + #cmd_prefix - #nvim_cmd_prefix
+
+     -- Determine which word the cursor is on
+     local text_until_cursor = cmd:sub(1, pos)
+     local words = vim.split(text_until_cursor, "%s+")
+     local comp_cword = #words - 1 -- 0-based index
+
+     local results = vim.fn.systemlist(
+       {"bash",
+        "-c",
+        string.format('source %s; ' ..
+                      'COMP_WORDS=(%s); COMP_CWORD=%d; COMP_LINE=%s; COMP_POINT=%d; ' ..
+                      '__git_wrap__git_main; printf "%%s\\n" "${COMPREPLY[@]}"',
+                      completion_script, cmd, comp_cword, vim.fn.shellescape(cmd), pos
+                     )
+       }
+     )
+
+     -- Bash's COMPREPLY may include trailing spaces; strip them.
+     return vim.tbl_map(function(r) return r:gsub(" $", "") end, results)
+   end
+  }
+)
+
+local function close_left_diff_window()
+  local diff_wins = get_diff_windows(0)
+  if #diff_wins == 0 then return end
+  local win = diff_wins[1]
+  local buf = vim.api.nvim_win_get_buf(win)
+  if #vim.fn.win_findbuf(buf) == 1 then
+    vim.cmd("bwipeout! " .. buf)
+  else
+    vim.api.nvim_win_close(win, true)
+  end
+end
+
+function CloseDiffTool()
+  if DiffToolState.tab then
+    if #vim.api.nvim_list_tabpages() > 1 then
+      vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(DiffToolState.tab))
+    else
+      close_left_diff_window()
+    end
+  end
+end
+
+function CloseDiff()
+  if vim.api.nvim_get_current_tabpage() == DiffToolState.tab then
+    CloseDiffTool()
+  else
+    close_left_diff_window()
+  end
+end
+
+vim.keymap.set("n", "<leader>cd", CloseDiff)
+
+--------------------------------------------------------------------------------
 -- User Interface
 --------------------------------------------------------------------------------
 -- Print a table in a Scratch buffer

@@ -123,6 +123,8 @@ function! PlugPostHooks()
                       \ )
 endfunction
 
+set diffopt+=context:999999
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Text
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -310,6 +312,9 @@ nnoremap <leader>nc :NERDTreeFind<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-fugitive
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Disable fugitive's automatic diffoff.
+autocmd BufWinEnter fugitive://* augroup fugitive_diff | autocmd! | augroup END
+
 " The command and function wrappers for diffsplit are ugly, but I found no better
 " way
 exe 'command! -bar -bang -nargs=* -complete=customlist,fugitive#EditComplete Gd exe MyDiffsplit(0, <bang>0, "vertical <mods>", <q-args>)'
@@ -318,25 +323,6 @@ function! MyDiffsplit(...) abort
     call call('fugitive#Diffsplit', a:000)
     set splitright
     wincmd l
-endfunction
-
-nnoremap <leader>cd :call CloseDiff()<CR>
-function! CloseDiff()
-    let l:Windows = range(1, winnr('$')) " Iterate through all windows in the current tab.
-    for l:Window in l:Windows
-        let l:Buffer = winbufnr(l:Window)
-        if bufname(l:Buffer) =~ '^fugitive:///.*\.git.*//\S\+'
-            let l:AllBufferWindows = win_findbuf(l:Buffer)
-            if len(l:AllBufferWindows) == 1
-                " The buffer doesn't exist in other windows, just wipeout.
-                execute 'bwipeout! ' . l:Buffer
-            elseif len(l:AllBufferWindows) > 1
-                " The buffer exists in other windows. Just close the window.
-                call win_execute(win_getid(l:Window), 'close')
-            endif
-            break
-        endif
-    endfor
 endfunction
 
 command! -nargs=* Gs call GitShow(<f-args>)
