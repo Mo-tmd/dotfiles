@@ -17,9 +17,9 @@ cp -r "$Local" "$LocalCopy"
 cp -r "$Remote" "$RemoteCopy"
 WorkTree=$(git rev-parse --show-toplevel)
 
+SetTmpDir="lua DiffToolState.tmp_dir='$TmpDir'"
+SetWorkTree="lua DiffToolState.work_tree='$WorkTree'"
 DiffToolCmd="DiffTool $LocalCopy $RemoteCopy"
-SetTmpDir="let t:difftool_tmp_dir='$TmpDir'"
-SetWorkTree="let t:difftool_work_tree='$WorkTree'"
 
 if [[ -n "$NVIM" ]]; then
     nvr -cc "if mode()=='t' | let b:LeftInTerminalMode=1 | endif" \

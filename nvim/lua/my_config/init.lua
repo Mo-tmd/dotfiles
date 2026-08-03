@@ -188,13 +188,19 @@ vim.api.nvim_create_autocmd('FileType', {
 --------------------------------------------------------------------------------
 vim.cmd("packadd nvim.difftool")
 
+DiffToolState = {
+  tab = nil,
+  tmp_dir = nil,
+  work_tree = nil,
+}
+
 local function get_diff_windows(tab)
   return vim.tbl_filter(function(w) return vim.wo[w].diff end, vim.api.nvim_tabpage_list_wins(tab))
 end
 
 -- Setup difftool when it's opened:
 -- * Setup colors for the quickfix window.
--- * Set tab-local variables.
+-- * Set DiffToolState.
 local difftool_group = vim.api.nvim_create_augroup("MyDiffTool", {clear=true})
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = difftool_group,
@@ -205,7 +211,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
       return
     end
 
-    vim.t.difftool_tab = true
+    DiffToolState.tab = vim.api.nvim_get_current_tabpage()
 
     -- vim.schedule ensures this runs after nvim.difftool's own BufWinEnter
     vim.schedule(function()
@@ -243,17 +249,17 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 })
 
 -- Cleanup difftool when it's closed:
--- * Unset tab-local variables.
+-- * Clear DiffToolState.
 -- * Remove tmp_dir and wipeout all buffers under it.
 vim.api.nvim_create_autocmd("WinClosed", {
   group = difftool_group,
   pattern = "*",
-  nested = true,
   callback = function(ev)
     local win = tonumber(ev.match) or -1
+    -- if not vim.api.nvim_win_is_valid(win) then return end
     local tab = vim.api.nvim_win_get_tabpage(win)
 
-    if not vim.t[tab].difftool_tab then
+    if DiffToolState.tab ~= tab then
       -- Not a difftool tab
       return
     end
@@ -266,18 +272,20 @@ vim.api.nvim_create_autocmd("WinClosed", {
 
     -- We are in a difftool tab and no longer in a diff layout.
     -- i.e. difftool is closed. Cleanup
-    local tmp_dir = vim.t[tab].difftool_tmp_dir
-    if tmp_dir then
-      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        local name = vim.api.nvim_buf_get_name(buf)
-        if name:find(tmp_dir, 1, true) then
-          vim.api.nvim_buf_delete(buf, {force=true})
+    vim.schedule(function()
+      if DiffToolState.tmp_dir then
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+          local name = vim.api.nvim_buf_get_name(buf)
+          if name:find(DiffToolState.tmp_dir, 1, true) then
+            vim.api.nvim_buf_delete(buf, {force=true})
+          end
         end
+        vim.fn.delete(DiffToolState.tmp_dir, "rf")
       end
-      vim.fn.delete(tmp_dir, "rf")
-    end
-    vim.t[tab].difftool_tab = nil
-    vim.t[tab].difftool_tmp_dir = nil
+      DiffToolState.tab = nil
+      DiffToolState.tmp_dir = nil
+      DiffToolState.work_tree = nil
+    end)
   end
 })
 
@@ -357,20 +365,17 @@ local function close_left_diff_window()
 end
 
 function CloseDiffTool()
-  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
-    if vim.t[tab].difftool_tab then
-      if #vim.api.nvim_list_tabpages() > 1 then
-        vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
-      else
-        close_left_diff_window()
-      end
-      return
+  if DiffToolState.tab then
+    if #vim.api.nvim_list_tabpages() > 1 then
+      vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(DiffToolState.tab))
+    else
+      close_left_diff_window()
     end
   end
 end
 
 function CloseDiff()
-  if vim.t.difftool_tab then
+  if vim.api.nvim_get_current_tabpage() == DiffToolState.tab then
     CloseDiffTool()
   else
     close_left_diff_window()
