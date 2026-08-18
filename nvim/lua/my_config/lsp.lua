@@ -56,7 +56,7 @@ vim.lsp.enable("lua_ls")
 vim.lsp.enable("vimls")
 vim.lsp.enable("clangd")
 vim.lsp.enable("bashls")
-vim.lsp.enable("erlangls")
+vim.lsp.enable("elp")
 vim.lsp.enable("jdtls")
 
 vim.api.nvim_create_autocmd("LspAttach", {
