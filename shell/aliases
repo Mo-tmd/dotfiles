@@ -50,6 +50,7 @@ alias source_tmux_conf='[[ -n "$TMUX" ]] && tmux source-file ~/.tmux.conf'
 mywhich() { which $@ | sed 's/^\([^[:space:]]\)\+=//'; }
 prettyxml() { if [[ -f "$1" ]]; then xmllint --format "$1"; else echo "$1" | xmllint --format -; fi; }
 filter_pcap() { tshark -Y "$1" -r "$2" -w "$2_filtered" > /dev/null; }
+rgm() { rg -U "$1(?:.*\n){0,$3}.*$2"; }
 
 ################################################################################
 # Aliases specific to zsh
@@ -71,3 +72,4 @@ alias saf 'source "$Dotfiles/shell/tcsh/rc.tcsh"; source_tmux_conf'
 alias mywhich 'which \!* | sed "s/^[^[:space:]]\+:[[:space:]]\+aliased[[:space:]]\+to[[:space:]]//"'
 alias prettyxml 'test -f \!:1 && xmllint --format \!:1 || echo \!:1 | xmllint --format -'
 alias filter_pcap 'tshark -r \!:1 -Y \!:2 -w \!:1_filtered > /dev/null'
+alias rgm 'rg -U "\!:1(?:.*\n){0,\!:3}.*\!:2"'
