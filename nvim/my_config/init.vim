@@ -113,7 +113,7 @@ endfunction
 set autoread
 autocmd FocusGained,BufEnter,WinEnter,CursorHold,CursorHoldI * call timer_start(1, { -> execute('if getcmdwintype() == "" | checktime | endif') })
 
-au TermOpen * if bufname('%') !~# 'fzf' | setlocal number relativenumber | endif
+au TermOpen * if bufname() !~# 'fzf' | setlocal number relativenumber | endif
 call term#define('<leader>td', 'Dotfiles', 'cd ~/dotfiles')
 
 function! PlugPostHooks()
@@ -378,7 +378,7 @@ function! TryMyMan(Args)
     let l:FirstManWindow = GetFirstManWindow()
     if (l:FirstManWindow == 0)
         exec 'Man ' . a:Args
-        let l:ManBuffer = bufnr('%')
+        let l:ManBuffer = bufnr()
         q
         exec 'buffer! ' . l:ManBuffer
     else
