@@ -47,7 +47,7 @@ function! s:update_windows_buffer_history()
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Keeps a global buffer history (not specific to windows). GoToAlternateBuffer()
+" Keeps a global buffer history (not specific to windows). alternate_buffer#go()
 " falls back to it if there are no existing buffers in the window specific history.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! s:update_global_buffer_history()

@@ -361,7 +361,7 @@ function! s:my_man(args)
         echohl None
     finally
         if (&filetype == 'man')
-            exec 'nnoremap <silent> <buffer> q :call GoToAlternateBuffer()<CR>'
+            exec 'nnoremap <silent> <buffer> q :call alternate_buffer#go()<CR>'
             if bufname() !~ '^\d\+ man'
                 " There's a bug in Man when invoked as a MANPAGER. It would crash if there's
                 " already an existing buffer with the same name as the new man page.
