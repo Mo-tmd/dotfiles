@@ -38,7 +38,7 @@ call term#map('ii', '')
 nnoremap <silent> <CR> :noh<CR><CR>
 
 nnoremap <leader>q :q<CR>
-tnoremap <leader>q <C-\><C-n>:let b:LeftInTerminalMode=1<CR>:q<CR>
+tnoremap <leader>q <C-\><C-n>:let b:left_in_terminal_mode=1<CR>:q<CR>
 
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
@@ -69,37 +69,37 @@ set splitbelow
 set splitright
 
 " Reload File
-nnoremap <leader>rf :call ReloadFile()<CR>
-function! ReloadFile()
-    let l:FilePath = expand('%:p')
+nnoremap <leader>rf :call <SID>reload_file()<CR>
+function! s:reload_file()
+    let file_path = expand('%:p')
     call KillBuffer()
-    execute 'edit ' . l:FilePath
+    execute 'edit ' . file_path
 endfunction
 
 " Kill buffer
 nnoremap <leader>kb :call KillBuffer()<CR>
 call term#map('<leader>kb', ':call KillBuffer()<CR>')
 function! KillBuffer()
-    let l:BufferToKill = bufnr()
-    let l:AlternateBuffer = alternate_buffer#get()
-    if l:AlternateBuffer != -1
-        execute 'buffer! ' . l:AlternateBuffer
+    let buffer_to_kill = bufnr()
+    let alternate_buffer = alternate_buffer#get()
+    if alternate_buffer != -1
+        execute 'buffer! ' . alternate_buffer
     else
         execute 'enew'
     endif
-    if bufexists(l:BufferToKill)
-        execute 'bwipeout! ' . l:BufferToKill
+    if bufexists(buffer_to_kill)
+        execute 'bwipeout! ' . buffer_to_kill
     else
         : " Probably buhidden=wipe
     endif
 endfunction
 
-nnoremap <leader>sc :call ScratchBuffer()<CR>
-function! ScratchBuffer()
-    let l:BufferName = 'Scratch Buffer'
-    if GoToBuffer(l:BufferName) != 'ok'
+nnoremap <leader>sc :call <SID>scratch_buffer()<CR>
+function! s:scratch_buffer()
+    let bufname = 'Scratch Buffer'
+    if GoToBuffer(bufname) != 'ok'
         enew
-        execute 'file ' . l:BufferName
+        execute 'file ' . bufname
         setlocal buftype=nofile
         setlocal bufhidden=hide
         setlocal nobuflisted
@@ -201,7 +201,7 @@ let g:strip_whitespace_confirm = 0
 " fzf
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <leader>b :Telescope buffers<CR>
-call term#map('<leader>b', ':let b:LeftInTerminalMode=1<CR>:Telescope buffers<CR>')
+call term#map('<leader>b', ':let b:left_in_terminal_mode=1<CR>:Telescope buffers<CR>')
 
 autocmd FileType fzf nnoremap <silent> <buffer> <Esc> :q<CR>
 autocmd FileType fzf autocmd WinLeave <buffer> close
@@ -213,84 +213,84 @@ nnoremap <silent> <leader>af
   \    'full': 1
   \   }
   \  )<CR>
-call term#map('<leader>af', ':let b:LeftInTerminalMode=1<CR><leader>af', 1)
+call term#map('<leader>af', ':let b:left_in_terminal_mode=1<CR><leader>af', 1)
 
-let g:MyRgExcludePaths = ['.git/', '**/.m2/repository/', '**/python*/site-packages/', '.cache/', '**/mason/packages/', '**/.config/google-chrome/', '**/.config/Code/', '**/.config/nvim/', '.eclipse/']
+let g:my_rg_exclude_paths = ['.git/', '**/.m2/repository/', '**/python*/site-packages/', '.cache/', '**/mason/packages/', '**/.config/google-chrome/', '**/.config/Code/', '**/.config/nvim/', '.eclipse/']
 nnoremap <silent> <leader>f
   \ :call FzfFindFiles(
   \   {'search_dirs': ['~', getcwd()],
-  \    'rg_exclude_paths': g:MyRgExcludePaths,
+  \    'rg_exclude_paths': g:my_rg_exclude_paths,
   \    'full': 0
   \   }
   \  )<CR>
-call term#map('<leader>f', ':let b:LeftInTerminalMode=1<CR><leader>f', 1)
+call term#map('<leader>f', ':let b:left_in_terminal_mode=1<CR><leader>f', 1)
 
-let s:MyRgCmd = 'rg --no-config --hidden --follow --no-messages'
-function! FzfFindFiles(Args)
-    let l:SearchDirectories = get(a:Args, 'search_dirs',      [])
-    let l:RgExcludePaths    = get(a:Args, 'rg_exclude_paths', [])
-    let l:Full              = get(a:Args, 'full')
-    let l:SearchDirectories = s:ProcessSearchDirectories(l:SearchDirectories)
-    let l:RgExcludePaths = s:ProcessRgExcludePaths(l:RgExcludePaths)
-    let l:RgCmd = (l:Full ? s:MyRgCmd.' --no-ignore' : s:MyRgCmd)
-    let l:RgCmd = printf('%s %s --files -- %s', l:RgCmd, l:RgExcludePaths, l:SearchDirectories)
-    call fzf#run(fzf#wrap(fzf#vim#with_preview({'source': l:RgCmd})))
+let s:my_rg_cmd = 'rg --no-config --hidden --follow --no-messages'
+function! FzfFindFiles(args)
+    let search_directories = get(a:args, 'search_dirs',      [])
+    let rg_exclude_paths    = get(a:args, 'rg_exclude_paths', [])
+    let full              = get(a:args, 'full')
+    let search_directories = s:process_search_directories(search_directories)
+    let rg_exclude_paths = s:process_rg_exclude_paths(rg_exclude_paths)
+    let rg_cmd = (full ? s:my_rg_cmd.' --no-ignore' : s:my_rg_cmd)
+    let rg_cmd = printf('%s %s --files -- %s', rg_cmd, rg_exclude_paths, search_directories)
+    call fzf#run(fzf#wrap(fzf#vim#with_preview({'source': rg_cmd})))
 endfunction
 
-" e.g. s:ProcessSearchDirectories(['~', '/home/<User>', '/path with spaces', '~/dotfiles']) returns a string:
+" e.g. s:process_search_directories(['~', '/home/<User>', '/path with spaces', '~/dotfiles']) returns a string:
 " `'/home/<User>' '/path with spaces'`
-function! s:ProcessSearchDirectories(Directories)
-    let l:Directories = copy(a:Directories)
-    call map(l:Directories, 'expand(v:val)') " Expand paths.
+function! s:process_search_directories(directories)
+    let directories = copy(a:directories)
+    call map(directories, 'expand(v:val)') " Expand paths.
     " Remove duplicates and directories whose parents are already in search_dirs
-    call map(l:Directories, 'substitute(v:val, "/$", "", "")') " Remove trailing slashes.
-    call sort(l:Directories)
-    if len(l:Directories) > 1
-        for l:PossibleChildIndex in reverse(range(1, len(l:Directories)-1))
-            for l:PossibleParentIndex in range(0, l:PossibleChildIndex-1)
-                if l:Directories[l:PossibleChildIndex] =~# '^' . l:Directories[l:PossibleParentIndex] . '\(/\|$\)'
-                    call remove(l:Directories, l:PossibleChildIndex)
+    call map(directories, 'substitute(v:val, "/$", "", "")') " Remove trailing slashes.
+    call sort(directories)
+    if len(directories) > 1
+        for possible_child_index in reverse(range(1, len(directories)-1))
+            for possible_parent_index in range(0, possible_child_index-1)
+                if directories[possible_child_index] =~# '^' . directories[possible_parent_index] . '\(/\|$\)'
+                    call remove(directories, possible_child_index)
                     break
                 endif
             endfor
         endfor
     endif
-    call map(l:Directories, 'fzf#shellescape(v:val)')
-    return join(l:Directories, ' ') " Convert the list to a string with space separated directories
+    call map(directories, 'fzf#shellescape(v:val)')
+    return join(directories, ' ') " Convert the list to a string with space separated directories
 endfunction
 
-" e.g. s:ProcessRgExcludePaths(['some_dir/', '**/some dir/*.beam']) returns a string:
+" e.g. s:process_rg_exclude_paths(['some_dir/', '**/some dir/*.beam']) returns a string:
 " `-g '!some_dir' -g '!**/some folder/*.beam'`
-function! s:ProcessRgExcludePaths(Paths)
-    let l:Paths = copy(a:Paths)
-    call map(l:Paths, '"!" . v:val') " Prefix with `!`
-    call map(l:Paths, 'fzf#shellescape(v:val)')
-    call map(l:Paths, '"-g " . v:val') " Prefix with `-g `
-    return join(l:Paths, ' ') " Convert the list to a string with space separated arguments
+function! s:process_rg_exclude_paths(paths)
+    let paths = copy(a:paths)
+    call map(paths, '"!" . v:val') " Prefix with `!`
+    call map(paths, 'fzf#shellescape(v:val)')
+    call map(paths, '"-g " . v:val') " Prefix with `-g `
+    return join(paths, ' ') " Convert the list to a string with space separated arguments
 endfunction
 
 " e.g. :Mrg ~/path\ with\ spaces some search query
-command! -bang -nargs=+ -complete=file Mrg call MyRipGrep(<q-args>, <bang>0)
-function! MyRipGrep(PathAndQuery, Full)
-    for i in range(0, len(a:PathAndQuery)-1)
-        if a:PathAndQuery[i] == ' ' && a:PathAndQuery[i-1] != '\'
-            let l:Path = strpart(a:PathAndQuery, 0, i)
-            let l:Query = strpart(a:PathAndQuery, i+1)
+command! -bang -nargs=+ -complete=file Mrg call <SID>my_rip_grep(<q-args>, <bang>0)
+function! s:my_rip_grep(path_and_query, full)
+    for i in range(0, len(a:path_and_query)-1)
+        if a:path_and_query[i] == ' ' && a:path_and_query[i-1] != '\'
+            let path = strpart(a:path_and_query, 0, i)
+            let query = strpart(a:path_and_query, i+1)
             break
-        elseif i == len(a:PathAndQuery)-1
-            let l:Path = a:PathAndQuery
-            let l:Query = ''
+        elseif i == len(a:path_and_query)-1
+            let path = a:path_and_query
+            let query = ''
         endif
     endfor
-    let l:Path = substitute(l:Path, '\\ ', ' ', 'g') " Unescape spaces.
-    let l:Path = expand(l:Path)
-    let l:Cmd = printf('%s %s --column --line-number --no-heading --with-filename --color=always --smart-case -- %s %s || true',
-      \                s:MyRgCmd,
-      \                (a:Full ? '--no-ignore --binary' : '-g '.fzf#shellescape('!.git/')),
-      \                fzf#shellescape(l:Query),
-      \                fzf#shellescape(l:Path)
+    let path = substitute(path, '\\ ', ' ', 'g') " Unescape spaces.
+    let path = expand(path)
+    let cmd = printf('%s %s --column --line-number --no-heading --with-filename --color=always --smart-case -- %s %s || true',
+      \                s:my_rg_cmd,
+      \                (a:full ? '--no-ignore --binary' : '-g '.fzf#shellescape('!.git/')),
+      \                fzf#shellescape(query),
+      \                fzf#shellescape(path)
       \               )
-    call fzf#vim#grep(l:Cmd, fzf#vim#with_preview(), 0)
+    call fzf#vim#grep(cmd, fzf#vim#with_preview(), 0)
 endfunction
 
 command! -bang -nargs=* Gg
@@ -317,28 +317,28 @@ autocmd BufWinEnter fugitive://* augroup fugitive_diff | autocmd! | augroup END
 
 " The command and function wrappers for diffsplit are ugly, but I found no better
 " way
-exe 'command! -bar -bang -nargs=* -complete=customlist,fugitive#EditComplete Gd exe MyDiffsplit(0, <bang>0, "vertical <mods>", <q-args>)'
-function! MyDiffsplit(...) abort
+exe 'command! -bar -bang -nargs=* -complete=customlist,fugitive#EditComplete Gd exe <SID>my_diffsplit(0, <bang>0, "vertical <mods>", <q-args>)'
+function! s:my_diffsplit(...) abort
     set nosplitright
     call call('fugitive#Diffsplit', a:000)
     set splitright
     wincmd l
 endfunction
 
-command! -nargs=* Gs call GitShow(<f-args>)
-function! GitShow(...)
-    let l:Commit = len(a:000) > 0 ? a:000[0] : 'HEAD'
-    let l:File = len(a:000) > 1 ? a:000[1] : ''
-    exec printf('G difftool -y %s~1 %s %s', l:Commit, l:Commit, l:File)
+command! -nargs=* Gs call <SID>git_show(<f-args>)
+function! s:git_show(...)
+    let commit = len(a:000) > 0 ? a:000[0] : 'HEAD'
+    let file = len(a:000) > 1 ? a:000[1] : ''
+    exec printf('G difftool -y %s~1 %s %s', commit, commit, file)
 endfunction
 
 " TODO this doesn't handle renames.
-command! Grb call GitRecursiveBlame()
-function! GitRecursiveBlame()
-    let l:ReblameMapping = execute('nmap -')
-    let l:FugitiveScript = matchstr(l:ReblameMapping, '<SNR>\d\+_')
-    let [l:Commit, l:Path, l:Lnum] = call(l:FugitiveScript . 'BlameCommitFileLnum', [])
-    call GitShow(expand('<cword>'), l:Path)
+command! Grb call <SID>git_recursive_blame()
+function! s:git_recursive_blame()
+    let reblame_mapping = execute('nmap -')
+    let fugitive_script = matchstr(reblame_mapping, '<SNR>\d\+_')
+    let [commit, path, lnum] = call(fugitive_script . 'BlameCommitFileLnum', [])
+    call <SID>git_show(expand('<cword>'), path)
 endfunction
 
 nnoremap <leader>gg :G grep -iF -- <C-r>=shellescape(expand('<cword>'))<CR><CR>
@@ -351,10 +351,10 @@ xnoremap <silent> <leader>GG y:<C-u>G grep -F -- <C-r>=shellescape(@")<CR><CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 autocmd filetype man setlocal number relativenumber | setlocal nowrap
 
-command! -nargs=* -complete=customlist,v:lua.require'man'.man_complete Mn call MyMan(<q-args>)
-function! MyMan(Args)
+command! -nargs=* -complete=customlist,v:lua.require'man'.man_complete Mn call <SID>my_man(<q-args>)
+function! s:my_man(args)
     try
-        call TryMyMan(a:Args)
+        call <SID>try_my_man(a:args)
     catch
         echohl ErrorMsg
         echom v:exception
@@ -374,31 +374,31 @@ function! MyMan(Args)
     endtry
 endfunction
 
-function! TryMyMan(Args)
-    let l:FirstManWindow = GetFirstManWindow()
-    if (l:FirstManWindow == 0)
-        exec 'Man ' . a:Args
-        let l:ManBuffer = bufnr()
+function! s:try_my_man(args)
+    let first_man_window = <SID>get_first_man_window()
+    if (first_man_window == 0)
+        exec 'Man ' . a:args
+        let man_buffer = bufnr()
         q
-        exec 'buffer! ' . l:ManBuffer
+        exec 'buffer! ' . man_buffer
     else
-        if (&filetype != 'man') | exec 'buffer! ' . winbufnr(l:FirstManWindow) | endif
-        exec 'Man ' . a:Args
-        for l:Buffer in range(1, bufnr('$'))
-            if l:Buffer != bufnr() && bufexists(l:Buffer) && bufname(l:Buffer) =~ '^\d\+ ' . bufname()
+        if (&filetype != 'man') | exec 'buffer! ' . winbufnr(first_man_window) | endif
+        exec 'Man ' . a:args
+        for bufnr in range(1, bufnr('$'))
+            if bufnr != bufnr() && bufexists(bufnr) && bufname(bufnr) =~ '^\d\+ ' . bufname()
                 execute 'bwipeout! %'
-                execute 'buffer! ' . l:Buffer
+                execute 'buffer! ' . bufnr
                 return
             endif
         endfor
     endif
 endfunction
 
-function! GetFirstManWindow()
-    for l:i in range(1, winnr('$'))
-        let l:Buffer = winbufnr(l:i)
-        if (getbufvar(l:Buffer,'&filetype') == 'man')
-            return l:i
+function! s:get_first_man_window()
+    for i in range(1, winnr('$'))
+        let bufnr = winbufnr(i)
+        if (getbufvar(bufnr,'&filetype') == 'man')
+            return i
         endif
     endfor
     return 0

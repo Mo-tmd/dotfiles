@@ -23,7 +23,7 @@ SetWorkTree="lua DiffToolState.work_tree='$WorkTree'"
 DiffToolCmd="DiffTool $LocalCopy $RemoteCopy"
 
 if [[ -n "$NVIM" ]]; then
-    nvr -cc "if mode()=='t' | let b:LeftInTerminalMode=1 | endif" \
+    nvr -cc "if mode()=='t' | let b:left_in_terminal_mode=1 | endif" \
         -cc "lua CloseDiffTool()" \
         -cc "tabnew" \
         -cc "$SetTmpDir" \

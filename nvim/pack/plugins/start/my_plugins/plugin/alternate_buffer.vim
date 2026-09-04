@@ -5,9 +5,9 @@
 "     window history.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! alternate_buffer#go()
-    let l:AlternateBuffer = alternate_buffer#get()
-    if l:AlternateBuffer != -1
-        execute 'buffer! ' . l:AlternateBuffer
+    let alternate_bufnr = alternate_buffer#get()
+    if alternate_bufnr != -1
+        execute 'buffer! ' . alternate_bufnr
         return 0
     else
         echohl ErrorMsg
@@ -18,10 +18,10 @@ function! alternate_buffer#go()
 endfunction
 
 function! alternate_buffer#get()
-    let l:Buffers = s:GlobalBufferHistory + get(s:WindowsBufferHistory,win_getid())
-    for l:Buffer in reverse(l:Buffers)
-        if bufexists(l:Buffer) && l:Buffer != bufnr()
-            return l:Buffer
+    let bufnrs = s:global_buffer_history + get(s:windows_buffer_history,win_getid())
+    for bufnr in reverse(bufnrs)
+        if bufexists(bufnr) && bufnr != bufnr()
+            return bufnr
         endif
     endfor
     return -1
@@ -37,13 +37,13 @@ endfunction
 " Keeps a window specific buffer history (buffers visited inside specific windows).
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! s:update_windows_buffer_history()
-    if !exists('s:WindowsBufferHistory') | let s:WindowsBufferHistory = {} | endif
-    let l:Win = win_getid()
-    let l:Buffer = bufnr()
-    let l:WindowBufferHistory= get(s:WindowsBufferHistory, l:Win, [])
-    call RemoveElement(l:WindowBufferHistory, l:Buffer)
-    call add(l:WindowBufferHistory, l:Buffer)
-    let s:WindowsBufferHistory[l:Win] = l:WindowBufferHistory
+    if !exists('s:windows_buffer_history') | let s:windows_buffer_history = {} | endif
+    let win = win_getid()
+    let bufnr = bufnr()
+    let window_buffer_history = get(s:windows_buffer_history, win, [])
+    call RemoveElement(window_buffer_history, bufnr)
+    call add(window_buffer_history, bufnr)
+    let s:windows_buffer_history[win] = window_buffer_history
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -51,8 +51,8 @@ endfunction
 " falls back to it if there are no existing buffers in the window specific history.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! s:update_global_buffer_history()
-    if !exists('s:GlobalBufferHistory') | let s:GlobalBufferHistory = [] | endif
-    let l:Buffer = bufnr()
-    call RemoveElement(s:GlobalBufferHistory, l:Buffer)
-    call add(s:GlobalBufferHistory, l:Buffer)
+    if !exists('s:global_buffer_history') | let s:global_buffer_history = [] | endif
+    let bufnr = bufnr()
+    call RemoveElement(s:global_buffer_history, bufnr)
+    call add(s:global_buffer_history, bufnr)
 endfunction

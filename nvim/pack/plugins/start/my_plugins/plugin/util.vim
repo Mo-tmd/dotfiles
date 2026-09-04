@@ -4,52 +4,52 @@
 " See https://superuser.com/a/935646
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! SystemCmd(...)
-    let l:Output = call('system', a:000)
-    return substitute(l:Output, '\n$', '', '')
+    let output = call('system', a:000)
+    return substitute(output, '\n$', '', '')
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Prints buffer variables and some 'famous' options/properties to a file.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! PrintBufferInfoToFile(FileName)
+function! PrintBufferInfoToFile(file_name)
     " Initialize an empty list to hold all lines of output
-    let l:Output = []
+    let output = []
 
     " Collect buffer-local variables
-    call add(l:Output, 'Buffer Variables:')
-    for l:Key in keys(b:)
-        call add(l:Output, l:Key . ': ' . string(get(b:, l:Key)))
+    call add(output, 'Buffer Variables:')
+    for key in keys(b:)
+        call add(output, key . ': ' . string(get(b:, key)))
     endfor
 
     " Collect buffer options and properties
-    call add(l:Output, '')
-    call add(l:Output, 'Buffer Options and Properties:')
-    call add(l:Output, 'bufhidden: ' . &l:bufhidden)
-    call add(l:Output, 'buflisted: ' . &l:buflisted)
-    call add(l:Output, 'bufname: ' . bufname())
-    call add(l:Output, 'buftype: ' . &l:buftype)
-    call add(l:Output, 'filetype: ' . &l:filetype)
-    call add(l:Output, 'modifiable: ' . &l:modifiable)
-    call add(l:Output, 'readonly: ' . &l:readonly)
-    call add(l:Output, 'swapfile: ' . &l:swapfile)
-    call add(l:Output, '-------------------------------')
+    call add(output, '')
+    call add(output, 'Buffer Options and Properties:')
+    call add(output, 'bufhidden: ' . &l:bufhidden)
+    call add(output, 'buflisted: ' . &l:buflisted)
+    call add(output, 'bufname: ' . bufname())
+    call add(output, 'buftype: ' . &l:buftype)
+    call add(output, 'filetype: ' . &l:filetype)
+    call add(output, 'modifiable: ' . &l:modifiable)
+    call add(output, 'readonly: ' . &l:readonly)
+    call add(output, 'swapfile: ' . &l:swapfile)
+    call add(output, '-------------------------------')
 
     " Write the output list to the specified file
-    call writefile(l:Output, a:FileName, 'a')
+    call writefile(output, a:file_name, 'a')
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Removes an element from a list or a blob.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! RemoveElement(ListOrBlob, Value, End=v:null)
-    let l:Index = index(a:ListOrBlob, a:Value)
-    if l:Index != -1
-        if a:End != v:null
-            return remove(a:ListOrBlob, l:Index, a:End)
+function! RemoveElement(list_or_blob, value, end=v:null)
+    let index = index(a:list_or_blob, a:value)
+    if index != -1
+        if a:end != v:null
+            return remove(a:list_or_blob, index, a:end)
         else
-            return remove(a:ListOrBlob, l:Index)
+            return remove(a:list_or_blob, index)
         endif
     else
-        return a:ListOrBlob
+        return a:list_or_blob
     endif
 endfunction

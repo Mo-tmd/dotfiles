@@ -45,7 +45,7 @@ alias suicide{separator}'pkill -u $USER'
 ################################################################################
 # Aliases for POSIX shells
 ################################################################################
-e() { [[ -n "$NVIM" ]] && nvr -cc "let b:LeftInTerminalMode=1" "$@" || nvim "$@"; }
+e() { [[ -n "$NVIM" ]] && nvr -cc "let b:left_in_terminal_mode=1" "$@" || nvim "$@"; }
 ra() { git restore --source="$1" --staged --worktree "$(git rev-parse --show-toplevel)" && git commit -m "Restore all files to $1"; }
 alias source_tmux_conf='[[ -n "$TMUX" ]] && tmux source-file ~/.tmux.conf'
 mywhich() { which $@ | sed 's/^\([^[:space:]]\)\+=//'; }
@@ -66,7 +66,7 @@ alias saf='source "$Dotfiles/shell/bash/rc.bash"; source_tmux_conf'
 ################################################################################
 # Aliases specific to tcsh
 ################################################################################
-alias e 'test $?NVIM -eq 1 && nvr -cc "let b:LeftInTerminalMode=1" \!* || nvim \!*'
+alias e 'test $?NVIM -eq 1 && nvr -cc "let b:left_in_terminal_mode=1" \!* || nvim \!*'
 alias ra 'git restore --source=\!:1 --staged --worktree "`git rev-parse --show-toplevel`" && git commit -m "Restore all files to \!:1"'
 alias source_tmux_conf 'test $?TMUX -eq 1 && tmux source-file ~/.tmux.conf'
 alias saf 'source "$Dotfiles/shell/tcsh/rc.tcsh"; source_tmux_conf'
