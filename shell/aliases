@@ -26,7 +26,8 @@ alias svg{separator}'git add -u; git commit -m "Save game"'
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 alias tma{separator}'tmux attach -t'
 alias tml{separator}'tmux list-sessions'
-alias tmkk{separator}'tmux_kill_session'
+alias tmk{separator}'tmux_kill_session'
+alias tmr{separator}'tmux_rename_session'
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Misc
