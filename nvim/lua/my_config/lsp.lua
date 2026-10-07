@@ -73,7 +73,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     -- diagnostics
     local on_jump = function() vim.diagnostic.open_float({focus=false}) end
-    local severity = {min=vim.diagnostic.severity.INFO}
+    local severity = {min=vim.diagnostic.severity.ERROR}
     vim.keymap.set("n", "]d", function() vim.diagnostic.jump({count=1,  on_jump=on_jump, severity=severity}) end, opts)
     vim.keymap.set("n", "[d", function() vim.diagnostic.jump({count=-1, on_jump=on_jump, severity=severity}) end, opts)
     vim.keymap.set("n", "]D", function() vim.diagnostic.jump({count=vim._maxint,  on_jump=on_jump, severity=severity, wrap=false}) end, opts)
