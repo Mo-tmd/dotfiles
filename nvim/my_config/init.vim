@@ -97,7 +97,10 @@ endfunction
 nnoremap <leader>sc :call <SID>scratch_buffer()<CR>
 function! s:scratch_buffer()
     let bufname = 'Scratch Buffer'
-    if GoToBuffer(bufname) != 'ok'
+    let bufnr = bufnr('^' . bufname . '$')
+    if bufnr > 0
+        execute 'buffer! ' . bufnr
+    else
         enew
         execute 'file ' . bufname
         setlocal buftype=nofile

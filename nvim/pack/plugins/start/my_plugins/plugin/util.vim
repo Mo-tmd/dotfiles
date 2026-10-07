@@ -53,3 +53,16 @@ function! RemoveElement(list_or_blob, value, end=v:null)
         return a:list_or_blob
     endif
 endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Renames a buffer and wipes the ghost buffer left behind, preserving
+" alternate buffer.
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! RenameBuffer(name)
+    let old_name = bufname()
+    let old_alt_bufnr = bufnr('#')
+    execute 'file ' . fnameescape(a:name)
+    let ghost_bufnr = bufnr('^' . old_name . '$')
+    if ghost_bufnr != -1 | execute 'bwipeout ' . ghost_bufnr | endif
+    if old_alt_bufnr != -1 | call setreg('#', old_alt_bufnr) | endif
+endfunction

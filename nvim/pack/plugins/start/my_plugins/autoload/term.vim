@@ -20,9 +20,12 @@ function! term#new(...)
         let start_actions = []
     endif
 
-    if GoToBuffer(bufname) != 'ok'
+    let bufnr = bufnr('^' . bufname . '$')
+    if bufnr > 0
+        execute 'buffer! ' . bufnr
+    else
         execute 'terminal'
-        execute 'file ' . bufname
+        call RenameBuffer(bufname)
         for mapping in s:my_terminal_mappings | execute mapping | endfor
         for start_action in start_actions
             call feedkeys(start_action . "\<CR>", 'n')
@@ -38,27 +41,6 @@ endfunction
 
 function! term#bufname(terminal_name)
     return 'Term: ' . a:terminal_name
-endfunction
-
-" * Go to a buffer and return 'ok' if it exists.
-" * Return 'error' if it doesn't exist.
-" * If the buffer exists and is neither loaded nor listed, kill the
-"   buffer and return 'error'.
-"   Don't know why this happens sometimes. Noticed this for terminals
-"   where it would go to the buffer, but it's not a terminal.
-function! GoToBuffer(bufname)
-    let bufnr = bufnr('^' . a:bufname . '$')
-    if bufnr > 0
-        if bufloaded(bufnr) || buflisted(bufnr)
-            execute 'buffer! ' . bufnr
-            return 'ok'
-        else
-            execute 'bwipeout ' . bufnr
-            return 'error'
-        endif
-    else
-        return 'error'
-    endif
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -91,47 +73,15 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup MaybeEnteredTerminalBuffer
     autocmd!
-    " The function s:maybe_entered_terminal_buffer relies on cursor position (line
-    " specifically). When triggered by BufEnter, line('.') always
-    " returns 1. This is probably because cursor hasn't been drawn yet or
-    " similar. So add a delay to solve.
-    " Update: this seems to also solve the issue where entering a terminal
-    " buffer through :Buffers doesn't enter terminal mode for some reason.
-    autocmd WinEnter,BufEnter * call timer_start(10, function('s:maybe_entered_terminal_buffer'))
+    autocmd WinEnter,BufEnter * call s:maybe_entered_terminal_buffer()
     autocmd TermOpen * startinsert
 augroup END
 
-function! s:maybe_entered_terminal_buffer(...)
-    if &buftype == 'terminal'
-        let first_time = !exists('b:not_first_time')
-        if (first_time)
-            startinsert
-            let b:not_first_time = 'true'
-        elseif exists('b:left_in_terminal_mode')
+function! s:maybe_entered_terminal_buffer()
+    if &buftype == 'terminal' && exists('b:left_in_terminal_mode')
             unlet b:left_in_terminal_mode
             startinsert
-        elseif (line('.') >= s:get_last_non_empty_line())
-            startinsert
-        endif
-    elseif &filetype != 'TelescopePrompt' && &filetype != 'alpha'
-        stopinsert
     endif
-endfunction
-
-function! s:get_last_non_empty_line()
-    " Start from the last line in the buffer
-    let last_line = line('$')
-
-    " Loop backwards until a non-empty line is found
-    while last_line > 0
-        if getline(last_line) != ''
-            return last_line
-        endif
-        let last_line -= 1
-    endwhile
-
-    " If no non-empty line is found, return 0
-    return 0
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
