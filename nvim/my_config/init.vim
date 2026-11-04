@@ -117,6 +117,10 @@ set autoread
 autocmd FocusGained,BufEnter,WinEnter,CursorHold,CursorHoldI * call timer_start(1, { -> execute('if getcmdwintype() == "" | checktime | endif') })
 
 au TermOpen * if bufname() !~# 'fzf' | setlocal number relativenumber | endif
+if has('win32') && executable('bash.exe')
+    set shell=bash.exe
+    set shellcmdflag=-c
+endif
 call term#define('<leader>td', 'Dotfiles', 'cd ~/dotfiles')
 
 function! PlugPostHooks()
